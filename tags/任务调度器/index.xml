@@ -6,14 +6,14 @@
         <description>Recent content in 任务调度器 on N1ntyNine99</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <copyright>Example Person</copyright>
+        <copyright>© 2025 N1ntyNine99. 保留所有权利。</copyright>
         <lastBuildDate>Thu, 21 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://example.com/tags/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>任务调度器</title>
         <link>https://example.com/p/%E8%B0%83%E5%BA%A6%E5%99%A8/</link>
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/%E8%B0%83%E5%BA%A6%E5%99%A8/</guid>
-        <description>&lt;h1 id=&#34;task-scheduler-任务调度器&#34;&gt;Task Scheduler 任务调度器
+        <description>&lt;img src="https://example.com/p/%E8%B0%83%E5%BA%A6%E5%99%A8/pic8.jpg" alt="Featured image of post 任务调度器" /&gt;&lt;h1 id=&#34;task-scheduler-任务调度器&#34;&gt;Task Scheduler 任务调度器
 &lt;/h1&gt;&lt;p&gt;一个轻量级、可配置的任务调度管理系统，专为嵌入式系统设计。支持多任务定时调度、优先级管理、动态调整和低功耗模式。&lt;/p&gt;
 &lt;h2 id=&#34;-功能特性&#34;&gt;📋 功能特性
 &lt;/h2&gt;&lt;ul&gt;

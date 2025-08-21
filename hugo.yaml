@@ -8,10 +8,16 @@ languageCode: en-us
 theme: hugo-theme-stack
 
 # 网站标题
-title: Example Site
+title: N1ntyNine99`s Blog
+
+author:
+  name: N1ntyNine99
+  email: 2570955716@qq.com
+  github: https://github.com/00lllooolll00
+  bilibili: https://space.bilibili.com/97101368
 
 # 版权信息
-copyright: Example Person
+copyright: "© 2025 N1ntyNine99. 保留所有权利。"
 
 # 主题国际化支持
 # 可用值: ar, bn, ca, de, el, en, es, fr, hu, id, it, ja, ko, nl, pt-br, th, uk, zh-cn, zh-hk, zh-tw
@@ -20,7 +26,7 @@ DefaultContentLanguage: zh-cn
 
 # 如果默认内容语言是中文、日文或韩文，设置为true
 # 这将使.Summary和.WordCount对CJK语言正确处理
-hasCJKLanguage: false
+hasCJKLanguage: true
 
 # 多语言配置
 languages:
@@ -74,7 +80,7 @@ params:
   rssFullContent: true
 
   # 网站图标路径
-  favicon: # 例如：将favicon.ico放在static目录下，设置为`/favicon.ico`
+  favicon: /favicon.ico # 将favicon.ico放在static目录下
 
   # 页脚配置
   footer:
@@ -240,9 +246,9 @@ params:
     content:
       enabled: true # 是否处理内容图片
 
-### 自定义菜单配置
-### 参考: https://stack.jimmycai.com/config/menu
-### 要移除关于、归档和搜索页面菜单项，请从它们的FrontMatter中删除`menu`字段
+# 自定义菜单配置
+# 参考: https://stack.jimmycai.com/config/menu
+# 要移除关于、归档和搜索页面菜单项，请从它们的FrontMatter中删除`menu`字段
 menu:
   main: [] # 主菜单（空数组表示使用默认配置）
 
@@ -275,18 +281,6 @@ related:
 # Markup配置（标记语言处理）
 markup:
   goldmark:
-    extensions:
-      passthrough:
-        enable: true # 启用直通扩展
-        delimiters:
-          block:
-            - - \[
-              - \]
-            - - $$
-              - $$
-          inline:
-            - - \(
-              - \)
     renderer:
       unsafe: true # 是否允许在Markdown中使用HTML
   tableOfContents:
@@ -301,3 +295,8 @@ markup:
     lineNos: true # 是否显示行号
     lineNumbersInTable: true # 是否在表格中显示行号
     tabWidth: 4 # 制表符宽度
+
+# 数学公式支持（推荐使用Hugo内置的数学模块）
+math:
+  enable: true
+  format: "mathjax" # 或 'katex'

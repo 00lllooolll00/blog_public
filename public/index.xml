@@ -6,14 +6,14 @@
         <description>Recent content on N1ntyNine99</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <copyright>Example Person</copyright>
+        <copyright>© 2025 N1ntyNine99. 保留所有权利。</copyright>
         <lastBuildDate>Thu, 21 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>GD25Q40E驱动</title>
         <link>https://example.com/p/gd25q40e/</link>
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/gd25q40e/</guid>
-        <description>&lt;h1 id=&#34;gd25q40e-flash-存储器驱动&#34;&gt;GD25Q40E Flash 存储器驱动
+        <description>&lt;img src="https://example.com/p/gd25q40e/pic2.jpg" alt="Featured image of post GD25Q40E驱动" /&gt;&lt;h1 id=&#34;gd25q40e-flash-存储器驱动&#34;&gt;GD25Q40E Flash 存储器驱动
 &lt;/h1&gt;&lt;p&gt;一个针对兆易创新 GD25Q40E 4Mbit SPI Flash 存储器的完整驱动程序，支持标准的 SPI 接口通信和各种存储操作。&lt;/p&gt;
 &lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;ul&gt;
@@ -392,7 +392,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/hwt101/</guid>
-        <description>&lt;h1 id=&#34;hwt101-陀螺仪模块移植指南&#34;&gt;HWT101 陀螺仪模块移植指南
+        <description>&lt;img src="https://example.com/p/hwt101/HWT101.jpg" alt="Featured image of post HWT101 驱动" /&gt;&lt;h1 id=&#34;hwt101-陀螺仪模块移植指南&#34;&gt;HWT101 陀螺仪模块移植指南
 &lt;/h1&gt;&lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://example.com/code/HWT101/HWT101.c&#34; &gt;HWT101.c&lt;/a&gt;&lt;/li&gt;
@@ -619,7 +619,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/oled/</guid>
-        <description>&lt;h1 id=&#34;oled-096寸-dma驱动库使用说明-iic--spi-版本&#34;&gt;OLED 0.96寸 DMA驱动库使用说明 (IIC &amp;amp; SPI 版本)
+        <description>&lt;img src="https://example.com/p/oled/OLED.jpg" alt="Featured image of post OLED DMA高刷驱动" /&gt;&lt;h1 id=&#34;oled-096寸-dma驱动库使用说明-iic--spi-版本&#34;&gt;OLED 0.96寸 DMA驱动库使用说明 (IIC &amp;amp; SPI 版本)
 &lt;/h1&gt;&lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;h3 id=&#34;spi版本&#34;&gt;SPI版本
 &lt;/h3&gt;&lt;p&gt;&lt;strong&gt;注意:SPI版本目前还有问题，在显示大型图片会不稳定&lt;/strong&gt;&lt;/p&gt;
@@ -1266,7 +1266,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/rust-self-teach/</guid>
-        <description>&lt;p&gt;[TOC]&lt;/p&gt;
+        <description>&lt;img src="https://example.com/p/rust-self-teach/rust-2.jpg" alt="Featured image of post Rust自学笔记" /&gt;&lt;p&gt;[TOC]&lt;/p&gt;
 &lt;h1 id=&#34;chapter-1-cargorust-的包管理器&#34;&gt;Chapter 1: Cargo——Rust 的包管理器
 &lt;/h1&gt;&lt;p&gt;&lt;strong&gt;Cargo 是 Rust 的一个强大的包管理器，通过 cargo 可以快速构建一个结构完整的 Rust 项目，并且通过命令行来编译运行项目&lt;/strong&gt;&lt;/p&gt;
 &lt;h2 id=&#34;1cargo-new&#34;&gt;1.cargo new
@@ -1337,7 +1337,7 @@
 &lt;/h2&gt;&lt;p&gt;&lt;strong&gt;作为一个输出语句，Rust 标准的输出语句是 &lt;code&gt;println&lt;/code&gt;，没有 &lt;code&gt;!&lt;/code&gt;, 这个感叹号的意思是这是一个 &lt;em&gt;“宏(marco)”&lt;/em&gt;，而非一个函数。而 &lt;code&gt;println!&lt;/code&gt; 的标准占位符是 &lt;code&gt;{}&lt;/code&gt;，具体用法后文再提。&lt;/strong&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2 id=&#34;24let&#34;&gt;2.4.let
-&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;在 Rust 中，&lt;code&gt;let&lt;/code&gt; 用来声明一个变量，比如 &lt;code&gt;let apple = 5;&lt;/code&gt; 在这个语句中，我们声明了一个变量名为 &lt;code&gt;apple&lt;/code&gt;，其值为 5 的一个变量。在 Rust 中，如果不做说明，则默认声明的变量是一个 &lt;em&gt;“不可变的(immutable)”&lt;/em&gt;。意思就是，在我们声明了这个 &lt;code&gt;apple&lt;/code&gt; 之后，是没有办法修改其值 5 的，编译器会报错，如下图所示&lt;/strong&gt;：&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250808172150285.png&#34;
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;在 Rust 中，&lt;code&gt;let&lt;/code&gt; 用来声明一个变量，比如 &lt;code&gt;let apple = 5;&lt;/code&gt; 在这个语句中，我们声明了一个变量名为 &lt;code&gt;apple&lt;/code&gt;，其值为 5 的一个变量。在 Rust 中，如果不做说明，则默认声明的变量是一个 &lt;em&gt;“不可变的(immutable)”&lt;/em&gt;。意思就是，在我们声明了这个 &lt;code&gt;apple&lt;/code&gt; 之后，是没有办法修改其值 5 的，编译器会报错，如下图所示&lt;/strong&gt;：&lt;img src=&#34;https://example.com/index.assets/image-20250808172150285.png&#34;
 	
 	
 	
@@ -1347,7 +1347,7 @@
 	
 	
 &gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;我们现在删除修改其值的语句之后再次编译会发现就可以成功通过编译并且运行:&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250808172245539.png&#34;
+&lt;p&gt;&lt;strong&gt;我们现在删除修改其值的语句之后再次编译会发现就可以成功通过编译并且运行:&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250808172245539.png&#34;
 	
 	
 	
@@ -1357,7 +1357,7 @@
 	
 	
 &gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;如果所有的变量都是不可变的，那 Rust 也太鸡肋了，所以官方有一个关键字 &lt;code&gt;mut&lt;/code&gt;，来声明这个变量是 &lt;em&gt;“可变的(mutable)”&lt;/em&gt;，在声明变量的时候加上这个关键字就可以告知编译器，当前这个变量是一个可变的变量。如下图所示:&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250808172653364.png&#34;
+&lt;p&gt;&lt;strong&gt;如果所有的变量都是不可变的，那 Rust 也太鸡肋了，所以官方有一个关键字 &lt;code&gt;mut&lt;/code&gt;，来声明这个变量是 &lt;em&gt;“可变的(mutable)”&lt;/em&gt;，在声明变量的时候加上这个关键字就可以告知编译器，当前这个变量是一个可变的变量。如下图所示:&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250808172653364.png&#34;
 	
 	
 	
@@ -1448,7 +1448,7 @@
 &lt;/div&gt;
 &lt;/div&gt;&lt;hr&gt;
 &lt;h2 id=&#34;28-导入外部-crate&#34;&gt;2.8 导入外部 crate
-&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;在使用 rand 生成随机数之前，我们首先需要修改 &lt;em&gt;Cargo.toml&lt;/em&gt;，把 rand 添加到我们的“&lt;em&gt;依赖（dependencies）&lt;/em&gt;”中&lt;/strong&gt;：&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250808184006422.png&#34;
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;在使用 rand 生成随机数之前，我们首先需要修改 &lt;em&gt;Cargo.toml&lt;/em&gt;，把 rand 添加到我们的“&lt;em&gt;依赖（dependencies）&lt;/em&gt;”中&lt;/strong&gt;：&lt;img src=&#34;https://example.com/index.assets/image-20250808184006422.png&#34;
 	
 	
 	
@@ -1459,7 +1459,7 @@
 	
 &gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;其中格式为“crate 名 + 版本号”（Rust 中的 crates 可以简单理解为外部库），这里的 &lt;em&gt;0.8.5&lt;/em&gt; 是 &lt;em&gt;^0.8.5&lt;/em&gt; 的简写，意味着任何低于 &lt;em&gt;0.9&lt;/em&gt; 但是高于等于 &lt;em&gt;0.8.5&lt;/em&gt; 的版本。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;接下来不对代码做任何修改，直接编译运行，我们会发现，它在自己下载相关依赖并且重新编译：&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250808184537246.png&#34;
+&lt;p&gt;&lt;strong&gt;接下来不对代码做任何修改，直接编译运行，我们会发现，它在自己下载相关依赖并且重新编译：&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250808184537246.png&#34;
 	
 	
 	
@@ -1563,7 +1563,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;首先我们先导入 &lt;code&gt;cmp&lt;/code&gt; 库中的 &lt;code&gt;Ordering&lt;/code&gt; 模块，&lt;code&gt;Ordering&lt;/code&gt; 本质也是一个枚举，拥有 &lt;code&gt;Equal&lt;/code&gt;, &lt;code&gt;Greater&lt;/code&gt;, &lt;code&gt;Less&lt;/code&gt; 三个值。&lt;code&gt;match&lt;/code&gt; 在这里的作用是根据后面的 &lt;code&gt;Ordering&lt;/code&gt; 的值来匹配执行不同的语句，类似与 C 语言中的 &lt;code&gt;switch case&lt;/code&gt; 语句，它是顺序依次匹配。而不同的返回值对应的执行语句则是通过 &lt;code&gt;=&amp;gt;&lt;/code&gt; 来引出。我们通过 &lt;code&gt;.cmp&lt;/code&gt; 方法来比较 &lt;code&gt;guess&lt;/code&gt; 和 &lt;code&gt;secret_number&lt;/code&gt; 的值, 并且返回对应的 &lt;code&gt;Ordering&lt;/code&gt; 的枚举值。注意，&lt;code&gt;.cmp&lt;/code&gt; 中应当使用 &lt;code&gt;&amp;amp;&lt;/code&gt; 来引用，而不是直接通过传入变量名来比较！&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;接下来我们编译运行，会发现运行报错：&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250808194017191.png&#34;
+&lt;p&gt;&lt;strong&gt;接下来我们编译运行，会发现运行报错：&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250808194017191.png&#34;
 	
 	
 	
@@ -1632,7 +1632,7 @@
 &lt;p&gt;[!NOTE]&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;parse&lt;/code&gt; 方法只适用于逻辑上可以转换为数字的字符，因此很容易导致错误。例如，如果字符串包含 &lt;code&gt;A👍%&lt;/code&gt; ，则无法将其转换为数字。由于它可能会失败， &lt;code&gt;parse&lt;/code&gt; 方法返回 &lt;code&gt;Result&lt;/code&gt; 类型，就像 &lt;code&gt;read_line&lt;/code&gt; 方法一样。我们将以相同的方式处理这个 &lt;code&gt;Result&lt;/code&gt; ，再次使用 &lt;code&gt;expect&lt;/code&gt; 方法。如果 &lt;code&gt;parse&lt;/code&gt; 因为无法从字符串中创建数字而返回 &lt;code&gt;Err&lt;/code&gt; ， &lt;code&gt;expect&lt;/code&gt; 调用将崩溃游戏并打印我们给它的消息。如果 &lt;code&gt;parse&lt;/code&gt; 成功将字符串转换为数字，它将返回 &lt;code&gt;Ok&lt;/code&gt; 变体的 &lt;code&gt;Result&lt;/code&gt; ，而 &lt;code&gt;expect&lt;/code&gt; 将返回我们从 &lt;code&gt;Ok&lt;/code&gt; 值中想要的数字。&lt;/p&gt;&lt;/blockquote&gt;
 &lt;p&gt;&lt;strong&gt;接下来我们直接编译并且运行代码，会发现代码成功运行起来了：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250808202343869.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250808202343869.png&#34;
 	
 	
 	
@@ -1916,7 +1916,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spaces&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;spaces&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;len&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250809005540559.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250809005540559.png&#34;
 	
 	
 	
@@ -2222,7 +2222,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译上面这段代码会如下报错:&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250810011314872.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译上面这段代码会如下报错:&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250810011314872.png&#34;
 	
 	
 	
@@ -2329,7 +2329,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;如果我们输入的索引值超过了 4，那么就会看到如下报错：&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250809023517322.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;如果我们输入的索引值超过了 4，那么就会看到如下报错：&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250809023517322.png&#34;
 	
 	
 	
@@ -2453,7 +2453,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;在这段代码中我们直接指定 &lt;code&gt;y&lt;/code&gt; 的数据类型是 &lt;code&gt;str&lt;/code&gt; 字符串型，然后在调用函数的时候传入我们想要的字符串即可，可是我们编译运行发现不能通过编译。编译器报错如下图：&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250809195750334.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;在这段代码中我们直接指定 &lt;code&gt;y&lt;/code&gt; 的数据类型是 &lt;code&gt;str&lt;/code&gt; 字符串型，然后在调用函数的时候传入我们想要的字符串即可，可是我们编译运行发现不能通过编译。编译器报错如下图：&lt;img src=&#34;https://example.com/index.assets/image-20250809195750334.png&#34;
 	
 	
 	
@@ -2527,7 +2527,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250809202137910.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250809202137910.png&#34;
 	
 	
 	
@@ -2658,7 +2658,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译后运行发现:&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250809204313039.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译后运行发现:&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250809204313039.png&#34;
 	
 	
 	
@@ -2817,7 +2817,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译运行这段代码会发现编译器报错如下:&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250809221653397.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250809221653397.png&#34;
 	
 	
 	
@@ -2900,7 +2900,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;上述代码中，程序从终端中读取一个值，如果这个值不是一个数字，那么就会让程序回到循环开始再次读取，直到读取到一个数字。之使用这个输入的数字与 100 做比较，通过 &lt;code&gt;if-else&lt;/code&gt; 与表达式结合，来对布尔类型的变量 &lt;code&gt;condition&lt;/code&gt; 赋值，最后打印出对应的消息然后终止循环。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;在这里我们就把 &lt;code&gt;if-else&lt;/code&gt; 分支巧妙的与赋值语句结合在一起了，让程序更加清晰和明了。但是，上述例子中的两个分支的值都是整型，如果两个分支的类型不同，编译器将会报错。例如我把 &lt;code&gt;false&lt;/code&gt; 变成 &lt;code&gt;0&lt;/code&gt;。编译后会发现如下报错：&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250809223557297.png&#34;
+&lt;p&gt;&lt;strong&gt;在这里我们就把 &lt;code&gt;if-else&lt;/code&gt; 分支巧妙的与赋值语句结合在一起了，让程序更加清晰和明了。但是，上述例子中的两个分支的值都是整型，如果两个分支的类型不同，编译器将会报错。例如我把 &lt;code&gt;false&lt;/code&gt; 变成 &lt;code&gt;0&lt;/code&gt;。编译后会发现如下报错：&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250809223557297.png&#34;
 	
 	
 	
@@ -2994,7 +2994,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;外层循环有标签 &lt;code&gt;&#39;outter_loop_label&lt;/code&gt; ，它会从 0 计数到 2。内层循环没有标签，会从 10 计数到 9。第一个没有指定标签的 &lt;code&gt;break&lt;/code&gt; 只会退出内层循环。 &lt;code&gt;break &#39;outter_loop_label;&lt;/code&gt; 语句会退出外层循环。这段代码打印：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250809231633908.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250809231633908.png&#34;
 	
 	
 	
@@ -3031,7 +3031,7 @@
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;这段代码中，我们设定了一个倒计时值 &lt;code&gt;loop_count&lt;/code&gt;，循环体内我们就打印当前的这个倒计时值。当这个倒计时值不为 0 的时候，我们就执行循环。结束循环之后就让程序提示我们循环结束了。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;执行效果如下:&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250810010005451.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250810010005451.png&#34;
 	
 	
 	
@@ -3070,7 +3070,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译运行结果如下：&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250810011740719.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译运行结果如下：&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250810011740719.png&#34;
 	
 	
 	
@@ -3141,7 +3141,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;在这里，我们使用了 &lt;code&gt;for&lt;/code&gt; 循环先正着从 1 到 9，然后从 9 走到 1。在 Rust 中，&lt;code&gt;（x..y）&lt;/code&gt; 的含义是[x, y)，左闭右开。而我们看见的 &lt;code&gt;rec()&lt;/code&gt; 方法，是将一个序列按照他的反方向读取。所以编译运行之后就可以看见如下情况：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250810022509232.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250810022509232.png&#34;
 	
 	
 	
@@ -3507,10 +3507,10 @@
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;这看起来非常相似，所以我们可能会假设它的工作方式是相同的：也就是说，第三行会复制 &lt;code&gt;s1&lt;/code&gt; 中的值并将其绑定到 &lt;code&gt;s2&lt;/code&gt; 。但这并不是实际发生的真实情况。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;看看下图，了解 String 在底层发生了什么。一个 String 由三个部分组成，如图左侧所示：一个指向存储字符串内容的内存的指针、一个长度和一个容量(&lt;em&gt;capacity&lt;/em&gt;)。这组数据存储在栈上。右侧是存储内容的堆内存。&lt;/strong&gt;&lt;/p&gt;
-&lt;img src=&#34;./Self%20Teach%20Rust.assets/image-20250811014919964.png&#34; alt=&#34;image-20250811014919964&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;img src=&#34;./index.assets/image-20250811014919964.png&#34; alt=&#34;image-20250811014919964&#34; style=&#34;zoom:50%;&#34; /&gt;
 &lt;p&gt;&lt;strong&gt;长度是指 &lt;code&gt;String&lt;/code&gt; 的内容目前使用的内存大小（以字节为单位）。容量是指 &lt;code&gt;String&lt;/code&gt; 从分配器那里获得的内存总大小（以字节为单位）。长度和容量之间的差异很重要，但在当前上下文中并不重要，因此暂时可以忽略容量。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;当我们把 &lt;code&gt;s1&lt;/code&gt; 赋值给 &lt;code&gt;s2&lt;/code&gt; 时， &lt;code&gt;String&lt;/code&gt; 数据会被复制，这意味着我们复制了栈上的指针、长度和容量。我们不会复制指针所指向的堆上的数据。&lt;/strong&gt;&lt;/p&gt;
-&lt;img src=&#34;./Self%20Teach%20Rust.assets/image-20250811015010434.png&#34; alt=&#34;image-20250811015010434&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;img src=&#34;./index.assets/image-20250811015010434.png&#34; alt=&#34;image-20250811015010434&#34; style=&#34;zoom:50%;&#34; /&gt;
 &lt;p&gt;&lt;strong&gt;之前，我们说过当变量超出作用域时，Rust 会自动调用 &lt;code&gt;drop&lt;/code&gt; 函数并清理该变量的堆内存。但上图显示两个数据指针都指向相同的位置。这是一个问题：当 &lt;code&gt;s2&lt;/code&gt; 和 &lt;code&gt;s1&lt;/code&gt; 超出作用域时，它们都会尝试释放同一块内存。这被称为双重释放错误，也是我们之前提到的内存安全漏洞之一。重复释放内存会导致内存损坏，这可能会引发安全漏洞。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;为确保内存安全，在行 &lt;code&gt;let s2 = s1;&lt;/code&gt; 之后，Rust 将 &lt;code&gt;s1&lt;/code&gt; 视为不再有效。因此，当 &lt;code&gt;s1&lt;/code&gt; 超出作用域时，Rust 无需释放任何内容。看看在 &lt;code&gt;s2&lt;/code&gt; 创建后尝试使用 &lt;code&gt;s1&lt;/code&gt; 会发生什么；它将无法工作：&lt;/strong&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -3532,7 +3532,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;你会得到类似这样的错误，因为 Rust 阻止你使用失效的引用：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250811015227556.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250811015227556.png&#34;
 	
 	
 	
@@ -3567,7 +3567,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;我们最初声明一个变量 &lt;code&gt;s&lt;/code&gt; 并将其绑定到值为 &lt;code&gt;&amp;quot;hello&amp;quot;&lt;/code&gt; 的 &lt;code&gt;String&lt;/code&gt; 。然后我们立即创建一个新的 &lt;code&gt;String&lt;/code&gt; ，其值为 &lt;code&gt;&amp;quot;ahoy&amp;quot;&lt;/code&gt; ，并将其赋给 &lt;code&gt;s&lt;/code&gt; 。此时，没有任何东西再引用堆上的原始值了。&lt;/strong&gt;&lt;/p&gt;
-&lt;img src=&#34;./Self%20Teach%20Rust.assets/image-20250811015904941.png&#34; alt=&#34;image-20250811015904941&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;img src=&#34;./index.assets/image-20250811015904941.png&#34; alt=&#34;image-20250811015904941&#34; style=&#34;zoom:50%;&#34; /&gt;
 &lt;p&gt;&lt;strong&gt;因此原始字符串立即超出作用域。Rust 会运行 &lt;code&gt;drop&lt;/code&gt; 函数处理它，并且内存会立即释放。当我们最后打印这个值时，它将是 &lt;code&gt;&amp;quot;ahoy, world!&amp;quot;&lt;/code&gt; 。&lt;/strong&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;417-克隆clone&#34;&gt;4.1.7 克隆（&lt;em&gt;Clone&lt;/em&gt;）
@@ -3821,7 +3821,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;首先，请注意变量声明和函数返回值中的所有元组代码都不见了。其次，请注意我们将 &lt;code&gt;&amp;amp;s&lt;/code&gt; 传递给 &lt;code&gt;calculate_length&lt;/code&gt; ，在其定义中，我们使用 &lt;code&gt;&amp;amp;String&lt;/code&gt; 而不是 &lt;code&gt;String&lt;/code&gt; 。这些 &lt;code&gt;&amp;amp;&lt;/code&gt; 代表引用，它们允许你在不拥有值的情况下引用它。具体关系如下图所示：&lt;/strong&gt;&lt;/p&gt;
-&lt;img src=&#34;./Self%20Teach%20Rust.assets/image-20250811205245044.png&#34; alt=&#34;image-20250811205245044&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;img src=&#34;./index.assets/image-20250811205245044.png&#34; alt=&#34;image-20250811205245044&#34; style=&#34;zoom:50%;&#34; /&gt;
 &lt;blockquote&gt;
 &lt;p&gt;[!NOTE]&lt;/p&gt;
 &lt;p&gt;使用 &lt;code&gt;&amp;amp;&lt;/code&gt; 进行引用的反操作是解引用，这通过解引用操作符 &lt;code&gt;*&lt;/code&gt; 完成。&lt;/p&gt;&lt;/blockquote&gt;
@@ -3868,7 +3868,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;在这个代码中，我们将 &lt;code&gt;s1&lt;/code&gt; 的 &lt;code&gt;String&lt;/code&gt; 借用给了函数 &lt;code&gt;change&lt;/code&gt; 中的 &lt;code&gt;s&lt;/code&gt;，并尝试在 &lt;code&gt;s&lt;/code&gt; 的作用域中修改 &lt;code&gt;String&lt;/code&gt;，但是编译后会发现如下报错：&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250811210319483.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;在这个代码中，我们将 &lt;code&gt;s1&lt;/code&gt; 的 &lt;code&gt;String&lt;/code&gt; 借用给了函数 &lt;code&gt;change&lt;/code&gt; 中的 &lt;code&gt;s&lt;/code&gt;，并尝试在 &lt;code&gt;s&lt;/code&gt; 的作用域中修改 &lt;code&gt;String&lt;/code&gt;，但是编译后会发现如下报错：&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250811210319483.png&#34;
 	
 	
 	
@@ -3928,7 +3928,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;其报错的代码如下：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250811212942956.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250811212942956.png&#34;
 	
 	
 	
@@ -4000,7 +4000,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译结果如下：&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250811212254540.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译结果如下：&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250811212254540.png&#34;
 	
 	
 	
@@ -4039,7 +4039,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//此时已经超出s的作用域，s将被编译器drop 所以返回给调用变量的是一个悬挂引用
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译报错的结果如下：&lt;/strong&gt; &lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250811223937514.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译报错的结果如下：&lt;/strong&gt; &lt;img src=&#34;https://example.com/index.assets/image-20250811223937514.png&#34;
 	
 	
 	
@@ -4186,7 +4186,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;切片不是对一整个字符串的引用，而是其的一部分。比如说“hello”在字符串中的切片就是从第 0 个字符到第 5 个字符，不包含第五个字符。所以它是 &lt;code&gt;&amp;amp;s[0..5]&lt;/code&gt;。一个字符切片的格式就是你想要切片的字符串的引用加上 &lt;code&gt;[start_index..end_index]&lt;/code&gt;，其中 &lt;code&gt;start_index&lt;/code&gt; 是第一个字符的位置，而 &lt;code&gt;end_index&lt;/code&gt; 是最后一个字符的后一个位置（因为 Rust 总是左开右闭）。在字符串切片的内部，存储着两个信息，第一是切片开始的位置，第二个是字符长度，通过 &lt;code&gt;end_index&lt;/code&gt; 减去 &lt;code&gt;start_index&lt;/code&gt; 得到。所以在 &lt;code&gt;let world = &amp;amp;s[6..11]&lt;/code&gt; 之中的 &lt;code&gt;world&lt;/code&gt;，就是一个包含一个指向 &lt;code&gt;s&lt;/code&gt; 的第 6 个字符，并且长度为 5 的指针。具体如下图所示：&lt;/strong&gt;&lt;/p&gt;
-&lt;img src=&#34;./Self%20Teach%20Rust.assets/image-20250812220743608.png&#34; alt=&#34;image-20250812220743608&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;img src=&#34;./index.assets/image-20250812220743608.png&#34; alt=&#34;image-20250812220743608&#34; style=&#34;zoom:50%;&#34; /&gt;
 &lt;p&gt;&lt;strong&gt;在 Rust 的 &lt;code&gt;..&lt;/code&gt; 表达中，如果这个序列是从 0 开始的，那么 0 是可以省略，意味着下面两个表述是等价的：&lt;/strong&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -4318,7 +4318,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250812224455938.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250812224455938.png&#34;
 	
 	
 	
@@ -4651,7 +4651,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;你会得到如下的报错：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250813231404176.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250813231404176.png&#34;
 	
 	
 	
@@ -4691,7 +4691,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译结果如下：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250814000247052.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250814000247052.png&#34;
 	
 	
 	
@@ -4810,7 +4810,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;会得到如下报错：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250814012949149.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250814012949149.png&#34;
 	
 	
 	
@@ -4855,7 +4855,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译后依旧报错：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250814013301343.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250814013301343.png&#34;
 	
 	
 	
@@ -4901,7 +4901,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;加上之后再次编译运行代码就会看到如下输出：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250814013914634.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250814013914634.png&#34;
 	
 	
 	
@@ -4912,7 +4912,7 @@
 	
 &gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;太好了！虽然输出不是最美观的，但它显示了该实例中所有字段的值，这在调试时肯定会有帮助。当我们的结构体更复杂时，有一个更易于阅读的输出会很有用；在这种情况下，我们可以在 &lt;code&gt;println!&lt;/code&gt; 字符串中使用 &lt;code&gt;{:#?}&lt;/code&gt; 而不是 &lt;code&gt;{:?}&lt;/code&gt; 。在这个例子中，使用 &lt;code&gt;{:#?}&lt;/code&gt; 风格将输出以下内容：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250814014117763.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250814014117763.png&#34;
 	
 	
 	
@@ -4964,7 +4964,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;我们可以将 &lt;code&gt;dbg!&lt;/code&gt; 宏包裹在表达式 &lt;code&gt;30f64 * scale&lt;/code&gt; 外围，由于 &lt;code&gt;dbg!&lt;/code&gt; 会返回该表达式的值的所有权（即不影响原值传递），因此 &lt;code&gt;width&lt;/code&gt; 字段最终获得的值就和没有调用 &lt;code&gt;dbg!&lt;/code&gt; 时完全一样。在接下来的调用中，我们不希望 &lt;code&gt;dbg!&lt;/code&gt; 获取 &lt;code&gt;rect1&lt;/code&gt; 的所有权，所以传入的是 &lt;code&gt;rect1&lt;/code&gt; 的引用。以下是这个示例的输出结果：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250814014932344.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250814014932344.png&#34;
 	
 	
 	
@@ -5076,7 +5076,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;运行结果如下：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250814021437696.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250814021437696.png&#34;
 	
 	
 	
@@ -5241,7 +5241,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;输出结果如下：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250814023015365.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250814023015365.png&#34;
 	
 	
 	
@@ -5649,7 +5649,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;运行这段代码的报错如下：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250815231230434.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250815231230434.png&#34;
 	
 	
 	
@@ -5883,7 +5883,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译运行会发现如下报错：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250816014455172.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250816014455172.png&#34;
 	
 	
 	
@@ -6477,7 +6477,7 @@
 &lt;/ol&gt;
 &lt;p&gt;&lt;strong&gt;一般来说，我们更倾向于使用绝对路径，因为在代码重构时，项的定义位置和调用位置往往需要独立调整。这就像在文件系统中使用绝对路径能更好地适应目录结构调整一样，能显著提升代码的可维护性。&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;我们编译上述代码会发现：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250817005847486.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250817005847486.png&#34;
 	
 	
 	
@@ -6526,7 +6526,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;但是编译后发现依旧报错：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250818215342184.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250818215342184.png&#34;
 	
 	
 	
@@ -6771,7 +6771,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译后如下报错：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250819012432756.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250819012432756.png&#34;
 	
 	
 	
@@ -7178,7 +7178,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译后的结果是：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250820015816914.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250820015816914.png&#34;
 	
 	
 	
@@ -7552,7 +7552,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译这段代码，会发现如下报错：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250820200238993.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250820200238993.png&#34;
 	
 	
 	
@@ -7691,7 +7691,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;编译结果如下：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250820203248384.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250820203248384.png&#34;
 	
 	
 	
@@ -7959,7 +7959,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;如果解除注释之后再编译，会发现如下报错：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://example.com/Self%20Teach%20Rust.assets/image-20250821005422935.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://example.com/index.assets/image-20250821005422935.png&#34;
 	
 	
 	
@@ -8195,7 +8195,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/%E4%B8%B2%E5%8F%A3/</guid>
-        <description>&lt;h1 id=&#34;串口通信模块使用说明&#34;&gt;串口通信模块使用说明
+        <description>&lt;img src="https://example.com/p/%E4%B8%B2%E5%8F%A3/pic3.jpg" alt="Featured image of post 串口格式化发送&#43;环形缓冲区" /&gt;&lt;h1 id=&#34;串口通信模块使用说明&#34;&gt;串口通信模块使用说明
 &lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
 &lt;/h2&gt;&lt;p&gt;本模块实现了一个功能完整的串口通信系统，支持环形缓冲区数据管理、DMA数据传输、格式化输出以及数据帧解析功能。适用于STM32等嵌入式系统的串口通信需求。&lt;/p&gt;
 &lt;h2 id=&#34;源码下载地址&#34;&gt;源码下载地址
@@ -8814,7 +8814,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/%E6%BB%A4%E6%B3%A2%E5%99%A8/</guid>
-        <description>&lt;h1 id=&#34;myfilter---嵌入式信号处理滤波器库&#34;&gt;MyFilter - 嵌入式信号处理滤波器库
+        <description>&lt;img src="https://example.com/p/%E6%BB%A4%E6%B3%A2%E5%99%A8/pic5.jpg" alt="Featured image of post 滤波器" /&gt;&lt;h1 id=&#34;myfilter---嵌入式信号处理滤波器库&#34;&gt;MyFilter - 嵌入式信号处理滤波器库
 &lt;/h1&gt;&lt;p&gt;一个轻量级、高性能的嵌入式信号处理滤波器库，提供四种常用的数字滤波器实现，适用于各种嵌入式系统的信号处理需求。&lt;/p&gt;
 &lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;ul&gt;
@@ -9146,7 +9146,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/%E5%86%85%E5%AD%98%E6%B1%A0/</guid>
-        <description>&lt;h1 id=&#34;内存池管理库-poolcpoolh&#34;&gt;内存池管理库 (Pool.c/Pool.h)
+        <description>&lt;img src="https://example.com/p/%E5%86%85%E5%AD%98%E6%B1%A0/pic6.png" alt="Featured image of post 嵌入式系统内存池" /&gt;&lt;h1 id=&#34;内存池管理库-poolcpoolh&#34;&gt;内存池管理库 (Pool.c/Pool.h)
 &lt;/h1&gt;&lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://example.com/code/Pool/Pool.c&#34; &gt;Pool.c&lt;/a&gt;&lt;/li&gt;
@@ -9307,7 +9307,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/%E8%B0%83%E5%BA%A6%E5%99%A8/</guid>
-        <description>&lt;h1 id=&#34;task-scheduler-任务调度器&#34;&gt;Task Scheduler 任务调度器
+        <description>&lt;img src="https://example.com/p/%E8%B0%83%E5%BA%A6%E5%99%A8/pic8.jpg" alt="Featured image of post 任务调度器" /&gt;&lt;h1 id=&#34;task-scheduler-任务调度器&#34;&gt;Task Scheduler 任务调度器
 &lt;/h1&gt;&lt;p&gt;一个轻量级、可配置的任务调度管理系统，专为嵌入式系统设计。支持多任务定时调度、优先级管理、动态调整和低功耗模式。&lt;/p&gt;
 &lt;h2 id=&#34;-功能特性&#34;&gt;📋 功能特性
 &lt;/h2&gt;&lt;ul&gt;

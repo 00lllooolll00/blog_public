@@ -6,14 +6,14 @@
         <description>Recent content in 嵌入式 on N1ntyNine99</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <copyright>Example Person</copyright>
+        <copyright>© 2025 N1ntyNine99. 保留所有权利。</copyright>
         <lastBuildDate>Thu, 21 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://example.com/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>GD25Q40E驱动</title>
         <link>https://example.com/p/gd25q40e/</link>
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/gd25q40e/</guid>
-        <description>&lt;h1 id=&#34;gd25q40e-flash-存储器驱动&#34;&gt;GD25Q40E Flash 存储器驱动
+        <description>&lt;img src="https://example.com/p/gd25q40e/pic2.jpg" alt="Featured image of post GD25Q40E驱动" /&gt;&lt;h1 id=&#34;gd25q40e-flash-存储器驱动&#34;&gt;GD25Q40E Flash 存储器驱动
 &lt;/h1&gt;&lt;p&gt;一个针对兆易创新 GD25Q40E 4Mbit SPI Flash 存储器的完整驱动程序，支持标准的 SPI 接口通信和各种存储操作。&lt;/p&gt;
 &lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;ul&gt;
@@ -392,7 +392,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/hwt101/</guid>
-        <description>&lt;h1 id=&#34;hwt101-陀螺仪模块移植指南&#34;&gt;HWT101 陀螺仪模块移植指南
+        <description>&lt;img src="https://example.com/p/hwt101/HWT101.jpg" alt="Featured image of post HWT101 驱动" /&gt;&lt;h1 id=&#34;hwt101-陀螺仪模块移植指南&#34;&gt;HWT101 陀螺仪模块移植指南
 &lt;/h1&gt;&lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://example.com/code/HWT101/HWT101.c&#34; &gt;HWT101.c&lt;/a&gt;&lt;/li&gt;
@@ -619,7 +619,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/oled/</guid>
-        <description>&lt;h1 id=&#34;oled-096寸-dma驱动库使用说明-iic--spi-版本&#34;&gt;OLED 0.96寸 DMA驱动库使用说明 (IIC &amp;amp; SPI 版本)
+        <description>&lt;img src="https://example.com/p/oled/OLED.jpg" alt="Featured image of post OLED DMA高刷驱动" /&gt;&lt;h1 id=&#34;oled-096寸-dma驱动库使用说明-iic--spi-版本&#34;&gt;OLED 0.96寸 DMA驱动库使用说明 (IIC &amp;amp; SPI 版本)
 &lt;/h1&gt;&lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;h3 id=&#34;spi版本&#34;&gt;SPI版本
 &lt;/h3&gt;&lt;p&gt;&lt;strong&gt;注意:SPI版本目前还有问题，在显示大型图片会不稳定&lt;/strong&gt;&lt;/p&gt;
@@ -1266,7 +1266,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/%E4%B8%B2%E5%8F%A3/</guid>
-        <description>&lt;h1 id=&#34;串口通信模块使用说明&#34;&gt;串口通信模块使用说明
+        <description>&lt;img src="https://example.com/p/%E4%B8%B2%E5%8F%A3/pic3.jpg" alt="Featured image of post 串口格式化发送&#43;环形缓冲区" /&gt;&lt;h1 id=&#34;串口通信模块使用说明&#34;&gt;串口通信模块使用说明
 &lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
 &lt;/h2&gt;&lt;p&gt;本模块实现了一个功能完整的串口通信系统，支持环形缓冲区数据管理、DMA数据传输、格式化输出以及数据帧解析功能。适用于STM32等嵌入式系统的串口通信需求。&lt;/p&gt;
 &lt;h2 id=&#34;源码下载地址&#34;&gt;源码下载地址
@@ -1885,7 +1885,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/%E6%BB%A4%E6%B3%A2%E5%99%A8/</guid>
-        <description>&lt;h1 id=&#34;myfilter---嵌入式信号处理滤波器库&#34;&gt;MyFilter - 嵌入式信号处理滤波器库
+        <description>&lt;img src="https://example.com/p/%E6%BB%A4%E6%B3%A2%E5%99%A8/pic5.jpg" alt="Featured image of post 滤波器" /&gt;&lt;h1 id=&#34;myfilter---嵌入式信号处理滤波器库&#34;&gt;MyFilter - 嵌入式信号处理滤波器库
 &lt;/h1&gt;&lt;p&gt;一个轻量级、高性能的嵌入式信号处理滤波器库，提供四种常用的数字滤波器实现，适用于各种嵌入式系统的信号处理需求。&lt;/p&gt;
 &lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;ul&gt;
@@ -2217,7 +2217,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/%E5%86%85%E5%AD%98%E6%B1%A0/</guid>
-        <description>&lt;h1 id=&#34;内存池管理库-poolcpoolh&#34;&gt;内存池管理库 (Pool.c/Pool.h)
+        <description>&lt;img src="https://example.com/p/%E5%86%85%E5%AD%98%E6%B1%A0/pic6.png" alt="Featured image of post 嵌入式系统内存池" /&gt;&lt;h1 id=&#34;内存池管理库-poolcpoolh&#34;&gt;内存池管理库 (Pool.c/Pool.h)
 &lt;/h1&gt;&lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://example.com/code/Pool/Pool.c&#34; &gt;Pool.c&lt;/a&gt;&lt;/li&gt;
@@ -2378,7 +2378,7 @@
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/%E8%B0%83%E5%BA%A6%E5%99%A8/</guid>
-        <description>&lt;h1 id=&#34;task-scheduler-任务调度器&#34;&gt;Task Scheduler 任务调度器
+        <description>&lt;img src="https://example.com/p/%E8%B0%83%E5%BA%A6%E5%99%A8/pic8.jpg" alt="Featured image of post 任务调度器" /&gt;&lt;h1 id=&#34;task-scheduler-任务调度器&#34;&gt;Task Scheduler 任务调度器
 &lt;/h1&gt;&lt;p&gt;一个轻量级、可配置的任务调度管理系统，专为嵌入式系统设计。支持多任务定时调度、优先级管理、动态调整和低功耗模式。&lt;/p&gt;
 &lt;h2 id=&#34;-功能特性&#34;&gt;📋 功能特性
 &lt;/h2&gt;&lt;ul&gt;

@@ -6,14 +6,14 @@
         <description>Recent content in 串口 on N1ntyNine99</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <copyright>Example Person</copyright>
+        <copyright>© 2025 N1ntyNine99. 保留所有权利。</copyright>
         <lastBuildDate>Thu, 21 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://example.com/tags/%E4%B8%B2%E5%8F%A3/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>串口格式化发送&#43;环形缓冲区</title>
         <link>https://example.com/p/%E4%B8%B2%E5%8F%A3/</link>
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/p/%E4%B8%B2%E5%8F%A3/</guid>
-        <description>&lt;h1 id=&#34;串口通信模块使用说明&#34;&gt;串口通信模块使用说明
+        <description>&lt;img src="https://example.com/p/%E4%B8%B2%E5%8F%A3/pic3.jpg" alt="Featured image of post 串口格式化发送&#43;环形缓冲区" /&gt;&lt;h1 id=&#34;串口通信模块使用说明&#34;&gt;串口通信模块使用说明
 &lt;/h1&gt;&lt;h2 id=&#34;概述&#34;&gt;概述
 &lt;/h2&gt;&lt;p&gt;本模块实现了一个功能完整的串口通信系统，支持环形缓冲区数据管理、DMA数据传输、格式化输出以及数据帧解析功能。适用于STM32等嵌入式系统的串口通信需求。&lt;/p&gt;
 &lt;h2 id=&#34;源码下载地址&#34;&gt;源码下载地址

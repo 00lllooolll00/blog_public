@@ -10,10 +10,12 @@
 <meta property='og:description' content="根据官网学习Rust时做的笔记">
 <meta property='og:url' content='https://example.com/p/rust-self-teach/'>
 <meta property='og:site_name' content='N1ntyNine99'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-08-21T00:00:00&#43;00:00'/><meta property='og:image' content='https://example.com/' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-08-21T00:00:00&#43;00:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
 <meta name="twitter:title" content="Rust自学笔记">
 <meta name="twitter:description" content="根据官网学习Rust时做的笔记"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='https://example.com/' />
+    <meta name="twitter:image" content='https://example.com/p/rust-self-teach/rust-2.jpg' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
     </head>
     <body class="
     article-page
@@ -482,8 +484,20 @@
 
 
             <main class="main full-width">
-    <article class="main-article">
+    <article class="has-image main-article">
     <header class="article-header">
+        <div class="article-image">
+            <a href="/p/rust-self-teach/">
+                <img src="/p/rust-self-teach/rust-2_hu_aea56834c5a49ed.jpg"
+                        srcset="/p/rust-self-teach/rust-2_hu_aea56834c5a49ed.jpg 800w, /p/rust-self-teach/rust-2_hu_a936bc9912fe1846.jpg 1600w"
+                        width="800" 
+                        height="430" 
+                        loading="lazy"
+                        alt="Featured image of post Rust自学笔记" />
+                
+            </a>
+        </div>
+    
 
     <div class="article-details">
     
@@ -543,7 +557,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 60 分钟
+                    阅读时长: 133 分钟
                 </time>
             </div>
         
@@ -629,7 +643,7 @@
 </h2><p><strong>作为一个输出语句，Rust 标准的输出语句是 <code>println</code>，没有 <code>!</code>, 这个感叹号的意思是这是一个 <em>“宏(marco)”</em>，而非一个函数。而 <code>println!</code> 的标准占位符是 <code>{}</code>，具体用法后文再提。</strong></p>
 <hr>
 <h2 id="24let">2.4.let
-</h2><p><strong>在 Rust 中，<code>let</code> 用来声明一个变量，比如 <code>let apple = 5;</code> 在这个语句中，我们声明了一个变量名为 <code>apple</code>，其值为 5 的一个变量。在 Rust 中，如果不做说明，则默认声明的变量是一个 <em>“不可变的(immutable)”</em>。意思就是，在我们声明了这个 <code>apple</code> 之后，是没有办法修改其值 5 的，编译器会报错，如下图所示</strong>：<img src="/Self%20Teach%20Rust.assets/image-20250808172150285.png"
+</h2><p><strong>在 Rust 中，<code>let</code> 用来声明一个变量，比如 <code>let apple = 5;</code> 在这个语句中，我们声明了一个变量名为 <code>apple</code>，其值为 5 的一个变量。在 Rust 中，如果不做说明，则默认声明的变量是一个 <em>“不可变的(immutable)”</em>。意思就是，在我们声明了这个 <code>apple</code> 之后，是没有办法修改其值 5 的，编译器会报错，如下图所示</strong>：<img src="/index.assets/image-20250808172150285.png"
 	
 	
 	
@@ -639,7 +653,7 @@
 	
 	
 ></p>
-<p><strong>我们现在删除修改其值的语句之后再次编译会发现就可以成功通过编译并且运行:</strong> <img src="/Self%20Teach%20Rust.assets/image-20250808172245539.png"
+<p><strong>我们现在删除修改其值的语句之后再次编译会发现就可以成功通过编译并且运行:</strong> <img src="/index.assets/image-20250808172245539.png"
 	
 	
 	
@@ -649,7 +663,7 @@
 	
 	
 ></p>
-<p><strong>如果所有的变量都是不可变的，那 Rust 也太鸡肋了，所以官方有一个关键字 <code>mut</code>，来声明这个变量是 <em>“可变的(mutable)”</em>，在声明变量的时候加上这个关键字就可以告知编译器，当前这个变量是一个可变的变量。如下图所示:</strong> <img src="/Self%20Teach%20Rust.assets/image-20250808172653364.png"
+<p><strong>如果所有的变量都是不可变的，那 Rust 也太鸡肋了，所以官方有一个关键字 <code>mut</code>，来声明这个变量是 <em>“可变的(mutable)”</em>，在声明变量的时候加上这个关键字就可以告知编译器，当前这个变量是一个可变的变量。如下图所示:</strong> <img src="/index.assets/image-20250808172653364.png"
 	
 	
 	
@@ -740,7 +754,7 @@
 </div>
 </div><hr>
 <h2 id="28-导入外部-crate">2.8 导入外部 crate
-</h2><p><strong>在使用 rand 生成随机数之前，我们首先需要修改 <em>Cargo.toml</em>，把 rand 添加到我们的“<em>依赖（dependencies）</em>”中</strong>：<img src="/Self%20Teach%20Rust.assets/image-20250808184006422.png"
+</h2><p><strong>在使用 rand 生成随机数之前，我们首先需要修改 <em>Cargo.toml</em>，把 rand 添加到我们的“<em>依赖（dependencies）</em>”中</strong>：<img src="/index.assets/image-20250808184006422.png"
 	
 	
 	
@@ -751,7 +765,7 @@
 	
 ></p>
 <p><strong>其中格式为“crate 名 + 版本号”（Rust 中的 crates 可以简单理解为外部库），这里的 <em>0.8.5</em> 是 <em>^0.8.5</em> 的简写，意味着任何低于 <em>0.9</em> 但是高于等于 <em>0.8.5</em> 的版本。</strong></p>
-<p><strong>接下来不对代码做任何修改，直接编译运行，我们会发现，它在自己下载相关依赖并且重新编译：</strong> <img src="/Self%20Teach%20Rust.assets/image-20250808184537246.png"
+<p><strong>接下来不对代码做任何修改，直接编译运行，我们会发现，它在自己下载相关依赖并且重新编译：</strong> <img src="/index.assets/image-20250808184537246.png"
 	
 	
 	
@@ -855,7 +869,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>首先我们先导入 <code>cmp</code> 库中的 <code>Ordering</code> 模块，<code>Ordering</code> 本质也是一个枚举，拥有 <code>Equal</code>, <code>Greater</code>, <code>Less</code> 三个值。<code>match</code> 在这里的作用是根据后面的 <code>Ordering</code> 的值来匹配执行不同的语句，类似与 C 语言中的 <code>switch case</code> 语句，它是顺序依次匹配。而不同的返回值对应的执行语句则是通过 <code>=&gt;</code> 来引出。我们通过 <code>.cmp</code> 方法来比较 <code>guess</code> 和 <code>secret_number</code> 的值, 并且返回对应的 <code>Ordering</code> 的枚举值。注意，<code>.cmp</code> 中应当使用 <code>&amp;</code> 来引用，而不是直接通过传入变量名来比较！</strong></p>
-<p><strong>接下来我们编译运行，会发现运行报错：</strong> <img src="/Self%20Teach%20Rust.assets/image-20250808194017191.png"
+<p><strong>接下来我们编译运行，会发现运行报错：</strong> <img src="/index.assets/image-20250808194017191.png"
 	
 	
 	
@@ -924,7 +938,7 @@
 <p>[!NOTE]</p>
 <p><code>parse</code> 方法只适用于逻辑上可以转换为数字的字符，因此很容易导致错误。例如，如果字符串包含 <code>A👍%</code> ，则无法将其转换为数字。由于它可能会失败， <code>parse</code> 方法返回 <code>Result</code> 类型，就像 <code>read_line</code> 方法一样。我们将以相同的方式处理这个 <code>Result</code> ，再次使用 <code>expect</code> 方法。如果 <code>parse</code> 因为无法从字符串中创建数字而返回 <code>Err</code> ， <code>expect</code> 调用将崩溃游戏并打印我们给它的消息。如果 <code>parse</code> 成功将字符串转换为数字，它将返回 <code>Ok</code> 变体的 <code>Result</code> ，而 <code>expect</code> 将返回我们从 <code>Ok</code> 值中想要的数字。</p></blockquote>
 <p><strong>接下来我们直接编译并且运行代码，会发现代码成功运行起来了：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250808202343869.png"
+<p><img src="/index.assets/image-20250808202343869.png"
 	
 	
 	
@@ -1208,7 +1222,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">spaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spaces</span><span class="p">.</span><span class="n">len</span><span class="p">();</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><img src="/Self%20Teach%20Rust.assets/image-20250809005540559.png"
+</div><p><img src="/index.assets/image-20250809005540559.png"
 	
 	
 	
@@ -1514,7 +1528,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><strong>编译上面这段代码会如下报错:</strong> <img src="/Self%20Teach%20Rust.assets/image-20250810011314872.png"
+</div><p><strong>编译上面这段代码会如下报错:</strong> <img src="/index.assets/image-20250810011314872.png"
 	
 	
 	
@@ -1621,7 +1635,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><strong>如果我们输入的索引值超过了 4，那么就会看到如下报错：</strong> <img src="/Self%20Teach%20Rust.assets/image-20250809023517322.png"
+</div><p><strong>如果我们输入的索引值超过了 4，那么就会看到如下报错：</strong> <img src="/index.assets/image-20250809023517322.png"
 	
 	
 	
@@ -1745,7 +1759,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><strong>在这段代码中我们直接指定 <code>y</code> 的数据类型是 <code>str</code> 字符串型，然后在调用函数的时候传入我们想要的字符串即可，可是我们编译运行发现不能通过编译。编译器报错如下图：<img src="/Self%20Teach%20Rust.assets/image-20250809195750334.png"
+</div><p><strong>在这段代码中我们直接指定 <code>y</code> 的数据类型是 <code>str</code> 字符串型，然后在调用函数的时候传入我们想要的字符串即可，可是我们编译运行发现不能通过编译。编译器报错如下图：<img src="/index.assets/image-20250809195750334.png"
 	
 	
 	
@@ -1819,7 +1833,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><img src="/Self%20Teach%20Rust.assets/image-20250809202137910.png"
+</div><p><img src="/index.assets/image-20250809202137910.png"
 	
 	
 	
@@ -1950,7 +1964,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><strong>编译后运行发现:</strong> <img src="/Self%20Teach%20Rust.assets/image-20250809204313039.png"
+</div><p><strong>编译后运行发现:</strong> <img src="/index.assets/image-20250809204313039.png"
 	
 	
 	
@@ -2109,7 +2123,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>编译运行这段代码会发现编译器报错如下:</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250809221653397.png"
+<p><img src="/index.assets/image-20250809221653397.png"
 	
 	
 	
@@ -2192,7 +2206,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>上述代码中，程序从终端中读取一个值，如果这个值不是一个数字，那么就会让程序回到循环开始再次读取，直到读取到一个数字。之使用这个输入的数字与 100 做比较，通过 <code>if-else</code> 与表达式结合，来对布尔类型的变量 <code>condition</code> 赋值，最后打印出对应的消息然后终止循环。</strong></p>
-<p><strong>在这里我们就把 <code>if-else</code> 分支巧妙的与赋值语句结合在一起了，让程序更加清晰和明了。但是，上述例子中的两个分支的值都是整型，如果两个分支的类型不同，编译器将会报错。例如我把 <code>false</code> 变成 <code>0</code>。编译后会发现如下报错：</strong> <img src="/Self%20Teach%20Rust.assets/image-20250809223557297.png"
+<p><strong>在这里我们就把 <code>if-else</code> 分支巧妙的与赋值语句结合在一起了，让程序更加清晰和明了。但是，上述例子中的两个分支的值都是整型，如果两个分支的类型不同，编译器将会报错。例如我把 <code>false</code> 变成 <code>0</code>。编译后会发现如下报错：</strong> <img src="/index.assets/image-20250809223557297.png"
 	
 	
 	
@@ -2286,7 +2300,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>外层循环有标签 <code>'outter_loop_label</code> ，它会从 0 计数到 2。内层循环没有标签，会从 10 计数到 9。第一个没有指定标签的 <code>break</code> 只会退出内层循环。 <code>break 'outter_loop_label;</code> 语句会退出外层循环。这段代码打印：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250809231633908.png"
+<p><img src="/index.assets/image-20250809231633908.png"
 	
 	
 	
@@ -2323,7 +2337,7 @@
 </div>
 </div><p><strong>这段代码中，我们设定了一个倒计时值 <code>loop_count</code>，循环体内我们就打印当前的这个倒计时值。当这个倒计时值不为 0 的时候，我们就执行循环。结束循环之后就让程序提示我们循环结束了。</strong></p>
 <p><strong>执行效果如下:</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250810010005451.png"
+<p><img src="/index.assets/image-20250810010005451.png"
 	
 	
 	
@@ -2362,7 +2376,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><strong>编译运行结果如下：</strong> <img src="/Self%20Teach%20Rust.assets/image-20250810011740719.png"
+</div><p><strong>编译运行结果如下：</strong> <img src="/index.assets/image-20250810011740719.png"
 	
 	
 	
@@ -2433,7 +2447,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>在这里，我们使用了 <code>for</code> 循环先正着从 1 到 9，然后从 9 走到 1。在 Rust 中，<code>（x..y）</code> 的含义是[x, y)，左闭右开。而我们看见的 <code>rec()</code> 方法，是将一个序列按照他的反方向读取。所以编译运行之后就可以看见如下情况：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250810022509232.png"
+<p><img src="/index.assets/image-20250810022509232.png"
 	
 	
 	
@@ -2799,10 +2813,10 @@
 </div>
 </div><p><strong>这看起来非常相似，所以我们可能会假设它的工作方式是相同的：也就是说，第三行会复制 <code>s1</code> 中的值并将其绑定到 <code>s2</code> 。但这并不是实际发生的真实情况。</strong></p>
 <p><strong>看看下图，了解 String 在底层发生了什么。一个 String 由三个部分组成，如图左侧所示：一个指向存储字符串内容的内存的指针、一个长度和一个容量(<em>capacity</em>)。这组数据存储在栈上。右侧是存储内容的堆内存。</strong></p>
-<img src="./Self%20Teach%20Rust.assets/image-20250811014919964.png" alt="image-20250811014919964" style="zoom:50%;" />
+<img src="./index.assets/image-20250811014919964.png" alt="image-20250811014919964" style="zoom:50%;" />
 <p><strong>长度是指 <code>String</code> 的内容目前使用的内存大小（以字节为单位）。容量是指 <code>String</code> 从分配器那里获得的内存总大小（以字节为单位）。长度和容量之间的差异很重要，但在当前上下文中并不重要，因此暂时可以忽略容量。</strong></p>
 <p><strong>当我们把 <code>s1</code> 赋值给 <code>s2</code> 时， <code>String</code> 数据会被复制，这意味着我们复制了栈上的指针、长度和容量。我们不会复制指针所指向的堆上的数据。</strong></p>
-<img src="./Self%20Teach%20Rust.assets/image-20250811015010434.png" alt="image-20250811015010434" style="zoom:50%;" />
+<img src="./index.assets/image-20250811015010434.png" alt="image-20250811015010434" style="zoom:50%;" />
 <p><strong>之前，我们说过当变量超出作用域时，Rust 会自动调用 <code>drop</code> 函数并清理该变量的堆内存。但上图显示两个数据指针都指向相同的位置。这是一个问题：当 <code>s2</code> 和 <code>s1</code> 超出作用域时，它们都会尝试释放同一块内存。这被称为双重释放错误，也是我们之前提到的内存安全漏洞之一。重复释放内存会导致内存损坏，这可能会引发安全漏洞。</strong></p>
 <p><strong>为确保内存安全，在行 <code>let s2 = s1;</code> 之后，Rust 将 <code>s1</code> 视为不再有效。因此，当 <code>s1</code> 超出作用域时，Rust 无需释放任何内容。看看在 <code>s2</code> 创建后尝试使用 <code>s1</code> 会发生什么；它将无法工作：</strong></p>
 <div class="highlight"><div class="chroma">
@@ -2824,7 +2838,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>你会得到类似这样的错误，因为 Rust 阻止你使用失效的引用：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250811015227556.png"
+<p><img src="/index.assets/image-20250811015227556.png"
 	
 	
 	
@@ -2859,7 +2873,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>我们最初声明一个变量 <code>s</code> 并将其绑定到值为 <code>&quot;hello&quot;</code> 的 <code>String</code> 。然后我们立即创建一个新的 <code>String</code> ，其值为 <code>&quot;ahoy&quot;</code> ，并将其赋给 <code>s</code> 。此时，没有任何东西再引用堆上的原始值了。</strong></p>
-<img src="./Self%20Teach%20Rust.assets/image-20250811015904941.png" alt="image-20250811015904941" style="zoom:50%;" />
+<img src="./index.assets/image-20250811015904941.png" alt="image-20250811015904941" style="zoom:50%;" />
 <p><strong>因此原始字符串立即超出作用域。Rust 会运行 <code>drop</code> 函数处理它，并且内存会立即释放。当我们最后打印这个值时，它将是 <code>&quot;ahoy, world!&quot;</code> 。</strong></p>
 <hr>
 <h3 id="417-克隆clone">4.1.7 克隆（<em>Clone</em>）
@@ -3113,7 +3127,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>首先，请注意变量声明和函数返回值中的所有元组代码都不见了。其次，请注意我们将 <code>&amp;s</code> 传递给 <code>calculate_length</code> ，在其定义中，我们使用 <code>&amp;String</code> 而不是 <code>String</code> 。这些 <code>&amp;</code> 代表引用，它们允许你在不拥有值的情况下引用它。具体关系如下图所示：</strong></p>
-<img src="./Self%20Teach%20Rust.assets/image-20250811205245044.png" alt="image-20250811205245044" style="zoom:50%;" />
+<img src="./index.assets/image-20250811205245044.png" alt="image-20250811205245044" style="zoom:50%;" />
 <blockquote>
 <p>[!NOTE]</p>
 <p>使用 <code>&amp;</code> 进行引用的反操作是解引用，这通过解引用操作符 <code>*</code> 完成。</p></blockquote>
@@ -3160,7 +3174,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><strong>在这个代码中，我们将 <code>s1</code> 的 <code>String</code> 借用给了函数 <code>change</code> 中的 <code>s</code>，并尝试在 <code>s</code> 的作用域中修改 <code>String</code>，但是编译后会发现如下报错：</strong> <img src="/Self%20Teach%20Rust.assets/image-20250811210319483.png"
+</div><p><strong>在这个代码中，我们将 <code>s1</code> 的 <code>String</code> 借用给了函数 <code>change</code> 中的 <code>s</code>，并尝试在 <code>s</code> 的作用域中修改 <code>String</code>，但是编译后会发现如下报错：</strong> <img src="/index.assets/image-20250811210319483.png"
 	
 	
 	
@@ -3220,7 +3234,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>其报错的代码如下：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250811212942956.png"
+<p><img src="/index.assets/image-20250811212942956.png"
 	
 	
 	
@@ -3292,7 +3306,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><strong>编译结果如下：</strong> <img src="/Self%20Teach%20Rust.assets/image-20250811212254540.png"
+</div><p><strong>编译结果如下：</strong> <img src="/index.assets/image-20250811212254540.png"
 	
 	
 	
@@ -3331,7 +3345,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w"> </span><span class="c1">//此时已经超出s的作用域，s将被编译器drop 所以返回给调用变量的是一个悬挂引用
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><strong>编译报错的结果如下：</strong> <img src="/Self%20Teach%20Rust.assets/image-20250811223937514.png"
+</div><p><strong>编译报错的结果如下：</strong> <img src="/index.assets/image-20250811223937514.png"
 	
 	
 	
@@ -3478,7 +3492,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>切片不是对一整个字符串的引用，而是其的一部分。比如说“hello”在字符串中的切片就是从第 0 个字符到第 5 个字符，不包含第五个字符。所以它是 <code>&amp;s[0..5]</code>。一个字符切片的格式就是你想要切片的字符串的引用加上 <code>[start_index..end_index]</code>，其中 <code>start_index</code> 是第一个字符的位置，而 <code>end_index</code> 是最后一个字符的后一个位置（因为 Rust 总是左开右闭）。在字符串切片的内部，存储着两个信息，第一是切片开始的位置，第二个是字符长度，通过 <code>end_index</code> 减去 <code>start_index</code> 得到。所以在 <code>let world = &amp;s[6..11]</code> 之中的 <code>world</code>，就是一个包含一个指向 <code>s</code> 的第 6 个字符，并且长度为 5 的指针。具体如下图所示：</strong></p>
-<img src="./Self%20Teach%20Rust.assets/image-20250812220743608.png" alt="image-20250812220743608" style="zoom:50%;" />
+<img src="./index.assets/image-20250812220743608.png" alt="image-20250812220743608" style="zoom:50%;" />
 <p><strong>在 Rust 的 <code>..</code> 表达中，如果这个序列是从 0 开始的，那么 0 是可以省略，意味着下面两个表述是等价的：</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -3610,7 +3624,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><img src="/Self%20Teach%20Rust.assets/image-20250812224455938.png"
+</div><p><img src="/index.assets/image-20250812224455938.png"
 	
 	
 	
@@ -3943,7 +3957,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>你会得到如下的报错：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250813231404176.png"
+<p><img src="/index.assets/image-20250813231404176.png"
 	
 	
 	
@@ -3983,7 +3997,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>编译结果如下：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250814000247052.png"
+<p><img src="/index.assets/image-20250814000247052.png"
 	
 	
 	
@@ -4102,7 +4116,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>会得到如下报错：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250814012949149.png"
+<p><img src="/index.assets/image-20250814012949149.png"
 	
 	
 	
@@ -4147,7 +4161,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>编译后依旧报错：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250814013301343.png"
+<p><img src="/index.assets/image-20250814013301343.png"
 	
 	
 	
@@ -4193,7 +4207,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>加上之后再次编译运行代码就会看到如下输出：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250814013914634.png"
+<p><img src="/index.assets/image-20250814013914634.png"
 	
 	
 	
@@ -4204,7 +4218,7 @@
 	
 ></p>
 <p><strong>太好了！虽然输出不是最美观的，但它显示了该实例中所有字段的值，这在调试时肯定会有帮助。当我们的结构体更复杂时，有一个更易于阅读的输出会很有用；在这种情况下，我们可以在 <code>println!</code> 字符串中使用 <code>{:#?}</code> 而不是 <code>{:?}</code> 。在这个例子中，使用 <code>{:#?}</code> 风格将输出以下内容：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250814014117763.png"
+<p><img src="/index.assets/image-20250814014117763.png"
 	
 	
 	
@@ -4256,7 +4270,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>我们可以将 <code>dbg!</code> 宏包裹在表达式 <code>30f64 * scale</code> 外围，由于 <code>dbg!</code> 会返回该表达式的值的所有权（即不影响原值传递），因此 <code>width</code> 字段最终获得的值就和没有调用 <code>dbg!</code> 时完全一样。在接下来的调用中，我们不希望 <code>dbg!</code> 获取 <code>rect1</code> 的所有权，所以传入的是 <code>rect1</code> 的引用。以下是这个示例的输出结果：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250814014932344.png"
+<p><img src="/index.assets/image-20250814014932344.png"
 	
 	
 	
@@ -4368,7 +4382,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>运行结果如下：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250814021437696.png"
+<p><img src="/index.assets/image-20250814021437696.png"
 	
 	
 	
@@ -4533,7 +4547,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>输出结果如下：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250814023015365.png"
+<p><img src="/index.assets/image-20250814023015365.png"
 	
 	
 	
@@ -4941,7 +4955,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>运行这段代码的报错如下：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250815231230434.png"
+<p><img src="/index.assets/image-20250815231230434.png"
 	
 	
 	
@@ -5175,7 +5189,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>编译运行会发现如下报错：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250816014455172.png"
+<p><img src="/index.assets/image-20250816014455172.png"
 	
 	
 	
@@ -5769,7 +5783,7 @@
 </ol>
 <p><strong>一般来说，我们更倾向于使用绝对路径，因为在代码重构时，项的定义位置和调用位置往往需要独立调整。这就像在文件系统中使用绝对路径能更好地适应目录结构调整一样，能显著提升代码的可维护性。</strong></p>
 <p><strong>我们编译上述代码会发现：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250817005847486.png"
+<p><img src="/index.assets/image-20250817005847486.png"
 	
 	
 	
@@ -5818,7 +5832,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>但是编译后发现依旧报错：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250818215342184.png"
+<p><img src="/index.assets/image-20250818215342184.png"
 	
 	
 	
@@ -6063,7 +6077,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>编译后如下报错：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250819012432756.png"
+<p><img src="/index.assets/image-20250819012432756.png"
 	
 	
 	
@@ -6470,7 +6484,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>编译后的结果是：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250820015816914.png"
+<p><img src="/index.assets/image-20250820015816914.png"
 	
 	
 	
@@ -6844,7 +6858,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>编译这段代码，会发现如下报错：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250820200238993.png"
+<p><img src="/index.assets/image-20250820200238993.png"
 	
 	
 	
@@ -6983,7 +6997,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>编译结果如下：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250820203248384.png"
+<p><img src="/index.assets/image-20250820203248384.png"
 	
 	
 	
@@ -7251,7 +7265,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>如果解除注释之后再编译，会发现如下报错：</strong></p>
-<p><img src="/Self%20Teach%20Rust.assets/image-20250821005422935.png"
+<p><img src="/index.assets/image-20250821005422935.png"
 	
 	
 	
@@ -7575,7 +7589,7 @@
     <section class="copyright">
         &copy; 
         
-        2025 Example Person
+        2025 © 2025 N1ntyNine99. 保留所有权利。
     </section>
     
     <section class="powerby">
