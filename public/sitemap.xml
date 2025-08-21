@@ -11,13 +11,13 @@
     <loc>https://example.com/p/gd25q40e/</loc>
     <lastmod>2025-08-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://example.com/p/hwt101/</loc>
+    <loc>https://example.com/p/hwt101%E9%99%80%E8%9E%BA%E4%BB%AA/</loc>
     <lastmod>2025-08-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://example.com/tags/oled/</loc>
     <lastmod>2025-08-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://example.com/p/oled/</loc>
+    <loc>https://example.com/p/oled-dma%E6%96%B9%E6%A1%88/</loc>
     <lastmod>2025-08-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://example.com/post/</loc>
@@ -59,7 +59,7 @@
     <loc>https://example.com/p/%E5%86%85%E5%AD%98%E6%B1%A0/</loc>
     <lastmod>2025-08-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://example.com/p/%E8%B0%83%E5%BA%A6%E5%99%A8/</loc>
+    <loc>https://example.com/p/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/</loc>
     <lastmod>2025-08-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://example.com/tags/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/</loc>
@@ -80,8 +80,6 @@
     <loc>https://example.com/links/</loc>
   </url><url>
     <loc>https://example.com/search/</loc>
-  </url><url>
-    <loc>https://example.com/categories/test/</loc>
   </url><url>
     <loc>https://example.com/%E5%85%B3%E4%BA%8E/</loc>
   </url>

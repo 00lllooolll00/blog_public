@@ -10,6 +10,7 @@ theme: hugo-theme-stack
 # 网站标题
 title: N1ntyNine99`s Blog
 
+# 作者信息
 author:
   name: N1ntyNine99
   email: 2570955716@qq.com
@@ -300,3 +301,5 @@ markup:
 math:
   enable: true
   format: "mathjax" # 或 'katex'
+
+relativeURLs: false

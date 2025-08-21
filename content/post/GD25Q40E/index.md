@@ -2,7 +2,7 @@
 title: GD25Q40E驱动
 description: 基于HAL库的GD25Q40E硬件SPI驱动
 date: 2025-08-21
-slug: GD25Q40E
+slug: gd25q40e
 image: pic2.jpg
 categories:
     - 嵌入式

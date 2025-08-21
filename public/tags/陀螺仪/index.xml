@@ -9,11 +9,11 @@
         <copyright>© 2025 N1ntyNine99. 保留所有权利。</copyright>
         <lastBuildDate>Thu, 21 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://example.com/tags/%E9%99%80%E8%9E%BA%E4%BB%AA/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>HWT101 驱动</title>
-        <link>https://example.com/p/hwt101/</link>
+        <link>https://example.com/p/hwt101%E9%99%80%E8%9E%BA%E4%BB%AA/</link>
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
-        <guid>https://example.com/p/hwt101/</guid>
-        <description>&lt;img src="https://example.com/p/hwt101/HWT101.jpg" alt="Featured image of post HWT101 驱动" /&gt;&lt;h1 id=&#34;hwt101-陀螺仪模块移植指南&#34;&gt;HWT101 陀螺仪模块移植指南
+        <guid>https://example.com/p/hwt101%E9%99%80%E8%9E%BA%E4%BB%AA/</guid>
+        <description>&lt;img src="https://example.com/p/hwt101%E9%99%80%E8%9E%BA%E4%BB%AA/HWT101.jpg" alt="Featured image of post HWT101 驱动" /&gt;&lt;h1 id=&#34;hwt101-陀螺仪模块移植指南&#34;&gt;HWT101 陀螺仪模块移植指南
 &lt;/h1&gt;&lt;h2 id=&#34;源码下载&#34;&gt;源码下载
 &lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://example.com/code/HWT101/HWT101.c&#34; &gt;HWT101.c&lt;/a&gt;&lt;/li&gt;

@@ -2,7 +2,7 @@
 title: 任务调度器
 description: 基于定时器的任务调度器
 date: 2025-08-21
-slug: 调度器
+slug: 任务调度器
 image: pic8.jpg
 categories:
     - 嵌入式

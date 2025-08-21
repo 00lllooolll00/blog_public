@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="使用HAL库 DMA实现的OLED驱动">
+<title>OLED DMA高刷驱动</title>
+
+<link rel='canonical' href='https://example.com/p/oled-dma%E6%96%B9%E6%A1%88/'>
+
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="OLED DMA高刷驱动">
+<meta property='og:description' content="使用HAL库 DMA实现的OLED驱动">
+<meta property='og:url' content='https://example.com/p/oled-dma%E6%96%B9%E6%A1%88/'>
+<meta property='og:site_name' content='N1ntyNine99'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='OLED' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-08-21T00:00:00&#43;00:00'/><meta property='og:image' content='https://example.com/p/oled-dma%E6%96%B9%E6%A1%88/OLED.jpg' />
+<meta name="twitter:title" content="OLED DMA高刷驱动">
+<meta name="twitter:description" content="使用HAL库 DMA实现的OLED驱动"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://example.com/p/oled-dma%E6%96%B9%E6%A1%88/OLED.jpg' />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/blog_avtatar_hu_2fcd01c874799bc3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">N1ntyNine99</a></h1>
+            <h2 class="site-description">一个电子、编程苦逼爱好者</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/97101368'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg height="2500" viewBox="51.2 51.2 921.6 921.6" width="2500" xmlns="http://www.w3.org/2000/svg"><g fill="#f16c8d"><path d="m729.329 373.95c-9.795-5.945-19.062-6.785-19.144-6.785l-1.065-.05c-57.2-3.866-121.165-5.832-190.126-5.832l-13.988.005c-68.956 0-132.925 1.96-190.12 5.831l-1.066.052c-.082 0-9.349.84-19.144 6.784-15.047 9.129-24.273 25.948-27.417 49.97-10.071 76.913-4.383 173.65.19 251.393 2.938 49.966 33.407 62.459 85.048 67.149 10.782.988 69.089 5.867 159.508 5.893v-.005c90.42-.02 148.726-4.905 159.514-5.888 51.64-4.69 82.11-17.183 85.043-67.15 4.577-77.741 10.26-174.479.19-251.391-3.15-24.028-12.376-40.848-27.423-49.977zm-390.99 172.718a23.65 23.65 0 0 1 -31.687-10.845 23.68 23.68 0 0 1 10.844-31.687c2.038-1.004 50.693-24.725 110.541-43.065a23.68 23.68 0 1 1 13.88 45.292c-56.294 17.25-103.111 40.074-103.577 40.305zm268.898 35.886c-.44 2.232-11.269 54.64-50.939 54.64-21.442 0-36.1-14.049-44.984-26.772-8.694 12.708-22.805 26.772-42.655 26.772-35.533 0-50.135-48.266-51.681-53.77a11.366 11.366 0 0 1 21.878-6.17c2.75 9.652 14.13 37.202 29.798 37.202 16.374 0 28.892-23.644 31.985-31.928a11.372 11.372 0 0 1 10.65-7.388h.06a11.376 11.376 0 0 1 10.63 7.506c.107.286 11.965 31.815 34.314 31.815 20.864 0 28.565-35.952 28.641-36.32a11.346 11.346 0 0 1 13.358-8.94 11.361 11.361 0 0 1 8.945 13.353zm110.116-46.736a23.68 23.68 0 0 1 -31.683 10.844c-.47-.23-47.472-23.116-103.572-40.31a23.69 23.69 0 0 1 -15.708-29.583 23.67 23.67 0 0 1 29.578-15.703c59.848 18.34 108.498 42.061 110.551 43.065a23.68 23.68 0 0 1 10.834 31.687z"/><path d="m849.92 51.2h-675.84c-67.866 0-122.88 55.014-122.88 122.88v675.84c0 67.87 55.014 122.88 122.88 122.88h675.84c67.87 0 122.88-55.01 122.88-122.88v-675.84c0-67.86-55.01-122.88-122.88-122.88zm-36.603 627.45c-2.626 44.58-21.821 78.634-55.516 98.49-25.682 15.134-54.175 19.486-81.137 21.938-32.455 2.95-92.718 6.098-164.664 6.119-71.941-.02-132.209-3.164-164.664-6.119-26.962-2.452-55.455-6.804-81.132-21.939-33.695-19.855-52.89-53.903-55.51-98.483-4.706-80.133-10.574-179.855.194-262.108 10.654-81.383 70.102-104.976 100.612-106.168a2482.642 2482.642 0 0 1 81.423-4.086c-7.536-8.535-19.88-23.322-28.815-38.114-13.737-22.737 8.53-41.687 8.53-41.687s23.68-20.367 44.528 5.213c15.698 19.266 38.38 55.997 48.62 72.954l53.207-.215c13.26 0 26.332.072 39.22.215 10.24-16.957 32.92-53.683 48.619-72.954 20.843-25.58 44.528-5.213 44.528-5.213s22.262 18.95 8.525 41.687c-8.934 14.792-21.279 29.579-28.815 38.114 28.36.978 55.562 2.34 81.423 4.08 30.515 1.198 89.958 24.791 100.613 106.174 10.778 82.248 4.915 181.97.21 262.103z"/></g></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/00lllooolll00'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg width="2500" height="2432" viewBox="0 0 256 249" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet"><g fill="#161614"><path d="M127.505 0C57.095 0 0 57.085 0 127.505c0 56.336 36.534 104.13 87.196 120.99 6.372 1.18 8.712-2.766 8.712-6.134 0-3.04-.119-13.085-.173-23.739-35.473 7.713-42.958-15.044-42.958-15.044-5.8-14.738-14.157-18.656-14.157-18.656-11.568-7.914.872-7.752.872-7.752 12.804.9 19.546 13.14 19.546 13.14 11.372 19.493 29.828 13.857 37.104 10.6 1.144-8.242 4.449-13.866 8.095-17.05-28.32-3.225-58.092-14.158-58.092-63.014 0-13.92 4.981-25.295 13.138-34.224-1.324-3.212-5.688-16.18 1.235-33.743 0 0 10.707-3.427 35.073 13.07 10.17-2.826 21.078-4.242 31.914-4.29 10.836.048 21.752 1.464 31.942 4.29 24.337-16.497 35.029-13.07 35.029-13.07 6.94 17.563 2.574 30.531 1.25 33.743 8.175 8.929 13.122 20.303 13.122 34.224 0 48.972-29.828 59.756-58.22 62.912 4.573 3.957 8.648 11.717 8.648 23.612 0 17.06-.148 30.791-.148 34.991 0 3.393 2.295 7.369 8.759 6.117 50.634-16.879 87.122-64.656 87.122-120.973C255.009 57.085 197.922 0 127.505 0"/><path d="M47.755 181.634c-.28.633-1.278.823-2.185.389-.925-.416-1.445-1.28-1.145-1.916.275-.652 1.273-.834 2.196-.396.927.415 1.455 1.287 1.134 1.923M54.027 187.23c-.608.564-1.797.302-2.604-.589-.834-.889-.99-2.077-.373-2.65.627-.563 1.78-.3 2.616.59.834.899.996 2.08.36 2.65M58.33 194.39c-.782.543-2.06.034-2.849-1.1-.781-1.133-.781-2.493.017-3.038.792-.545 2.05-.055 2.85 1.07.78 1.153.78 2.513-.019 3.069M65.606 202.683c-.699.77-2.187.564-3.277-.488-1.114-1.028-1.425-2.487-.724-3.258.707-.772 2.204-.555 3.302.488 1.107 1.026 1.445 2.496.7 3.258M75.01 205.483c-.307.998-1.741 1.452-3.185 1.028-1.442-.437-2.386-1.607-2.095-2.616.3-1.005 1.74-1.478 3.195-1.024 1.44.435 2.386 1.596 2.086 2.612M85.714 206.67c.036 1.052-1.189 1.924-2.705 1.943-1.525.033-2.758-.818-2.774-1.852 0-1.062 1.197-1.926 2.721-1.951 1.516-.03 2.758.815 2.758 1.86M96.228 206.267c.182 1.026-.872 2.08-2.377 2.36-1.48.27-2.85-.363-3.039-1.38-.184-1.052.89-2.105 2.367-2.378 1.508-.262 2.857.355 3.049 1.398"/></g></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#源码下载">源码下载</a>
+      <ol>
+        <li><a href="#spi版本">SPI版本</a></li>
+        <li><a href="#iic版本">IIC版本</a></li>
+      </ol>
+    </li>
+    <li><a href="#-概述">📖 概述</a></li>
+    <li><a href="#-特性">✨ 特性</a></li>
+    <li><a href="#-硬件配置要求">🛠️ 硬件配置要求</a>
+      <ol>
+        <li><a href="#iic配置">IIC配置</a>
+          <ol>
+            <li><a href="#cubemx配置步骤-iic">CubeMX配置步骤 (IIC)</a></li>
+          </ol>
+        </li>
+        <li><a href="#spi配置">SPI配置</a>
+          <ol>
+            <li><a href="#cubemx配置步骤-spi">CubeMX配置步骤 (SPI)</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#-文件结构">📁 文件结构</a></li>
+    <li><a href="#-快速开始">🚀 快速开始</a>
+      <ol>
+        <li><a href="#1-添加文件到工程">1. 添加文件到工程</a></li>
+        <li><a href="#2-初始化oled">2. 初始化OLED</a></li>
+        <li><a href="#3-基本显示示例">3. 基本显示示例</a></li>
+      </ol>
+    </li>
+    <li><a href="#-api参考">📚 API参考</a>
+      <ol>
+        <li><a href="#基础控制函数">基础控制函数</a>
+          <ol>
+            <li><a href="#void-oled_initvoid"><code>void OLED_Init(void)</code></a></li>
+            <li><a href="#void-oled_clearvoid"><code>void OLED_Clear(void)</code></a></li>
+            <li><a href="#void-oled_updatevoid"><code>void OLED_Update(void)</code></a></li>
+            <li><a href="#void-oled_display_onvoid--void-oled_display_offvoid"><code>void OLED_Display_On(void)</code> / <code>void OLED_Display_Off(void)</code></a></li>
+            <li><a href="#void-oled_fill_pictureuint8_t-fill_data"><code>void OLED_fill_picture(uint8_t fill_Data)</code></a></li>
+          </ol>
+        </li>
+        <li><a href="#文本显示函数">文本显示函数</a>
+          <ol>
+            <li><a href="#void-oled_showcharuint8_t-x-uint8_t-y-uint8_t-char_size-uint8_t-chr"><code>void OLED_ShowChar(uint8_t x, uint8_t y, uint8_t Char_Size, uint8_t chr)</code></a></li>
+            <li><a href="#void-oled_showstringuint8_t-x-uint8_t-y-uint8_t-char_size-uint8_t-p"><code>void OLED_ShowString(uint8_t x, uint8_t y, uint8_t Char_Size, uint8_t *p)</code></a></li>
+            <li><a href="#void-oled_shownumuint8_t-x-uint8_t-y-uint8_t-char_size-uint32_t-num-uint8_t-len"><code>void OLED_ShowNum(uint8_t x, uint8_t y, uint8_t Char_Size, uint32_t num, uint8_t len)</code></a></li>
+            <li><a href="#void-oled_printfuint8_t-x-uint8_t-y-uint8_t-char_size-const-char-format-"><code>void OLED_Printf(uint8_t x, uint8_t y, uint8_t Char_Size, const char *format, ...)</code></a></li>
+          </ol>
+        </li>
+        <li><a href="#图形绘制函数">图形绘制函数</a>
+          <ol>
+            <li><a href="#基础图形">基础图形</a></li>
+            <li><a href="#高级图形">高级图形</a></li>
+            <li><a href="#实用功能">实用功能</a></li>
+          </ol>
+        </li>
+        <li><a href="#坐标系统说明">坐标系统说明</a></li>
+      </ol>
+    </li>
+    <li><a href="#-使用示例">🎯 使用示例</a>
+      <ol>
+        <li><a href="#示例1-基本文本显示">示例1: 基本文本显示</a></li>
+        <li><a href="#示例2-图形界面">示例2: 图形界面</a></li>
+        <li><a href="#示例3-数据监控界面">示例3: 数据监控界面</a></li>
+      </ol>
+    </li>
+    <li><a href="#-注意事项">⚠️ 注意事项</a></li>
+    <li><a href="#-故障排除">🔧 故障排除</a>
+      <ol>
+        <li><a href="#显示屏无反应">显示屏无反应</a></li>
+        <li><a href="#显示内容不更新">显示内容不更新</a></li>
+        <li><a href="#显示异常乱码">显示异常/乱码</a></li>
+      </ol>
+    </li>
+    <li><a href="#-版本历史">📝 版本历史</a></li>
+    <li><a href="#-作者信息">👨‍💻 作者信息</a></li>
+    <li><a href="#-许可证">📄 许可证</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/oled-dma%E6%96%B9%E6%A1%88/">
+                <img src="/p/oled-dma%E6%96%B9%E6%A1%88/OLED_hu_f58c5051a3401d11.jpg"
+                        srcset="/p/oled-dma%E6%96%B9%E6%A1%88/OLED_hu_f58c5051a3401d11.jpg 800w, /p/oled-dma%E6%96%B9%E6%A1%88/OLED_hu_d5907c663fc05e73.jpg 1600w"
+                        width="800" 
+                        height="600" 
+                        loading="lazy"
+                        alt="Featured image of post OLED DMA高刷驱动" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="background-color: #2a9d8f; color: #fff;">
+                嵌入式
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/oled-dma%E6%96%B9%E6%A1%88/">OLED DMA高刷驱动</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            使用HAL库 DMA实现的OLED驱动
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 21, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="oled-096寸-dma驱动库使用说明-iic--spi-版本">OLED 0.96寸 DMA驱动库使用说明 (IIC &amp; SPI 版本)
+</h1><h2 id="源码下载">源码下载
+</h2><h3 id="spi版本">SPI版本
+</h3><p><strong>注意:SPI版本目前还有问题，在显示大型图片会不稳定</strong></p>
+<ul>
+<li><a class="link" href="/code/OLED-SPI/OLED.c" >OLED.c</a></li>
+<li><a class="link" href="/code/OLED-SPI/OLED.h" >OLED.h</a></li>
+<li><a class="link" href="/code/OLED-SPI/OLED_Font.h" >OLED_Font.h</a></li>
+</ul>
+<h3 id="iic版本">IIC版本
+</h3><ul>
+<li><a class="link" href="/code/OLED-IIC/OLED.c" >OLED.c</a></li>
+<li><a class="link" href="/code/OLED-IIC/OLED.h" >OLED.h</a></li>
+<li><a class="link" href="/code/OLED-IIC/OLED_Font.h" >OLED_Font.h</a></li>
+</ul>
+<h2 id="-概述">📖 概述
+</h2><p>本驱动库基于STM32 HAL库开发，专为0.96寸OLED显示屏设计，支持I2C和SPI两种通信方式，均采用DMA方案实现高性能显示。支持SSD1306控制器，分辨率128x64像素。两个版本的API接口完全相同，便于切换使用。</p>
+<h2 id="-特性">✨ 特性
+</h2><ul>
+<li>🚀 <strong>高性能</strong>: 基于DMA非阻塞传输，显示效率高</li>
+<li>🎨 <strong>丰富的图形功能</strong>: 支持点、线、矩形、圆形、三角形等几何图形</li>
+<li>📝 <strong>灵活的文本显示</strong>: 支持6x8和8x16两种字体，支持Printf格式化输出</li>
+<li>🔧 <strong>易于集成</strong>: 简单的API接口，易于移植</li>
+<li>💾 <strong>双缓冲机制</strong>: 使用显示缓冲区，避免显示闪烁</li>
+<li>🔄 <strong>双模式支持</strong>: IIC和SPI版本无缝切换，共享相同API</li>
+</ul>
+<h2 id="-硬件配置要求">🛠️ 硬件配置要求
+</h2><h3 id="iic配置">IIC配置
+</h3><ul>
+<li><strong>I2C外设</strong>: I2C1 (可在OLED.h中修改OLED_I2C宏定义)</li>
+<li><strong>I2C地址</strong>: 0x78 (可在OLED.h中修改OLED_ADDR宏定义)</li>
+<li><strong>时钟频率</strong>: 建议100kHz-400kHz</li>
+</ul>
+<h4 id="cubemx配置步骤-iic">CubeMX配置步骤 (IIC)
+</h4><ol>
+<li>
+<p><strong>启用I2C1</strong></p>
+<ul>
+<li>Mode: I2C</li>
+<li>Configuration: Fast Mode (400kHz)</li>
+</ul>
+</li>
+<li>
+<p><strong>启用DMA</strong></p>
+<ul>
+<li>在DMA Settings中添加I2C1_TX通道</li>
+<li>Direction: Memory To Peripheral</li>
+<li>Priority: Medium或High</li>
+</ul>
+</li>
+<li>
+<p><strong>启用中断</strong></p>
+<ul>
+<li>I2C1 event interrupt: ✅ 启用</li>
+<li>I2C1 error interrupt: ✅ 启用</li>
+<li>DMA1 Channel X global interrupt: ✅ 启用</li>
+</ul>
+</li>
+<li>
+<p><strong>引脚配置</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PB6  -&gt; I2C1_SCL
+</span></span><span class="line"><span class="cl">PB7  -&gt; I2C1_SDA
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>(具体引脚根据你的硬件设计调整)</p>
+</li>
+</ol>
+<h3 id="spi配置">SPI配置
+</h3><ul>
+<li><strong>SPI外设</strong>: SPI1 (可在OLED.h中修改OLED_SPI宏定义)</li>
+<li><strong>DC/RES/CS引脚</strong>: 用于命令/数据切换和重置还有片选 (可在OLED.h中修改相关宏定义)</li>
+</ul>
+<h4 id="cubemx配置步骤-spi">CubeMX配置步骤 (SPI)
+</h4><ol>
+<li>
+<p><strong>启用SPI1</strong></p>
+<ul>
+<li>Mode: Full-Duplex Master 或者 Transmit Master Only(推荐)</li>
+<li>软件片选</li>
+<li>Configuration:默认即可</li>
+<li>SPI最稳定在 10M bits/s 最高在20M bits/s 左右</li>
+</ul>
+</li>
+<li>
+<p><strong>启用DMA</strong></p>
+<ul>
+<li>在DMA Settings中添加SPI1_TX通道</li>
+<li>Direction: Memory To Peripheral</li>
+<li>Priority: Medium或High</li>
+</ul>
+</li>
+<li>
+<p><strong>启用中断</strong></p>
+<ul>
+<li>SPI1 global interrupt: ✅ 启用</li>
+<li>DMA1 Channel X global interrupt: ✅ 启用</li>
+</ul>
+</li>
+<li>
+<p><strong>引脚配置</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PA5  -&gt; SPI1_SCK
+</span></span><span class="line"><span class="cl">PA7  -&gt; SPI1_MOSI
+</span></span><span class="line"><span class="cl">PB0  -&gt; OLED_DC (命令/数据切换，高电平=数据，低电平=命令)
+</span></span><span class="line"><span class="cl">PB1  -&gt; OLED_RES (重置，低电平=重置)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>(具体引脚根据你的硬件设计调整)</p>
+</li>
+</ol>
+<h2 id="-文件结构">📁 文件结构
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">OLED/
+</span></span><span class="line"><span class="cl">├── OLED.h          # 头文件，包含所有函数声明和宏定义 (IIC/SPI通用，根据宏配置)
+</span></span><span class="line"><span class="cl">├── OLED.c          # 主实现文件 (根据通信方式选择对应版本的实现)
+</span></span><span class="line"><span class="cl">├── OLED_Font.h     # 字体数据文件 (通用)
+</span></span><span class="line"><span class="cl">└── readme.md       # 本说明文档
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>注意</strong>: 根据选择的通信方式，使用对应的OLED.c实现文件。头文件OLED.h中通过宏定义（如OLED_SPI或OLED_I2C）区分配置。</p>
+<h2 id="-快速开始">🚀 快速开始
+</h2><h3 id="1-添加文件到工程">1. 添加文件到工程
+</h3><p>将所有源文件添加到你的STM32项目中，并在主文件中包含头文件。根据通信方式在OLED.h中配置宏定义（如定义OLED_SPI或OLED_I2C），并把对应中断回调函数（如OLED_I2C_MasterTxCplt_Handler或OLED_SPI_TxCplt_Handler）放到HAL回调中。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;OLED.h&#34;</span><span class="cp">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2-初始化oled">2. 初始化OLED
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">HAL_Init</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">SystemClock_Config</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MX_GPIO_Init</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 根据模式初始化外设
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// IIC模式:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MX_I2C1_Init</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// SPI模式:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// MX_SPI1_Init();
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MX_DMA_Init</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 初始化OLED
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_Init</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 你的主循环代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3-基本显示示例">3. 基本显示示例
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 清屏
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">OLED_Clear</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 显示字符串
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">OLED_ShowString</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;Hello OLED!&#34;</span><span class="p">,</span> <span class="mi">16</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 显示数字
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">OLED_ShowNum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12345</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">16</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 使用Printf格式化显示
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">OLED_Printf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="s">&#34;Temp: %d°C&#34;</span><span class="p">,</span> <span class="mi">25</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 更新显示（必须调用此函数才能在屏幕上看到内容）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">OLED_Update</span><span class="p">();</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="-api参考">📚 API参考
+</h2><h3 id="基础控制函数">基础控制函数
+</h3><h4 id="void-oled_initvoid"><code>void OLED_Init(void)</code>
+</h4><p>初始化OLED显示屏，必须在使用其他函数前调用。</p>
+<h4 id="void-oled_clearvoid"><code>void OLED_Clear(void)</code>
+</h4><p>清空显示缓冲区，将所有像素设为黑色。</p>
+<h4 id="void-oled_updatevoid"><code>void OLED_Update(void)</code>
+</h4><p>将显示缓冲区内容更新到OLED屏幕，使用DMA高速传输。</p>
+<h4 id="void-oled_display_onvoid--void-oled_display_offvoid"><code>void OLED_Display_On(void)</code> / <code>void OLED_Display_Off(void)</code>
+</h4><p>开启/关闭OLED显示。</p>
+<h4 id="void-oled_fill_pictureuint8_t-fill_data"><code>void OLED_fill_picture(uint8_t fill_Data)</code>
+</h4><p>用指定数据填充整个显示缓冲区。</p>
+<ul>
+<li><code>fill_Data</code>: 填充数据 (0x00=全黑, 0xFF=全白)</li>
+</ul>
+<h3 id="文本显示函数">文本显示函数
+</h3><h4 id="void-oled_showcharuint8_t-x-uint8_t-y-uint8_t-char_size-uint8_t-chr"><code>void OLED_ShowChar(uint8_t x, uint8_t y, uint8_t Char_Size, uint8_t chr)</code>
+</h4><p>在指定位置显示单个字符。</p>
+<ul>
+<li><code>x</code>: 列坐标 (0-127)</li>
+<li><code>y</code>: 页坐标 (0-7)</li>
+<li><code>chr</code>: 要显示的字符</li>
+<li><code>Char_Size</code>: 字符大小 (12: 6x8字体, 16: 8x16字体)</li>
+</ul>
+<h4 id="void-oled_showstringuint8_t-x-uint8_t-y-uint8_t-char_size-uint8_t-p"><code>void OLED_ShowString(uint8_t x, uint8_t y, uint8_t Char_Size, uint8_t *p)</code>
+</h4><p>显示字符串。</p>
+<ul>
+<li><code>p</code>: 字符串指针</li>
+</ul>
+<h4 id="void-oled_shownumuint8_t-x-uint8_t-y-uint8_t-char_size-uint32_t-num-uint8_t-len"><code>void OLED_ShowNum(uint8_t x, uint8_t y, uint8_t Char_Size, uint32_t num, uint8_t len)</code>
+</h4><p>显示数字。</p>
+<ul>
+<li><code>num</code>: 要显示的数字</li>
+<li><code>len</code>: 数字长度</li>
+<li><code>Char_Size</code>: 字符大小</li>
+</ul>
+<h4 id="void-oled_printfuint8_t-x-uint8_t-y-uint8_t-char_size-const-char-format-"><code>void OLED_Printf(uint8_t x, uint8_t y, uint8_t Char_Size, const char *format, ...)</code>
+</h4><p>Printf风格的格式化显示。</p>
+<ul>
+<li><code>format</code>: 格式化字符串</li>
+<li><code>...</code>: 可变参数</li>
+</ul>
+<h3 id="图形绘制函数">图形绘制函数
+</h3><h4 id="基础图形">基础图形
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 画像素点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawPixel</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 画直线
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawLine</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x1</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y1</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">x2</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y2</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 画矩形边框
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawRect</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">width</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">height</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 填充矩形
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_FillRect</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">width</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">height</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 画圆形边框
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawCircle</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x0</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y0</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">radius</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 填充圆形
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_FillCircle</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x0</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y0</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">radius</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="高级图形">高级图形
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 画三角形
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawTriangle</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x1</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y1</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">x2</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y2</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">x3</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y3</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 填充三角形
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_FillTriangle</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x1</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y1</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">x2</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y2</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">x3</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y3</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 画椭圆
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawEllipse</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x0</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y0</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">rx</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">ry</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 画圆角矩形
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawRoundRect</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">width</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">height</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">radius</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 画箭头
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawArrow</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x1</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y1</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">x2</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y2</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">size</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="实用功能">实用功能
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 画网格
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawGrid</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">spacing</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 画进度条
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawProgressBar</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">width</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">height</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">progress</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 画带厚度的边框
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawFrame</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">width</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">height</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">thickness</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 显示位图
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OLED_DrawBitmap</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">x</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">y</span><span class="p">,</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="o">*</span><span class="n">bitmap</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">width</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">height</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">color</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="坐标系统说明">坐标系统说明
+</h3><ul>
+<li><strong>列坐标 (x)</strong>: 0-127，从左到右</li>
+<li><strong>行坐标 (y)</strong>: 0-63，从上到下 (像素坐标)</li>
+<li><strong>页坐标 (y)</strong>: 0-7，从上到下 (字符显示坐标，每页8个像素)</li>
+<li><strong>颜色参数</strong>: 0=黑色(像素熄灭), 1=白色(像素点亮)</li>
+</ul>
+<h2 id="-使用示例">🎯 使用示例
+</h2><h3 id="示例1-基本文本显示">示例1: 基本文本显示
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">DisplayBasicText</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_Clear</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 显示标题 (8x16字体)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_ShowString</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;STM32 OLED&#34;</span><span class="p">,</span> <span class="mi">16</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 显示系统信息 (6x8字体)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_ShowString</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&#34;System: Running&#34;</span><span class="p">,</span> <span class="mi">12</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_ShowString</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&#34;Voltage: 3.3V&#34;</span><span class="p">,</span> <span class="mi">12</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 显示实时数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">static</span> <span class="kt">uint16_t</span> <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_Printf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="s">&#34;Count: %d&#34;</span><span class="p">,</span> <span class="n">counter</span><span class="o">++</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_Update</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="示例2-图形界面">示例2: 图形界面
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">DisplayGraphicsDemo</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_Clear</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 画边框
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_DrawRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 画进度条
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">static</span> <span class="kt">uint8_t</span> <span class="n">progress</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_DrawProgressBar</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_Printf</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="s">&#34;Progress: %d%%&#34;</span><span class="p">,</span> <span class="n">progress</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 画一些装饰图形
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_DrawCircle</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_FillCircle</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_DrawTriangle</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">progress</span> <span class="o">=</span> <span class="p">(</span><span class="n">progress</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">101</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_Update</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="示例3-数据监控界面">示例3: 数据监控界面
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">float</span> <span class="n">temperature</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">float</span> <span class="n">humidity</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint16_t</span> <span class="n">battery_mv</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">SensorData_t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">DisplaySensorData</span><span class="p">(</span><span class="n">SensorData_t</span><span class="o">*</span> <span class="n">data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_Clear</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 标题
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_ShowString</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;Sensor Data&#34;</span><span class="p">,</span> <span class="mi">12</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_DrawLine</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 温度
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_Printf</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="s">&#34;Temp: %.1f C&#34;</span><span class="p">,</span> <span class="n">data</span><span class="o">-&gt;</span><span class="n">temperature</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 湿度
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_Printf</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="s">&#34;Humi: %.1f%%&#34;</span><span class="p">,</span> <span class="n">data</span><span class="o">-&gt;</span><span class="n">humidity</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 电池电压
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_Printf</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="s">&#34;Batt: %dmV&#34;</span><span class="p">,</span> <span class="n">data</span><span class="o">-&gt;</span><span class="n">battery_mv</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 电池电量条
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">uint8_t</span> <span class="n">battery_percent</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">battery_mv</span> <span class="o">-</span> <span class="mi">3000</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">/</span> <span class="mi">1200</span><span class="p">;</span> <span class="c1">// 3.0V-4.2V
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_DrawProgressBar</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">battery_percent</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 状态指示器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">OLED_FillCircle</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_ShowString</span><span class="p">(</span><span class="mi">105</span><span class="p">,</span> <span class="mi">47</span><span class="p">,</span> <span class="s">&#34;OK&#34;</span><span class="p">,</span> <span class="mi">12</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">OLED_Update</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="-注意事项">⚠️ 注意事项
+</h2><ol>
+<li>
+<p><strong>必须调用OLED_Update()</strong></p>
+<ul>
+<li>所有绘制操作都是在显示缓冲区中进行</li>
+<li>必须调用<code>OLED_Update()</code>才能将内容显示到屏幕上</li>
+</ul>
+</li>
+<li>
+<p><strong>DMA传输状态</strong></p>
+<ul>
+<li><code>OLED_Update()</code>使用DMA非阻塞传输</li>
+<li>如果上一次传输未完成，会跳过本次更新</li>
+<li>正常情况下刷新频率可达到数十Hz</li>
+</ul>
+</li>
+<li>
+<p><strong>中断回调函数</strong></p>
+<ul>
+<li>确保在stm32xxxx_it.c中正确实现I2C/SPI和DMA中断回调</li>
+<li>本库已提供回调函数实现，会自动处理DMA传输 (IIC: OLED_I2C_xxx_Handler; SPI: OLED_SPI_xxx_Handler)</li>
+</ul>
+</li>
+<li>
+<p><strong>坐标边界</strong></p>
+<ul>
+<li>绘制时注意坐标边界，超出范围的绘制会被忽略</li>
+<li>文本显示会自动换行处理</li>
+</ul>
+</li>
+<li>
+<p><strong>性能优化建议</strong></p>
+<ul>
+<li>避免频繁调用<code>OLED_Clear()</code></li>
+<li>批量绘制后再调用<code>OLED_Update()</code></li>
+<li>对于动画效果，建议控制刷新频率</li>
+</ul>
+</li>
+<li>
+<p><strong>模式切换</strong></p>
+<ul>
+<li>在OLED.h中通过宏定义选择IIC或SPI模式</li>
+<li>SPI版本额外需要DC和RES引脚控制</li>
+</ul>
+</li>
+</ol>
+<h2 id="-故障排除">🔧 故障排除
+</h2><h3 id="显示屏无反应">显示屏无反应
+</h3><ol>
+<li>检查通信连接 (IIC: SCL/SDA; SPI: SCK/MOSI/DC/RES)</li>
+<li>确认CubeMX配置中的DMA和中断设置</li>
+<li>验证电源供电 (3.3V/5V)</li>
+</ol>
+<h3 id="显示内容不更新">显示内容不更新
+</h3><ol>
+<li>确保调用了<code>OLED_Update()</code></li>
+<li>检查DMA传输是否正常工作</li>
+<li>验证中断是否正确响应 (IIC/SPI特定)</li>
+</ol>
+<h3 id="显示异常乱码">显示异常/乱码
+</h3><ol>
+<li>检查字体文件是否正确包含</li>
+<li>确认坐标参数是否在有效范围内</li>
+<li>验证字符编码是否匹配</li>
+</ol>
+<h2 id="-版本历史">📝 版本历史
+</h2><ul>
+<li><strong>v1.0</strong> (2025-07-28)
+<ul>
+<li>初始版本发布，支持IIC和SPI双模式</li>
+<li>支持基本文本和图形显示</li>
+<li>实现DMA高速传输</li>
+</ul>
+</li>
+</ul>
+<h2 id="-作者信息">👨‍💻 作者信息
+</h2><ul>
+<li><strong>作者</strong>: N1ntyNine99</li>
+<li><strong>基于</strong>: <a class="link" href="https://blog.csdn.net/hwytree/article/details/123559144"  target="_blank" rel="noopener"
+    >CSDN博客文章</a> 和 <a class="link" href="https://blog.csdn.net/weixin_45065888/article/details/118225993"  target="_blank" rel="noopener"
+    >另一个CSDN文章</a></li>
+<li><strong>日期</strong>: 2025-07-28</li>
+</ul>
+<h2 id="-许可证">📄 许可证
+</h2><p>本项目采用开源许可证，请根据需要使用和修改。</p>
+<hr>
+<p>💡 <strong>提示</strong>: 如有任何问题或建议，欢迎通过Issues反馈！</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/oled/">OLED</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+	const mainArticleElement = document.querySelector(".main-article");
+        renderMathInElement(mainArticleElement, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/gd25q40e/">
+        
+        
+            <div class="article-image">
+                <img src="/p/gd25q40e/pic2.0b31f81dea2fe410f95fea09ce0513ad_hu_15a6fe78f23e68c0.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post GD25Q40E驱动"
+                        data-key="gd25q40e" 
+                        data-hash="md5-CzH4Heov5BD5X&#43;oJzgUTrQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">GD25Q40E驱动</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/hwt101%E9%99%80%E8%9E%BA%E4%BB%AA/">
+        
+        
+            <div class="article-image">
+                <img src="/p/hwt101%E9%99%80%E8%9E%BA%E4%BB%AA/HWT101.6f528cd6ac6e962656f14c1d92f2712a_hu_21edc3bbce63fe98.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post HWT101 驱动"
+                        data-key="hwt101陀螺仪" 
+                        data-hash="md5-b1KM1qxuliZW8UwdkvJxKg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">HWT101 驱动</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E4%B8%B2%E5%8F%A3/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E4%B8%B2%E5%8F%A3/pic3.e123d956b72f67e4ee9f1e06e0516d44_hu_d38f7587d474ba18.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 串口格式化发送&#43;环形缓冲区"
+                        data-key="串口" 
+                        data-hash="md5-4SPZVrcvZ&#43;Tunx4G4FFtRA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">串口格式化发送&#43;环形缓冲区</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/pic8.4d23723f665971529d311c5ef7f00610_hu_766fb068a8ab14ac.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 任务调度器"
+                        data-key="任务调度器" 
+                        data-hash="md5-TSNyP2ZZcVKdMRxe9/AGEA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">任务调度器</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E5%86%85%E5%AD%98%E6%B1%A0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E5%86%85%E5%AD%98%E6%B1%A0/pic6.5fbba57193f84183a640d6740244ae5c_hu_803ac12afe91868a.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 嵌入式系统内存池"
+                        data-key="内存池" 
+                        data-hash="md5-X7ulcZP4QYOmQNZ0AkSuXA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">嵌入式系统内存池</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <link rel="stylesheet" href="https://unpkg.com/vssue/dist/vssue.min.css" />
+
+<div id="vssue"></div>
+
+<script src="https://unpkg.com/vue@2/dist/vue.runtime.min.js"></script>
+<script src="https://unpkg.com/vssue/dist/vssue..min.js"></script>
+
+<script>
+    new Vue({
+        el: "#vssue",
+        render: (h) =>
+            h("Vssue", {
+                props: {
+                    title: "OLED DMA高刷驱动",
+                    options: {
+                        autoCreateIssue:  false ,
+                        owner: "",
+                        repo: "",
+                        clientId: "",
+                        clientSecret: "",
+                    },
+                },
+            }),
+    });
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 © 2025 N1ntyNine99. 保留所有权利。
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

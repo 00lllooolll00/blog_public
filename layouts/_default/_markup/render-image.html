@@ -1,0 +1,12 @@
+{{ if or (hasPrefix .Destination "http://") (hasPrefix .Destination "https://") }}
+  <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" {{ with .Title}} title="{{ . }}"{{ end }} />
+{{ else if hasPrefix .Destination "/" }}
+  <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" {{ with .Title}} title="{{ . }}"{{ end }} />
+{{ else }}
+  {{ $path := .Destination }}
+  {{ if hasPrefix $path "./" }}
+    {{ $path = strings.TrimPrefix "./" $path }}
+  {{ end }}
+  {{ $postURL := .Page.RelPermalink }}
+  <img src="{{ $postURL }}{{ $path }}" alt="{{ .Text }}" {{ with .Title}} title="{{ . }}"{{ end }} />
+{{ end }}
