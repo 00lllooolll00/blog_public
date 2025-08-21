@@ -1,18 +1,74 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-        <title>Tags on 演示站点</title>
+        <title>Tags on N1ntyNine99</title>
         <link>https://example.com/tags/</link>
-        <description>Recent content in Tags on 演示站点</description>
+        <description>Recent content in Tags on N1ntyNine99</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Example Person</copyright>
-        <lastBuildDate>Wed, 09 Sep 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://example.com/tags/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Hugo</title>
-        <link>https://example.com/tags/hugo/</link>
-        <pubDate>Wed, 09 Sep 2020 00:00:00 +0000</pubDate>
+        <lastBuildDate>Thu, 21 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://example.com/tags/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>OLED</title>
+        <link>https://example.com/tags/oled/</link>
+        <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
         
-        <guid>https://example.com/tags/hugo/</guid>
+        <guid>https://example.com/tags/oled/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Rust</title>
+        <link>https://example.com/tags/rust/</link>
+        <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://example.com/tags/rust/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>串口</title>
+        <link>https://example.com/tags/%E4%B8%B2%E5%8F%A3/</link>
+        <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://example.com/tags/%E4%B8%B2%E5%8F%A3/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>滤波</title>
+        <link>https://example.com/tags/%E6%BB%A4%E6%B3%A2/</link>
+        <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://example.com/tags/%E6%BB%A4%E6%B3%A2/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>内存池</title>
+        <link>https://example.com/tags/%E5%86%85%E5%AD%98%E6%B1%A0/</link>
+        <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://example.com/tags/%E5%86%85%E5%AD%98%E6%B1%A0/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>任务调度器</title>
+        <link>https://example.com/tags/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/</link>
+        <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://example.com/tags/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>陀螺仪</title>
+        <link>https://example.com/tags/%E9%99%80%E8%9E%BA%E4%BB%AA/</link>
+        <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://example.com/tags/%E9%99%80%E8%9E%BA%E4%BB%AA/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>外部Flash</title>
+        <link>https://example.com/tags/%E5%A4%96%E9%83%A8flash/</link>
+        <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://example.com/tags/%E5%A4%96%E9%83%A8flash/</guid>
         <description></description>
         </item>
         

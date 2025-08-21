@@ -1,91 +1,115 @@
+# 网站基础URL地址
 baseurl: https://example.com/
+
+# 网站默认语言编码
 languageCode: en-us
+
+# 使用的Hugo主题名称
 theme: hugo-theme-stack
+
+# 网站标题
 title: Example Site
+
+# 版权信息
 copyright: Example Person
 
-# Theme i18n support
-# Available values: ar, bn, ca, de, el, en, es, fr, hu, id, it, ja, ko, nl, pt-br, th, uk, zh-cn, zh-hk, zh-tw
+# 主题国际化支持
+# 可用值: ar, bn, ca, de, el, en, es, fr, hu, id, it, ja, ko, nl, pt-br, th, uk, zh-cn, zh-hk, zh-tw
+# 默认内容语言设置为简体中文
 DefaultContentLanguage: zh-cn
 
-# Set hasCJKLanguage to true if DefaultContentLanguage is in [zh-cn ja ko]
-# This will make .Summary and .WordCount behave correctly for CJK languages.
+# 如果默认内容语言是中文、日文或韩文，设置为true
+# 这将使.Summary和.WordCount对CJK语言正确处理
 hasCJKLanguage: false
 
+# 多语言配置
 languages:
-  en:
-    languageName: English
-    title: Example Site
-    weight: 1
-    params:
-      sidebar:
-        subtitle: Example description
-  zh-cn:
-    languageName: 中文
-    title: 演示站点
-    weight: 2
-    params:
-      sidebar:
-        subtitle: 演示说明
-  ar:
-    languageName: عربي
-    languagedirection: rtl
-    title: موقع تجريبي
-    weight: 3
-    params:
-      sidebar:
-        subtitle: وصف تجريبي
+  # 英文配置示例（已注释掉）
+  # en:
+  #   languageName: English
+  #   title: Example Site
+  #   weight: 1
+  #   params:
+  #     sidebar:
+  #       subtitle: Example description
 
+  # 简体中文配置
+  zh-cn:
+    languageName: 中文 # 语言名称
+    title: N1ntyNine99 # 该语言下的网站标题
+    weight: 2 # 权重（用于排序）
+    params:
+      sidebar:
+        subtitle: 一个电子、编程苦逼爱好者 # 侧边栏副标题
+
+# 第三方服务配置
 services:
-  # Change it to your Disqus shortname before using
+  # Disqus评论服务配置（使用前需改为你的Disqus短名称）
   disqus:
     shortname: "hugo-theme-stack"
-  # GA Tracking ID
+
+  # Google Analytics跟踪ID
   googleAnalytics:
-    id:
+    id: # 留空表示未配置
 
+# 分页设置
 pagination:
-  pagerSize: 3
+  pagerSize: 5 # 分页器显示的项目数量
 
+# 永久链接格式
 permalinks:
-  post: /p/:slug/
-  page: /:slug/
+  post: /p/:slug/ # 文章链接格式
+  page: /:slug/ # 页面链接格式
 
+# 主题参数配置
 params:
+  # 主要内容区域配置
   mainSections:
-    - post
+    - post # 主要内容区域显示post部分
+
+  # 特色图片字段名
   featuredImageField: image
+
+  # RSS是否显示全文
   rssFullContent: true
-  favicon: # e.g.: favicon placed in `static/favicon.ico` of your site folder, then set this field to `/favicon.ico` (`/` is necessary)
 
+  # 网站图标路径
+  favicon: # 例如：将favicon.ico放在static目录下，设置为`/favicon.ico`
+
+  # 页脚配置
   footer:
-    since: 2020
-    customText:
+    since: 2025 # 网站起始年份
+    customText: # 自定义页脚文本
 
+  # 日期格式
   dateFormat:
-    published: Jan 02, 2006
-    lastUpdated: Jan 02, 2006 15:04 MST
+    published: Jan 02, 2006 # 发布日期格式
+    lastUpdated: Jan 02, 2006 15:04 MST # 最后更新日期格式
 
+  # 侧边栏配置
   sidebar:
-    emoji: 🍥
-    subtitle: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    emoji: # 侧边栏表情符号
+    subtitle: Lorem ipsum dolor sit amet, consectetur adipiscing elit. # 侧边栏副标题
     avatar:
-      enabled: true
-      local: true
-      src: img/avatar.png
+      enabled: true # 是否显示头像
+      local: true # 是否使用本地图片
+      src: img/blog_avtatar.png # 头像图片路径
 
+  # 文章配置
   article:
-    math: false
-    toc: true
-    readingTime: true
+    math: true # 是否支持数学公式
+    toc: true # 是否显示目录
+    readingTime: true # 是否显示阅读时间
     license:
-      enabled: true
-      default: Licensed under CC BY-NC-SA 4.0
+      enabled: true # 是否显示许可证信息
+      default: Licensed under CC BY-NC-SA 4.0 # 默认许可证
 
+  # 评论系统配置
   comments:
-    enabled: true
-    provider: disqus
+    enabled: true # 是否启用评论
+    provider: vssue # 评论服务提供商
 
+    # DisqusJS配置（轻量级Disqus替代方案）
     disqusjs:
       shortname:
       apiUrl:
@@ -93,22 +117,26 @@ params:
       admin:
       adminLabel:
 
+    # Utterances配置（基于GitHub Issues的评论系统）
     utterances:
       repo:
       issueTerm: pathname
       label:
 
+    # Beaudar配置（另一个基于GitHub的评论系统）
     beaudar:
       repo:
       issueTerm: pathname
       label:
       theme:
 
+    # Remark42配置（自托管评论系统）
     remark42:
       host:
       site:
       locale:
 
+    # Vssue配置（基于GitHub/GitLab等的评论系统）
     vssue:
       platform:
       owner:
@@ -117,7 +145,7 @@ params:
       clientSecret:
       autoCreateIssue: false
 
-    # Waline client configuration see: https://waline.js.org/en/reference/component.html
+    # Waline配置（基于Valine的评论系统）
     waline:
       serverURL:
       lang:
@@ -132,18 +160,20 @@ params:
         admin: Admin
         placeholder:
 
+    # Twikoo配置（另一个评论系统）
     twikoo:
       envId:
       region:
       path:
       lang:
 
-    # See https://cactus.chat/docs/reference/web-client/#configuration for description of the various options
+    # Cactus评论系统配置（基于Matrix协议）
     cactus:
       defaultHomeserverUrl: "https://matrix.cactus.chat:8448"
       serverName: "cactus.chat"
-      siteName: "" # You must insert a unique identifier here matching the one you registered (See https://cactus.chat/docs/getting-started/quick-start/#register-your-site)
+      siteName: "" # 必须插入唯一标识符
 
+    # Giscus配置（基于GitHub Discussions的评论系统）
     giscus:
       repo:
       repoID:
@@ -155,6 +185,7 @@ params:
       reactionsEnabled: 1
       emitMetadata: 0
 
+    # Gitalk配置（基于GitHub Issues的评论系统）
     gitalk:
       owner:
       admin:
@@ -163,86 +194,90 @@ params:
       clientSecret:
       proxy:
 
+    # Cusdis配置（轻量级评论系统）
     cusdis:
       host:
       id:
-  widgets:
-    homepage:
-      - type: search
-      - type: archives
-        params:
-          limit: 5
-      - type: categories
-        params:
-          limit: 10
-      - type: tag-cloud
-        params:
-          limit: 10
-    page:
-      - type: toc
 
+  # 小部件配置
+  widgets:
+    homepage: # 首页小部件
+      - type: search # 搜索框
+      - type: archives # 归档
+        params:
+          limit: 5 # 显示数量限制
+      - type: categories # 分类
+        params:
+          limit: 10
+      - type: tag-cloud # 标签云
+        params:
+          limit: 10
+    page: # 页面小部件
+      - type: toc # 目录
+
+  # OpenGraph配置（社交媒体分享优化）
   opengraph:
     twitter:
-      # Your Twitter username
-      site:
+      site: # 你的Twitter用户名
+      card: summary_large_image # 可用值: summary, summary_large_image
 
-      # Available values: summary, summary_large_image
-      card: summary_large_image
-
+  # 默认图片配置
   defaultImage:
     opengraph:
-      enabled: false
-      local: false
-      src:
+      enabled: true # 是否启用OpenGraph默认图片
+      local: false # 是否使用本地图片
+      src: # 图片路径
 
+  # 颜色方案配置
   colorScheme:
-    # Display toggle
-    toggle: true
+    toggle: true # 是否显示明暗模式切换按钮
+    default: auto # 默认模式：auto, light, dark
 
-    # Available values: auto, light, dark
-    default: auto
-
+  # 图片处理配置
   imageProcessing:
     cover:
-      enabled: true
+      enabled: true # 是否处理封面图片
     content:
-      enabled: true
+      enabled: true # 是否处理内容图片
 
-### Custom menu
-### See https://stack.jimmycai.com/config/menu
-### To remove about, archive and search page menu item, remove `menu` field from their FrontMatter
+### 自定义菜单配置
+### 参考: https://stack.jimmycai.com/config/menu
+### 要移除关于、归档和搜索页面菜单项，请从它们的FrontMatter中删除`menu`字段
 menu:
-  main: []
+  main: [] # 主菜单（空数组表示使用默认配置）
 
+  # 社交媒体链接菜单
   social:
     - identifier: github
-      name: GitHub
-      url: https://github.com/CaiJimmy/hugo-theme-stack
+      name: Github
+      url: https://github.com/00lllooolll00
       params:
-        icon: brand-github
+        icon: github # 图标名称
 
-    - identifier: twitter
-      name: Twitter
-      url: https://twitter.com
+    - identifier: bilibili
+      name: Bilibili
+      url: https://space.bilibili.com/97101368
       params:
-        icon: brand-twitter
+        icon: bilibili
 
+# 相关文章配置
 related:
-  includeNewer: true
-  threshold: 60
-  toLower: false
+  includeNewer: true # 是否包含较新的文章
+  threshold: 60 # 相关性阈值
+  toLower: false # 是否转换为小写
   indices:
-    - name: tags
-      weight: 100
+    - name: tags # 使用标签作为相关性索引
+      weight: 100 # 权重
 
-    - name: categories
+    - name: categories # 使用分类作为相关性索引
       weight: 200
 
+# Markup配置（标记语言处理）
 markup:
   goldmark:
     extensions:
       passthrough:
-        enable: true
+        enable: true # 启用直通扩展
         delimiters:
           block:
             - - \[
@@ -253,17 +288,16 @@ markup:
             - - \(
               - \)
     renderer:
-      ## Set to true if you have HTML content inside Markdown
-      unsafe: true
+      unsafe: true # 是否允许在Markdown中使用HTML
   tableOfContents:
-    endLevel: 4
-    ordered: true
-    startLevel: 2
+    endLevel: 4 # 目录结束级别
+    ordered: true # 是否有序
+    startLevel: 2 # 目录开始级别
   highlight:
-    noClasses: false
-    codeFences: true
-    guessSyntax: true
-    lineNoStart: 1
-    lineNos: true
-    lineNumbersInTable: true
-    tabWidth: 4
+    noClasses: false # 是否不使用CSS类
+    codeFences: true # 是否启用代码围栏
+    guessSyntax: true # 是否猜测语法
+    lineNoStart: 1 # 行号起始值
+    lineNos: true # 是否显示行号
+    lineNumbersInTable: true # 是否在表格中显示行号
+    tabWidth: 4 # 制表符宽度
