@@ -1,0 +1,94 @@
+<!-- 返回顶部按钮样式定义 -->
+<style>
+  #backTopBtn {
+    display: none;                /* 初始隐藏按钮 */
+    position: fixed;              /* 固定定位，不随页面滚动 */
+    /* ========== 按钮位置调整区域 ========== */
+    bottom: 30px;                 /* 距离页面底部30px - 调整此值改变垂直位置 */
+    right: 400px;                  /* 距离页面右侧30px - 调整此值改变水平位置 */
+    /* ===================================== */
+    z-index: 99;                  /* 层级设置，确保按钮在最上层 */
+    cursor: pointer;              /* 鼠标悬停时显示手型光标 */
+    /* ========== 按钮尺寸调整区域 ========== */
+    width: 60px;                  /* 按钮宽度 - 调整此值改变按钮大小 */
+    height: 60px;                 /* 按钮高度 - 调整此值改变按钮大小 */
+    /* ===================================== */
+    background-image: url({{ (resources.Get "icons/backTop.svg").RelPermalink }}); /* 背景图标 */
+    background-size: contain;     /* 图标适应按钮大小 */
+    background-repeat: no-repeat; /* 不重复显示图标 */
+    background-position: center;  /* 图标居中显示 */
+    border-radius: 50%;           /* 圆形按钮 */
+    background-color: rgba(255, 255, 255, 0.8); /* 半透明白色背景 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);   /* 阴影效果 */
+    /* 添加will-change优化渲染性能 */
+    will-change: transform;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* 动画过渡效果 */
+  }
+
+  /* 鼠标悬停效果 */
+  #backTopBtn:hover {
+    transform: rotate(360deg);    /* 悬停时旋转360度 */
+    background-color: rgba(255, 255, 255, 1); /* 悬停时背景变为不透明白色 */
+  }
+</style>
+<!-- 返回顶部按钮JavaScript功能实现 -->
+<script>
+  /**
+   * 滚动回顶部功能初始化
+   * 功能说明：创建返回顶部按钮并设置滚动监听
+   */
+  function initScrollTop() {
+    // 检查是否在文章页面（通过检查是否存在文章内容区域）
+    // 检查是否在文章页面，排除首页
+    let articleContent = document.querySelector(".main-article") ||
+      document.querySelector(".article-content") ||
+      document.querySelector(".post-content");
+    let isHomePage = document.querySelector(".article-list");
+
+    if (!articleContent || isHomePage) {
+      return; // 不在文章页面或在首页，不显示按钮
+    }
+    // 动态创建返回顶部按钮元素并添加到页面body中
+    let btn = document.createElement("div");
+    btn.id = "backTopBtn";        // 设置按钮ID，对应上面的CSS样式
+    btn.onclick = backToTop;      // 绑定点击事件
+    document.body.appendChild(btn); // 将按钮添加到页面body中
+
+    // 设置页面滚动监听事件
+    window.onscroll = function () {
+      // 获取当前页面滚动距离（兼容不同浏览器）
+      let scrollTop = window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop || 0;
+
+      /* ========== 按钮显示条件调整区域 ========== */
+      // 当网页向下滑动超过200px时显示"返回顶部"按钮
+      // 调整此数值可以改变按钮出现的滚动距离
+      if (scrollTop > 200) {
+        btn.style.display = "block";  // 显示按钮
+      } else {
+        btn.style.display = "none";   // 隐藏按钮
+      }
+      /* ======================================= */
+    };
+  }
+
+  /**
+   * 返回顶部功能实现
+   * 功能说明：平滑滚动到页面顶部
+   */
+  function backToTop() {
+    // 使用smooth平滑滚动效果返回页面顶部
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // 页面DOM内容加载完成后初始化返回顶部功能
+  document.addEventListener('DOMContentLoaded', initScrollTop);
+</script>
+
+
+{{if .Page.Site.Params.fancybox }}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+{{ end }}

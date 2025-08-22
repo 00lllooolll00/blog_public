@@ -4,6 +4,7 @@ description: 根据官网学习Rust时做的笔记
 date: 2025-08-21
 slug: rust-self-teach
 image: rust-2.jpg
+comments: true
 categories:
     - 编程语言
     - rust
@@ -161,7 +162,7 @@ fn main() {
 
 ## 2.6 读取用户输入
 
-`  io::stdin().read_line(&mut guess).expect("Fail to readline");` 这条语句用来读取用户的终端输入。由于我们在第一行就显式的引入了标准输入输出，我们这里可以直接使用 `io::stdin()` 来使用 `stdin()` 这个方法。如果我们没有在第一行中显式的导入标准输入输出，我们同样可以直接调用 `stdin()` 但是需要说明来源，如 `stdio::io::stdin`。
+**`  io::stdin().read_line(&mut guess).expect("Fail to readline");` 这条语句用来读取用户的终端输入。由于我们在第一行就显式的引入了标准输入输出，我们这里可以直接使用 `io::stdin()` 来使用 `stdin()` 这个方法。如果我们没有在第一行中显式的导入标准输入输出，我们同样可以直接调用 `stdin()` 但是需要说明来源，如 `stdio::io::stdin`。**
 
 **在 `io::stdin()` 中，`stdin()` 会返回一个 [`std::io::Stdin`](https://doc.Rust-lang.org/std/io/struct.Stdin.html) 的一个实例，该类型是作为一个获取用户终端输入的一个“*句柄（handle）*”。**
 
@@ -4279,7 +4280,7 @@ fn main() {
 }
 ```
 
-`String` 中也存在 `push` 方法，只不过他只是将一个字符追加到字符串的后面：	
+**`String` 中也存在 `push` 方法，只不过他只是将一个字符追加到字符串的后面：**	
 
 ```rust
 fn main() {
@@ -4288,6 +4289,21 @@ fn main() {
     println!("{s1}");// 打印Rust
 }
 ```
+
+**想要使用`push_str`将一个字符串格式化追加到另一个字符串要这样：**
+
+```Rust
+fn main(){
+    let mut s = String::from("Old");
+    let s2 = String::from("New");
+
+    s.push_str(&format!("-123-{s2}"));
+
+    println!("{s}");//打印 Old-123-New
+}
+```
+
+**这是因为`push_str`的入参必须是`&str`，而我们使用格式化宏是返回`String`类型，所以需要加上`&`，`format!`宏接下里就会讲。**
 
 ---
 
@@ -4444,9 +4460,9 @@ let answer = &hello[0];
 
 ```rust
 fn main() {
-let hello = "Здравствуйте";
+    let hello = "Здравствуйте";
 
-let s = &hello[0..4];
+    let s = &hello[0..4];
 }
 ```
 
@@ -4810,3 +4826,225 @@ fn get_mid_mode(list: &Vec<i32>) -> HashMap<String, i32> {
 /*
 ```
 
+**2. 将字符串转换成 Pig Latin。每个单词的首个辅音被移到词尾并加上 ay，因此 first 变成 irst-fay。以元音开头的单词则在末尾加 hay（apple 变成 apple-hay）。**
+
+方式1：只使用学过的知识
+
+```Rust
+//元音表
+const VOWELS: [char; 10] = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+
+//判断是否是元音字母 a e i o u
+fn is_vowels(ch: &char) -> bool {
+    for i in &VOWELS {
+        if i == ch {
+            return true;
+        }
+    }
+    return false;
+}
+
+fn pig_latin(word: &str) -> String {
+    let word = word.trim(); // 去除前后空白
+
+    if word.is_empty() {
+        // 如果字符串为空 则返回空的字符串实例
+        return String::new();
+    }
+
+    let mut count = 0; //迭代计数器
+    let mut flag_vowels = bool::default(); //是否是元音标志位
+    let mut res_str = String::new(); //返回结果字符串
+    let mut first_letter = char::default(); //首字母
+
+    for i in word.chars() {
+        if count == 0 {
+            if is_vowels(&i) {
+                //是元音
+                flag_vowels = true;
+                break;
+            } else {
+                //是辅音
+                flag_vowels = false;
+                first_letter = i;
+            }
+        } else {
+            if flag_vowels == false {
+                res_str.push(i);
+            }
+        }
+        count += 1;
+    }
+    if flag_vowels {
+        //元音 结尾加上 -hay
+        return format!("{word}-hay");
+    } else {
+        // 首字母不是元音 首个辅音移到末尾加上ay
+        return format!("{res_str}-{first_letter}ay");
+    }
+}
+
+fn main() {
+    let s1 = String::from("apple");
+    let s1s = pig_latin(&s1);
+
+    let s2 = String::from("first");
+    let s2s = pig_latin(&s2);
+
+    println!("{s1} -> {s1s}\n{s2} -> {s2s}");
+}
+/*
+打印:
+apple -> apple-hay
+first -> irst-fay
+*/
+```
+
+方式2：使用高级的方法
+
+```Rust
+//元音表
+const VOWELS: [char; 10] = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+
+// 判断是否是元音字母 a e i o u
+fn is_vowels(ch: &char) -> bool {
+    for i in &VOWELS {
+        if i == ch {
+            return true;
+        }
+    }
+    return false;
+}
+
+fn pig_latin(word: &str) -> String {
+    let word = word.trim(); // 去除前后空白
+
+    if word.is_empty() {
+        // 如果字符串为空 则返回空的字符串实例
+        return String::new();
+    }
+    let mut all_the_chars = word.chars(); //获取所有字符的迭代器
+
+    if let Some(first_letter) = all_the_chars.next() {
+        // next():获取迭代器中的下一个元素 这里即第一个元素
+        // 此时all_the_chars就只包含除了第一个元素的所有元素
+        if is_vowels(&first_letter) {
+            // 首字母是元音 结尾加上 -hay即可
+            return format!("{}-hay", word);
+        } else {
+            // 首字母不是元音 首个辅音移到末尾加上ay
+            let reset_letters: String = all_the_chars.collect(); //收集除首字母的所有字母
+            // collect()将迭代器转换成一个集合
+            // 需要显式指定集合的数据类型
+            return format!("{}-{}ay", reset_letters, first_letter);
+        }
+    }
+
+    //未知错误 返回空的字符串
+    return String::new();
+}
+
+fn main() {
+    let s1 = String::from("apple");
+    let s1s = pig_latin(&s1);
+
+    let s2 = String::from("first");
+    let s2s = pig_latin(&s2);
+
+    println!("{s1} -> {s1s}\n{s2} -> {s2s}");// \n 是换行符
+}
+/*
+打印:
+apple -> apple-hay
+first -> irst-fay
+*/
+```
+
+**3. 使用哈希映射和向量，创建一个文本界面，让用户能够把员工姓名添加到公司的某个部门；例如，“Add Sally to Engineering” 或 “Add Amir to Sales”。然后允许用户按部门获取该部门所有人员的列表，或按部门获取全公司所有人员的列表，并按字母序排序。**
+
+```Rust
+use std::collections::HashMap;
+use std::io::{self, Write};//使用到了flush方法，需要Write模块
+
+//将员工添加到某个部门
+fn add_staff_to(map: &mut HashMap<String, Vec<String>>, satff: &str, dept: &str) {
+    //entry 会返回键对应值的可变引用
+    let v = map.entry(String::from(dept)).or_insert(Vec::new());
+    (*v).push(String::from(satff));//解引用的优先级低，所以要用括号
+    (*v).sort(); //排序
+}
+
+//展示某个部门的所有员工
+fn show_all_staff_of(map: &mut HashMap<String, Vec<String>>, dept: &str) {
+    let v = map.get(&String::from(dept));
+    // 使用from 将&str -> String
+
+    //没有这个部门
+    if let None = v {
+        println!("no this dept");
+        return;
+    } else {
+        //有这个部门
+        for i in v.unwrap() {
+            //哈希中get得到的是 Option<T>
+            //使用unwarp 方法可以解出 T
+            //但是如果作用于None 会使程序panic
+            println!("{i}");
+        }
+    }
+}
+
+//显示公司 所有部门 所有员工
+fn show_all(map: &HashMap<String, Vec<String>>) {
+    let mut dept: Vec<&String> = map.keys().collect();
+    dept.sort();
+    for i in dept {
+        println!("{i}:");
+        for j in map.get(&String::from(i)).unwrap() {
+            println!("{j}");
+        }
+        println!("----------");
+    }
+}
+
+fn main() {
+    let mut company: HashMap<String, Vec<String>> = HashMap::new();
+
+    loop {
+        print!(">>>"); //不会自动换行
+        io::stdout().flush().unwrap(); //让所有输出缓冲区的全部发送出去
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).expect("Fail to Read");
+        let cmd = input.trim();//除掉空格
+        if cmd.eq_ignore_ascii_case("quit") {
+            //eq_ignore_ascii_case 用于判断不论大小写两个字符串是否相等
+            break;
+        }
+
+        let tokens: Vec<&str> = cmd.split_whitespace().collect();
+        // split_whitespace 返回一个去除字符串中的空白的迭代器
+        // collect将迭代器转换为一个集合
+        // 最后 tokens 是由 collect 转换的集合创建的一个向量
+
+        match tokens.as_slice() {
+            //命令解析
+            ["add", name, "to", dept] => {
+                add_staff_to(&mut company, name, dept);
+                println!("add {name} to {dept} Ok!");
+            }
+            ["ls", dept] => {
+                println!("++++++++++");
+                println!("staff list:");
+                show_all_staff_of(&mut company, dept);
+                println!("++++++++++");
+            }
+            ["lsall"] => {
+                println!("\n++++++++++");
+                show_all(&company);
+                println!("++++++++++");
+            }
+            _ => println!("unkown cmd"),
+        }
+    }
+}				
+```

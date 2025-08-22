@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode }}" dir="{{ default `ltr` .Language.LanguageDirection }}">
+    <head>
+        {{- partial "head/head.html" . -}}
+        {{- block "head" . -}}{{ end }}
+    </head>
+    <body class="{{ block `body-class` . }}{{ end }}">
+        {{- partial "head/colorScheme" . -}}
+
+        <!-- 页面加载动画 -->
+        <div id="page-loading" class="page-loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner-container">
+                    <div class="loading-spinner"></div>
+                </div>
+                <div class="loading-text">加载中...</div>
+            </div>
+        </div>
+
+        {{/* The container is wider when there's any activated widget */}}
+        {{- $hasWidget := false -}}
+        {{- range .Site.Params.widgets -}}
+            {{- if gt (len .) 0 -}}
+                {{- $hasWidget = true -}}
+            {{- end -}}
+        {{- end -}}
+        <div class="container main-container flex on-phone--column {{ if $hasWidget }}extended{{ else }}compact{{ end }}" id="main-content">
+            {{- block "left-sidebar" . -}}
+                {{ partial "sidebar/left.html" . }}
+            {{- end -}}
+            {{- block "right-sidebar" . -}}{{ end }}
+            <main class="main full-width">
+                {{- block "main" . }}{{- end }}
+            </main>
+        </div>
+        {{ partial "footer/include.html" . }}
+
+        <!-- 页面加载动画脚本 -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const loadingOverlay = document.getElementById('page-loading');
+                const mainContent = document.getElementById('main-content');
+                
+                // 设置初始状态
+                mainContent.style.opacity = '0';
+                mainContent.style.transform = 'translateY(20px)';
+                
+                // 模拟加载时间（可以根据实际需要调整）
+                setTimeout(function() {
+                    // 隐藏加载动画
+                    loadingOverlay.style.opacity = '0';
+                    loadingOverlay.style.visibility = 'hidden';
+                    
+                    // 显示主内容
+                    mainContent.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateY(0)';
+                    
+                    // 完全移除加载动画元素
+                    setTimeout(function() {
+                        loadingOverlay.remove();
+                    }, 600);
+                }, 800); // 800ms 加载时间
+            });
+        </script>
+    </body>
+</html>

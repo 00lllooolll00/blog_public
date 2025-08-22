@@ -74,6 +74,8 @@ params:
   mainSections:
     - post # 主要内容区域显示post部分
 
+  fancybox: true # 图片灯箱，false为关闭，true为开启
+
   # 特色图片字段名
   featuredImageField: image
 
@@ -114,7 +116,7 @@ params:
   # 评论系统配置
   comments:
     enabled: true # 是否启用评论
-    provider: vssue # 评论服务提供商
+    provider: giscus # 评论服务提供商
 
     # DisqusJS配置（轻量级Disqus替代方案）
     disqusjs:
@@ -182,13 +184,13 @@ params:
 
     # Giscus配置（基于GitHub Discussions的评论系统）
     giscus:
-      repo:
-      repoID:
-      category:
-      categoryID:
-      mapping:
-      lightTheme:
-      darkTheme:
+      repo: "00lllooolll00/blog_public"
+      repoID: "R_kgDOPhv8YA"
+      category: "General"
+      categoryID: "DIC_kwDOPhv8YM4Cuegh"
+      mapping: "pathname"
+      lightTheme: "light"
+      darkTheme: "dark"
       reactionsEnabled: 1
       emitMetadata: 0
 
@@ -209,6 +211,7 @@ params:
   # 小部件配置
   widgets:
     homepage: # 首页小部件
+      - type: welcome-banner # 欢迎横幅
       - type: search # 搜索框
       - type: archives # 归档
         params:
@@ -221,6 +224,7 @@ params:
           limit: 10
     page: # 页面小部件
       - type: toc # 目录
+      - type: back-to-top # 返回顶部按钮
 
   # OpenGraph配置（社交媒体分享优化）
   opengraph:

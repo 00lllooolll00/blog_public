@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://example.com/archives/'>
 
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Archives">
+<link rel="stylesheet" href="/scss/style.min.c323b44d072984bfe940cc8d280532e811e3145c8e7cec099530529f5f7d846c.css"><meta property='og:title' content="Archives">
 <meta property='og:description' content="">
 <meta property='og:url' content='https://example.com/archives/'>
 <meta property='og:site_name' content='N1ntyNine99'>
@@ -40,7 +40,17 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+
+        <div id="page-loading" class="page-loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner-container">
+                    <div class="loading-spinner"></div>
+                </div>
+                <div class="loading-text">加载中...</div>
+            </div>
+        </div>
+
+        <div class="container main-container flex on-phone--column extended" id="main-content"><aside class="sidebar left-sidebar sticky ">
     <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
@@ -487,18 +497,65 @@
     </div>
     
 
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-        2025 © 2025 N1ntyNine99. 保留所有权利。
-    </section>
-    
-    <section class="powerby">
-        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
-        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
-    </section>
-</footer>
+    <section class="count_info">
+        <div>
+            本博客已稳定运行
+            <span id="ds" class="running-days"></span>
+            天
+            <span id="hs" class="running-days"></span>
+            小时
+            <span id="ms" class="running-days"></span>
+            分钟
+        </div>
+        <div>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            共发表 8 篇文章 · 总计 79.96 k 字
+        </div>
+        <div>
+            <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+        </div>
+</section>
+
+
+<script>
+    let s1 = '2025-8-21'; 
+    s1 = new Date(s1.replace(/-/g, "/"));
+    let s2 = new Date();
+    let timeDifference = s2.getTime() - s1.getTime();
+
+    let days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    let hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    let minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+    document.getElementById('ds').innerHTML = days;
+    document.getElementById('hs').innerHTML = hours;
+    document.getElementById('ms').innerHTML = minutes;
+
+</script>
 
 
             </main>
@@ -520,5 +577,123 @@
     }());
 </script>
 
+<style>
+  #backTopBtn {
+    display: none;                 
+    position: fixed;               
+     
+    bottom: 30px;                  
+    right: 400px;                   
+     
+    z-index: 99;                   
+    cursor: pointer;               
+     
+    width: 60px;                   
+    height: 60px;                  
+     
+    background-image: url(/icons/backTop.svg);  
+    background-size: contain;      
+    background-repeat: no-repeat;  
+    background-position: center;   
+    border-radius: 50%;            
+    background-color: rgba(255, 255, 255, 0.8);  
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);    
+     
+    will-change: transform;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;  
+  }
+
+   
+  #backTopBtn:hover {
+    transform: rotate(360deg);     
+    background-color: rgba(255, 255, 255, 1);  
+  }
+</style>
+
+<script>
+  
+
+  function initScrollTop() {
+    
+    
+    let articleContent = document.querySelector(".main-article") ||
+      document.querySelector(".article-content") ||
+      document.querySelector(".post-content");
+    let isHomePage = document.querySelector(".article-list");
+
+    if (!articleContent || isHomePage) {
+      return; 
+    }
+    
+    let btn = document.createElement("div");
+    btn.id = "backTopBtn";        
+    btn.onclick = backToTop;      
+    document.body.appendChild(btn); 
+
+    
+    window.onscroll = function () {
+      
+      let scrollTop = window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop || 0;
+
+       
+      
+      
+      if (scrollTop > 200) {
+        btn.style.display = "block";  
+      } else {
+        btn.style.display = "none";   
+      }
+       
+    };
+  }
+
+  
+
+  function backToTop() {
+    
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  
+  document.addEventListener('DOMContentLoaded', initScrollTop);
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const loadingOverlay = document.getElementById('page-loading');
+                const mainContent = document.getElementById('main-content');
+                
+                
+                mainContent.style.opacity = '0';
+                mainContent.style.transform = 'translateY(20px)';
+                
+                
+                setTimeout(function() {
+                    
+                    loadingOverlay.style.opacity = '0';
+                    loadingOverlay.style.visibility = 'hidden';
+                    
+                    
+                    mainContent.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateY(0)';
+                    
+                    
+                    setTimeout(function() {
+                        loadingOverlay.remove();
+                    }, 600);
+                }, 800); 
+            });
+        </script>
     </body>
 </html>

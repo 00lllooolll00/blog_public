@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://example.com/p/rust-self-teach/'>
 
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Rust自学笔记">
+<link rel="stylesheet" href="/scss/style.min.c323b44d072984bfe940cc8d280532e811e3145c8e7cec099530529f5f7d846c.css"><meta property='og:title' content="Rust自学笔记">
 <meta property='og:description' content="根据官网学习Rust时做的笔记">
 <meta property='og:url' content='https://example.com/p/rust-self-teach/'>
 <meta property='og:site_name' content='N1ntyNine99'>
@@ -42,7 +42,17 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+
+        <div id="page-loading" class="page-loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner-container">
+                    <div class="loading-spinner"></div>
+                </div>
+                <div class="loading-text">加载中...</div>
+            </div>
+        </div>
+
+        <div class="container main-container flex on-phone--column extended" id="main-content"><aside class="sidebar left-sidebar sticky ">
     <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
@@ -480,6 +490,10 @@
 
             
         
+            
+                
+            
+        
     </aside>
 
 
@@ -557,7 +571,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 133 分钟
+                    阅读时长: 136 分钟
                 </time>
             </div>
         
@@ -650,6 +664,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250808172150285.png" alt="image-20250808172150285"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250808172150285.png">
+<img src="./index.assets/image-20250808172150285.png" alt="image-20250808172150285"  />
+</a>
+</div>
+
 </p>
 <p><strong>我们现在删除修改其值的语句之后再次编译会发现就可以成功通过编译并且运行:</strong> 
   
@@ -658,6 +681,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250808172245539.png" alt="image-20250808172245539"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250808172245539.png">
+<img src="./index.assets/image-20250808172245539.png" alt="image-20250808172245539"  />
+</a>
+</div>
+
 </p>
 <p><strong>如果所有的变量都是不可变的，那 Rust 也太鸡肋了，所以官方有一个关键字 <code>mut</code>，来声明这个变量是 <em>“可变的(mutable)”</em>，在声明变量的时候加上这个关键字就可以告知编译器，当前这个变量是一个可变的变量。如下图所示:</strong> 
   
@@ -666,6 +698,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250808172653364.png" alt="image-20250808172653364"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250808172653364.png">
+<img src="./index.assets/image-20250808172653364.png" alt="image-20250808172653364"  />
+</a>
+</div>
+
 </p>
 <hr>
 <h2 id="25string-new">2.5.String:: new()
@@ -696,7 +737,7 @@
 </div><p><strong><code>let mut guess = String::new();</code> 创建了一个字符串类型的变量，其中 mut 表示可变，new()表示创建了一个 String 的实例。在 Rust 中，<code>::</code> 表示一个与前者关联的一个函数，在这里，<code>String</code> 是 Rust 标准库提供的一个字符串数据类型，<code>new()</code> 表示创建一个新的实例，是 <code>String</code> 所提供的一个“<em>关联函数</em>(<em>associated function</em>)”，所谓关联函数，是一个类中的函数，可以理解为 <code>Python</code> 中一个“<em>类（class）</em>”中的一个“<em>方法（method）</em>”。</strong></p>
 <hr>
 <h2 id="26-读取用户输入">2.6 读取用户输入
-</h2><p><code>  io::stdin().read_line(&amp;mut guess).expect(&quot;Fail to readline&quot;);</code> 这条语句用来读取用户的终端输入。由于我们在第一行就显式的引入了标准输入输出，我们这里可以直接使用 <code>io::stdin()</code> 来使用 <code>stdin()</code> 这个方法。如果我们没有在第一行中显式的导入标准输入输出，我们同样可以直接调用 <code>stdin()</code> 但是需要说明来源，如 <code>stdio::io::stdin</code>。</p>
+</h2><p><strong><code>  io::stdin().read_line(&amp;mut guess).expect(&quot;Fail to readline&quot;);</code> 这条语句用来读取用户的终端输入。由于我们在第一行就显式的引入了标准输入输出，我们这里可以直接使用 <code>io::stdin()</code> 来使用 <code>stdin()</code> 这个方法。如果我们没有在第一行中显式的导入标准输入输出，我们同样可以直接调用 <code>stdin()</code> 但是需要说明来源，如 <code>stdio::io::stdin</code>。</strong></p>
 <p><strong>在 <code>io::stdin()</code> 中，<code>stdin()</code> 会返回一个 <a class="link" href="https://doc.Rust-lang.org/std/io/struct.Stdin.html"  target="_blank" rel="noopener"
     ><code>std::io::Stdin</code></a> 的一个实例，该类型是作为一个获取用户终端输入的一个“<em>句柄（handle）</em>”。</strong></p>
 <p><strong>之后的 <code>.read_line(&amp;mut guess)</code> 调用了 <code>read_line</code> 方法来获取用户的输入，并且传入了 <code>&amp;mut guess</code> 来告诉 Rust 将读到的字符串放到 <code>guess</code> 变量中。<code>read_line</code> 会将用户在终端中输入的所有内容都变换成一个字符串来存储，存储方式是“<em>追加（append）</em>”，而不是“<em>覆写（overwrite）</em>”。</strong></p>
@@ -755,6 +796,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250808184006422.png" alt="image-20250808184006422"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250808184006422.png">
+<img src="./index.assets/image-20250808184006422.png" alt="image-20250808184006422"  />
+</a>
+</div>
+
 </p>
 <p><strong>其中格式为“crate 名 + 版本号”（Rust 中的 crates 可以简单理解为外部库），这里的 <em>0.8.5</em> 是 <em>^0.8.5</em> 的简写，意味着任何低于 <em>0.9</em> 但是高于等于 <em>0.8.5</em> 的版本。</strong></p>
 <p><strong>接下来不对代码做任何修改，直接编译运行，我们会发现，它在自己下载相关依赖并且重新编译：</strong> 
@@ -764,6 +814,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250808184537246.png" alt="image-20250808184537246"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250808184537246.png">
+<img src="./index.assets/image-20250808184537246.png" alt="image-20250808184537246"  />
+</a>
+</div>
+
 </p>
 <p><strong>当我们包含外部依赖项时，Cargo 会从 <em>注册表</em> 中获取依赖项所需的所有内容的最新版本， <em>注册表</em> 是 <a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
     >Crates.io</a> 中的数据副本。Crates.io 是 Rust 生态系统中的人们发布他们的开源 Rust 项目供其他人使用的地方。</strong></p>
@@ -866,6 +925,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250808194017191.png" alt="image-20250808194017191"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250808194017191.png">
+<img src="./index.assets/image-20250808194017191.png" alt="image-20250808194017191"  />
+</a>
+</div>
+
 </p>
 <p><strong>报错的主要问题是“<em>类型不匹配（mismatch）</em>”。Rust 作为一个强静态类型语言，具有一个数据类型推测功能。我们的 <code>guess</code>，在最开始声明的时候就是 <code>String</code> 字符串类型，但是我们生成的随机数，由于我们没有显式的指定类型，编译器会自己猜测数据类型，通常会猜测是一个“<em>整型（integer）</em>”，Rust 的几种数值类型中，有些可以在 1 到 100 之间取值： <code>i32</code> （32 位数值）、 <code>u32</code> （无符号 32 位数值）、 <code>i64</code> （64 位数值），以及其他类型。除非另有指定，Rust 默认使用 <code>i32</code> 类型。我们想要把一个字符串与整型比较，这显然是不符合常理的，所以编译器才会报错，说 <em>expected <code>&amp;String</code>, found <code>&amp;{integer}</code></em>, 预期输入的是一个字符串，但是却发现输入的是一个整型。</strong></p>
 <p><strong>想要能够正确识别，我们可以将 <code>guess</code> 从字符串转换为整型。代码如下:</strong></p>
@@ -933,6 +1001,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250808202343869.png" alt="image-20250808202343869"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250808202343869.png">
+<img src="./index.assets/image-20250808202343869.png" alt="image-20250808202343869"  />
+</a>
+</div>
+
 </p>
 <p><strong>但是有个显而易见的问题，不论我们猜测的正确与否，我们都只能猜测依次，我们预期的是，我们不停猜测，直到我们猜测的结果正确为止，这就涉及到了一个重要概念——“<em>循环（loop）</em>”！</strong></p>
 <hr>
@@ -1215,6 +1292,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250809005540559.png" alt="image-20250809005540559"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250809005540559.png">
+<img src="./index.assets/image-20250809005540559.png" alt="image-20250809005540559"  />
+</a>
+</div>
+
 </p>
 <p><strong>这是因为我们在第一行已经声明了 <code>space</code> 变量为一个字符串，而 <code>len()</code> 方法返回值是当前字符串的长度，是一个整数。我们尝试把一个整数赋值给一个字符串，这是 Rust 不允许的，所以报错了。正确做法应该是和上文一样使用两次 <code>let</code>。</strong></p>
 <hr>
@@ -1519,6 +1605,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250810011314872.png" alt="image-20250810011314872"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250810011314872.png">
+<img src="./index.assets/image-20250810011314872.png" alt="image-20250810011314872"  />
+</a>
+</div>
+
 </p>
 <p><strong>这是因为如果是用一个变量动态的访问一个元组，很有可能，这个变量的面值超过了元组的元素数量，会造成类似数组越界的错误。这是 Rust 所不希望看见的。</strong></p>
 <p><strong>没有任何值的元组有一个特殊的名称，称为 <code>unit</code>。这个值及其对应类型都写作 <code>()</code> ，表示一个空值或一个空的返回类型。如果表达式没有返回其他值，则会隐式返回 <code>unit</code> 值。</strong></p>
@@ -1624,6 +1719,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250809023517322.png" alt="image-20250809023517322"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250809023517322.png">
+<img src="./index.assets/image-20250809023517322.png" alt="image-20250809023517322"  />
+</a>
+</div>
+
 </p>
 <p><strong>程序在使用索引操作时无效值导致运行时错误。程序退出并显示错误消息，未执行最后的 <code>println!</code> 语句。当你尝试使用索引访问元素时，Rust 会检查你指定的索引是否小于数组长度。如果索引大于或等于长度，Rust 将发生 panic。这个检查必须在运行时进行，特别是这种情况，因为编译器不可能知道用户在后期运行代码时会输入什么值。</strong></p>
 <p><strong>这是 Rust 内存安全原则的一个实例。在许多低级语言中，这种检查不会进行，当你提供错误的索引时，可能会访问无效的内存。Rust 通过立即退出而不是允许内存访问并继续来保护你免受这种错误的影响。</strong></p>
@@ -1746,6 +1850,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250809195750334.png" alt="image-20250809195750334"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250809195750334.png">
+<img src="./index.assets/image-20250809195750334.png" alt="image-20250809195750334"  />
+</a>
+</div>
+
 </strong></p>
 <p><strong>我们查看编译器的第一个报错，它说 <code>function</code> 在 <code>y</code> 的位置预期得到的是一个 <code>str</code> 类型，但是我们传入的 <code>&quot;N1netyNine99&quot;</code> 确实一个 <code>&amp;str</code> 类型。这让我很疑惑，但是我们按下不表，接着看下面的报错。后面两个报错的都是 <code>doesn't have a size known at compile-time</code>，意思是在编译的时候不知道大小。经过我的查询，Rust 作为一个严格的内存安全的语言，其不允许任何可能造成内存错误的事情发生，就比如我们想要传入一个不知道大小的数据。在 Rust 中，<code>str</code> 和 <code>&amp;str</code> 是两种不同的数据类型；前者是一个抽象的数据类型，表示一段 <code>UTF-8</code> 字符串，它是动态大小类型(<em>DST</em>)，编译时不知道具体大小。而 <code>&amp;str</code> 它是对 <code>str</code> 的借用引用，<code>&amp;str</code> 本质是一个胖指针(<em>fat pointer</em>)，它包含了两个部分：一个指向实际字符串数据的内存地址的指针、字符串的字节长度；<code>&amp;str</code> 的大小是固定的，在 64 位系统中总是 16 字节(8 字节指针 + 8 字节长度)。所以可以使用，因为编译器清楚的知道其大小。</strong></p>
 <blockquote>
@@ -1818,6 +1931,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250809202137910.png" alt="image-20250809202137910"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250809202137910.png">
+<img src="./index.assets/image-20250809202137910.png" alt="image-20250809202137910"  />
+</a>
+</div>
+
 </p>
 <p><strong>编译器报错说 <code>error: expected expression, found </code> let <code> statement</code>，这也与我们上述的表述相同。<code>let x = 5</code> 语句不返回值，所以 <code>y</code> 没有可以绑定到的东西。这与 C 语言和 Ruby 等其他语言不同，在这些语言中，赋值会返回赋值的值。在这些语言中，你可以写 <code>x = y = 6</code> ，让 <code>x</code> 和 <code>y</code> 都具有值 `5 ；在 Rust 中则不是这种情况。</strong></p>
 <p><strong>在 Rust 中，使用 <code>{}</code> 可以创建一个表达式，表达式是有返回值的。</strong></p>
@@ -1947,6 +2069,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250809204313039.png" alt="image-20250809204313039"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250809204313039.png">
+<img src="./index.assets/image-20250809204313039.png" alt="image-20250809204313039"  />
+</a>
+</div>
+
 </p>
 <p><strong>这是因为，函数声明中显示说将会返回一个 <code>i32</code> 类型的值。但是我们的函数体内部，没有显式的返回值，第二行代码也只是简单的对 <code>x</code> 和 <code>y</code> 执行了一次加法，并且由于以 <code>;</code> 结尾，表明这是一个语句，没有返回值。那么函数的返回值便是 <code>()</code>，我们之前提到过，其数据类型是 <code>unit</code>，与我们的预取 <code>i32</code> 并不符合，所以编译器报错了。</strong></p>
 <hr>
@@ -2104,6 +2235,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250809221653397.png" alt="image-20250809221653397"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250809221653397.png">
+<img src="./index.assets/image-20250809221653397.png" alt="image-20250809221653397"  />
+</a>
+</div>
+
 </p>
 <p><strong>报错表明 Rust 期望一个 <code>bool</code> ，但得到的是一个整数。与 Ruby 和 JavaScript 等语言不同，Rust 不会自动尝试将非布尔类型转换为布尔类型。你必须明确指定，并且始终使用布尔值作为 <code>if</code> 的条件。例如，如果我们希望 <code>if</code> 代码块仅在数字不等于 <code>0</code> 时执行，我们可以将 <code>if</code> 表达式更改为以下内容：</strong></p>
 <div class="highlight"><div class="chroma">
@@ -2185,6 +2325,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250809223557297.png" alt="image-20250809223557297"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250809223557297.png">
+<img src="./index.assets/image-20250809223557297.png" alt="image-20250809223557297"  />
+</a>
+</div>
+
 </p>
 <p><strong>因为变量具有单一性，编译器在编译的时候不知道用户会输入什么，但是不同的输入可能造成变量的类型不同。Rust 是不允许这种未知的情况发生，所以报错来阻止编译。如果编译器必须跟踪任何变量的多个假设类型，编译器会更复杂，并且会减少对代码的保证。</strong></p>
 <hr>
@@ -2277,6 +2426,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250809231633908.png" alt="image-20250809231633908"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250809231633908.png">
+<img src="./index.assets/image-20250809231633908.png" alt="image-20250809231633908"  />
+</a>
+</div>
+
 </p>
 <hr>
 <h4 id="3523-while条件循环">3.5.2.3 while——条件循环
@@ -2312,6 +2470,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250810010005451.png" alt="image-20250810010005451"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250810010005451.png">
+<img src="./index.assets/image-20250810010005451.png" alt="image-20250810010005451"  />
+</a>
+</div>
+
 </p>
 <hr>
 <h4 id="3524-使用循环遍历复合类型数据元素">3.5.2.4 使用循环遍历复合类型数据元素
@@ -2349,6 +2516,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250810011740719.png" alt="image-20250810011740719"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250810011740719.png">
+<img src="./index.assets/image-20250810011740719.png" alt="image-20250810011740719"  />
+</a>
+</div>
+
 </p>
 <blockquote>
 <p>[!NOTE]</p>
@@ -2418,6 +2594,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250810022509232.png" alt="image-20250810022509232"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250810022509232.png">
+<img src="./index.assets/image-20250810022509232.png" alt="image-20250810022509232"  />
+</a>
+</div>
+
 </p>
 <hr>
 <h2 id="36-课后训练">3.6 课后训练
@@ -2807,6 +2992,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250811015227556.png" alt="image-20250811015227556"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250811015227556.png">
+<img src="./index.assets/image-20250811015227556.png" alt="image-20250811015227556"  />
+</a>
+</div>
+
 </p>
 <p><strong>如果你在其他语言中听说过浅拷贝和深拷贝这两个术语，那么复制指针、长度和容量而不复制数据的概念听起来可能就像是在进行浅拷贝。但由于 Rust 也会使第一个变量失效，所以它不是被称为浅拷贝，而是被称为移动。在这个例子中，我们会说 <code>s1</code> 被移动到了 <code>s2</code> 。</strong></p>
 <p><strong>这样就解决了我们的问题！当只有 <code>s2</code> 有效时，当它超出作用域时，它将单独释放内存，我们就完成了。</strong></p>
@@ -3141,6 +3335,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250811210319483.png" alt="image-20250811210319483"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250811210319483.png">
+<img src="./index.assets/image-20250811210319483.png" alt="image-20250811210319483"  />
+</a>
+</div>
+
 </p>
 <p><strong>这是因为和变量默认的不可变一样，引用默认也是不可变的。所以修改一个我们借用来的值，是不被允许的。</strong></p>
 <hr>
@@ -3199,6 +3402,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250811212942956.png" alt="image-20250811212942956"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250811212942956.png">
+<img src="./index.assets/image-20250811212942956.png" alt="image-20250811212942956"  />
+</a>
+</div>
+
 </p>
 <p><strong>报错中提到：我们不能在同一时间多次可变的借用 <code>s</code>。与之相对的，以下的代码都是是可以正常运行的：</strong></p>
 <div class="highlight"><div class="chroma">
@@ -3269,6 +3481,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250811212254540.png" alt="image-20250811212254540"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250811212254540.png">
+<img src="./index.assets/image-20250811212254540.png" alt="image-20250811212254540"  />
+</a>
+</div>
+
 </p>
 <p><strong>报错说，我们不能同时有可变引用和不可变引用。不可变引用的用户不会期望值突然从他们下面改变！然而，允许多个不可变引用，因为任何只是读取数据的人都没有能力影响其他人读取数据。</strong></p>
 <p><strong>这种限制的好处是 Rust 可以在编译时防止数据竞争。数据竞争类似于竞态条件，当出现以下三种行为时会发生：两个或多个指针同时访问相同的数据、至少有一个指针正在写入数据、没有机制用于同步对数据的访问。数据竞争会导致未定义行为，当你试图在运行时追踪它们时，诊断和修复它们可能很困难；Rust 通过拒绝编译存在数据竞争的代码来防止这个问题！</strong></p>
@@ -3306,6 +3527,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250811223937514.png" alt="image-20250811223937514"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250811223937514.png">
+<img src="./index.assets/image-20250811223937514.png" alt="image-20250811223937514"  />
+</a>
+</div>
+
 </p>
 <p><strong>这个错误信息指的是我们尚未讨论的一个特性：生命周期。我们将在第 10 章详细讨论生命周期。但是，如果你忽略关于生命周期的部分，这条信息确实包含了导致这段代码成为问题的关键：</strong></p>
 <p><em><strong>this function&rsquo;s return type contains a borrowed value, but there is no value for it to be borrowed from</strong></em></p>
@@ -3583,6 +3813,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250812224455938.png" alt="image-20250812224455938"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250812224455938.png">
+<img src="./index.assets/image-20250812224455938.png" alt="image-20250812224455938"  />
+</a>
+</div>
+
 </p>
 <p><strong>回想借用规则，如果我们对一个事物有不可变引用，我们就不能同时获取一个可变引用。因为 <code>clear</code> 需要截断 <code>String</code> ，它需要获取一个可变引用。调用 <code>clear</code> 后的 <code>println!</code> 使用 <code>word</code> 中的引用，所以在那一点上不可变引用必须仍然有效。Rust 禁止 <code>clear</code> 中的可变引用和 <code>word</code> 中的不可变引用同时存在，编译会失败。Rust 不仅使我们的 API 更容易使用，还在编译时消除了整类错误！</strong></p>
 <p><strong>回想我们之前讨论过字符串字面量存储在二进制文件中。现在我们已经了解了切片，可以正确理解字符串字面量：</strong></p>
@@ -3914,6 +4153,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250813231404176.png" alt="image-20250813231404176"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250813231404176.png">
+<img src="./index.assets/image-20250813231404176.png" alt="image-20250813231404176"  />
+</a>
+</div>
+
 </p>
 <p><strong>在第 10 章，我们将讨论如何修复这些错误，以便你可以在结构体中存储引用，但目前我们将使用类似于 <code>String</code> 的拥有类型来修复这些错误，而不是使用类似于 <code>&amp;str</code> 的引用。</strong></p>
 <hr>
@@ -3952,6 +4200,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250814000247052.png" alt="image-20250814000247052"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250814000247052.png">
+<img src="./index.assets/image-20250814000247052.png" alt="image-20250814000247052"  />
+</a>
+</div>
+
 </p>
 <p><strong>这段代码通过调用 <code>calculate_area</code> 函数，使用每个维度来成功计算出矩形的面积，但我们还可以做更多来使这段代码更加清晰易读。</strong></p>
 <p><strong>函数 <code>area</code> 本应计算一个矩形的面积，但我们编写的函数有两个参数，而且程序中没有任何地方明确说明这两个参数之间的关系。将宽度和高度组合在一起会使代码更易读、更易于管理。</strong></p>
@@ -4069,6 +4326,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250814012949149.png" alt="image-20250814012949149"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250814012949149.png">
+<img src="./index.assets/image-20250814012949149.png" alt="image-20250814012949149"  />
+</a>
+</div>
+
 </p>
 <p><strong><code>println!</code> 宏能够进行多种格式化操作，默认情况下，花括号会指示 <code>println!</code> 使用称为 <code>Display</code> 的格式化方式：这种输出形式是直接面向最终用户的。我们目前见过的原始类型都默认实现了 <code>Display</code>，因为你只会想用一种方式向用户展示 <code>1</code> 或其他原始类型的值。但对于结构体来说，<code>println!</code> 该如何格式化输出就不那么明确了，因为存在更多显示可能性：是否需要逗号？是否要打印花括号？所有字段都应该显示吗？由于这种不确定性，Rust 不会尝试猜测我们的意图，因此结构体没有提供默认的 <code>Display</code> 实现来配合 <code>println!</code> 和 <code>{}</code> 占位符使用。</strong></p>
 <p><strong>让我们试试看！现在 <code>println!</code> 宏调用会写成这样：<code>println!(&quot;rect1 is {rect1:?}&quot;);</code>。在花括号内加上 <code>:?</code> 标识符是告诉 <code>println!</code> 我们要使用名为 <code>Debug</code> 的输出格式。<code>Debug</code> trait 能让我们以对开发者友好的方式打印结构体，这样在调试代码时就能查看它的值了：</strong></p>
@@ -4112,6 +4378,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250814013301343.png" alt="image-20250814013301343"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250814013301343.png">
+<img src="./index.assets/image-20250814013301343.png" alt="image-20250814013301343"  />
+</a>
+</div>
+
 </p>
 <p><strong>但是人性化的编译器提示我们：<em>add <code>#[derive(Debug)]</code> to <code>Rectangle</code> or manually <code>impl Debug for Rectangle</code></em>。这是因为 Rust 本身不自带输出调试信息，我们需要手动显式的为我们的结构体开启这个功能——在结构体之前加上 <code>#[derive(Debug)]</code>：</strong></p>
 <div class="highlight"><div class="chroma">
@@ -4156,6 +4431,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250814013914634.png" alt="image-20250814013914634"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250814013914634.png">
+<img src="./index.assets/image-20250814013914634.png" alt="image-20250814013914634"  />
+</a>
+</div>
+
 </p>
 <p><strong>太好了！虽然输出不是最美观的，但它显示了该实例中所有字段的值，这在调试时肯定会有帮助。当我们的结构体更复杂时，有一个更易于阅读的输出会很有用；在这种情况下，我们可以在 <code>println!</code> 字符串中使用 <code>{:#?}</code> 而不是 <code>{:?}</code> 。在这个例子中，使用 <code>{:#?}</code> 风格将输出以下内容：</strong></p>
 <p>
@@ -4165,6 +4449,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250814014117763.png" alt="image-20250814014117763"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250814014117763.png">
+<img src="./index.assets/image-20250814014117763.png" alt="image-20250814014117763"  />
+</a>
+</div>
+
 </p>
 <blockquote>
 <p>[!NOTE]</p>
@@ -4215,6 +4508,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250814014932344.png" alt="image-20250814014932344"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250814014932344.png">
+<img src="./index.assets/image-20250814014932344.png" alt="image-20250814014932344"  />
+</a>
+</div>
+
 </p>
 <p><strong>从输出中可以看到，第一行内容来自 <em>src/main.rs</em> 第 10 行的调试输出，我们正在检查表达式 <code>30f64 * scale</code> 的计算过程，其结果值为 60.0（Rust 为整数/浮点数实现的 Debug 格式化输出会直接显示其数值）。<em>src/main.rs</em> 第 14 行的 <code>dbg! </code> 调用输出了 <code>&amp;rect1</code> 的值，也就是 <code>Rectangle </code> 结构体的内容。这里的输出使用了 <code>Rectangle </code> 类型提供的格式化调试显示方式。当你需要弄清楚代码的实际执行过程时，<code>dbg! </code> 宏会非常有用！</strong></p>
 <p><strong>除了 <code>Debug trait</code> 外，Rust 还提供了许多可以通过派生（<em>derive</em>）属性来使用的 <code>trait</code>，它们能为我们的自定义类型添加实用功能。我们将在第 10 章探讨如何为这些 <code>trait </code> 实现自定义行为，以及如何创建你自己的 <code>trait</code>。Rust 中除了派生外还有许多其他属性，更多信息请参阅《Rust 参考手册》中的 &ldquo;属性&rdquo; 章节。</strong></p>
@@ -4325,6 +4627,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250814021437696.png" alt="image-20250814021437696"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250814021437696.png">
+<img src="./index.assets/image-20250814021437696.png" alt="image-20250814021437696"  />
+</a>
+</div>
+
 </p>
 <p><strong>在这个实现中，我们定义当实例的 <code>width </code> 成员值大于 0 时，<code>width </code> 方法返回 <code>true</code>，值小于等于 0 时返回 <code>false</code>：这种同名方法可以自由访问同名成员，实现任意逻辑。在 <code>main </code> 函数中：</strong></p>
 <ul>
@@ -4488,6 +4799,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250814023015365.png" alt="image-20250814023015365"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250814023015365.png">
+<img src="./index.assets/image-20250814023015365.png" alt="image-20250814023015365"  />
+</a>
+</div>
+
 </p>
 <p><strong>我们知道要定义一个方法，因此它应该位于 <code>impl Rectangle</code> 代码块中。这个方法将被命名为 <code>can_hold</code>，它会以不可变借用的形式接收另一个 <code>Rectangle</code> 作为参数。通过观察调用该方法的代码 <code>rect1.can_hold(&amp;rect2)</code>，我们可以确定参数类型：这里传入了 <code>&amp;rect2</code>，即对 <code>rect2</code> 实例的不可变借用（<code>rect2</code> 是 <code>Rectangle</code> 的一个实例）。这样的设计是合理的，因为我们只需要读取 <code>rect2</code> 的数据（而不需要修改，否则就需要可变借用），同时我们希望 <code>main</code> 函数能保留 <code>rect2</code> 的所有权以便在调用 <code>can_hold</code> 方法后继续使用它。</strong></p>
 <p><strong><code>can_hold</code> 方法的返回值将是一个布尔值，其实现逻辑会分别检查当前矩形实例（<code>self</code>）的宽度和高度是否大于另一个 <code>Rectangle</code> 的宽度和高度。</strong></p>
@@ -4894,6 +5214,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250815231230434.png" alt="image-20250815231230434"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250815231230434.png">
+<img src="./index.assets/image-20250815231230434.png" alt="image-20250815231230434"  />
+</a>
+</div>
+
 </p>
 <p><strong>换句话说，你必须先将 <code>Option&lt;T&gt;</code> 转换成 <code>T</code> 类型，才能对其执行 <code>T</code> 类型的操作。这种设计从根本上解决了 null 最常见的陷阱——当某个值实际为 null 时，开发者却误以为它非空。</strong></p>
 <p><strong>通过显式要求可能为空的值必须声明为 <code>Option&lt;T&gt;</code> 类型，Rust 帮助你避免错误假设值非空的情况，从而让你对代码更有信心。当你需要使用可能为空的值时，必须通过将该值的类型设为 <code>Option&lt;T&gt;</code> 来明确表明这一点。在使用这个值时，你必须显式处理值为空的情况。而对于那些类型不是 <code>Option&lt;T&gt;</code> 的值，你可以安全地认为它们绝不会为空。这是 Rust 为了限制空值的普遍性并提高代码安全性而做出的深思熟虑的设计决策。</strong></p>
@@ -5126,6 +5455,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250816014455172.png" alt="image-20250816014455172"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250816014455172.png">
+<img src="./index.assets/image-20250816014455172.png" alt="image-20250816014455172"  />
+</a>
+</div>
+
 </p>
 <p><strong>我们没有处理 <code>None</code> 分支，存在潜在威胁，所以编译器向我们报错了。</strong></p>
 <p><strong>Rust 的编译器知道我们没有覆盖所有可能的情况，甚至能精确指出我们遗漏了哪个模式！Rust 中的匹配是穷尽式的：我们必须涵盖所有可能性，代码才能通过编译。特别是在处理 <code>Option&lt;T&gt;</code> 时，当 Rust 阻止我们忘记显式处理 <code>None</code> 的情况时，它实际上保护我们免于在可能为 null 的情况下错误假定值一定存在——从而彻底避免了 <code>null</code> 值匹配的情况。</strong></p>
@@ -5718,6 +6056,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250817005847486.png" alt="image-20250817005847486"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250817005847486.png">
+<img src="./index.assets/image-20250817005847486.png" alt="image-20250817005847486"  />
+</a>
+</div>
+
 </p>
 <p><strong>错误信息显示 <code>hosting</code> 模块是私有的。换句话说，虽然我们给出的 <code>hosting</code> 模块和 <code>add_to_waitlist</code> 函数的路径是正确的，但 Rust 不允许我们使用这些路径，因为它无法访问私有部分。在 Rust 中，所有项（函数、方法、结构体、枚举、模块和常量）默认对其父模块都是私有的。如果你想让某个项（比如函数或结构体）保持私有，只需将其放入模块中即可。</strong></p>
 <p><strong>父模块中的项不能使用子模块中的私有项，但子模块中的项可以使用其祖先模块中的项。这是因为子模块封装并隐藏了它们的实现细节，但子模块可以看到它们被定义的上下文环境。延续我们的比喻，可以将隐私规则想象成餐厅的后厨：对顾客来说后厨操作是私密的，但餐厅经理可以看到并操作整个餐厅的所有环节。</strong></p>
@@ -5765,6 +6112,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250818215342184.png" alt="image-20250818215342184"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250818215342184.png">
+<img src="./index.assets/image-20250818215342184.png" alt="image-20250818215342184"  />
+</a>
+</div>
+
 </p>
 <p><strong>这是因为，虽然我们使用 <code>pub</code> 关键字公开了 <code>hosting</code>，但是其内部的 <code>add_to_waitlist</code> 依旧是私有的。这就是我们前面提到的双重公开，我们想要调用 <code>add_to_waitlist</code>，必须也要在定义函数的时候加上 <code>pub</code>：</strong></p>
 <div class="highlight"><div class="chroma">
@@ -6008,6 +6364,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250819012432756.png" alt="image-20250819012432756"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250819012432756.png">
+<img src="./index.assets/image-20250819012432756.png" alt="image-20250819012432756"  />
+</a>
+</div>
+
 </p>
 <p><strong>注意，编译器还会警告：这段 <code>use</code> 在它所在的作用域里并未被使用！解决办法有两种：把 <code>use crate::front_of_house::hosting;</code> 同样移到 <code>customer</code> 模块内部，或者在子模块 <code>customer</code> 里改用 <code>super::hosting</code> 来引用父模块中的这条快捷路径。</strong></p>
 <hr>
@@ -6413,6 +6778,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250820015816914.png" alt="image-20250820015816914"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250820015816914.png">
+<img src="./index.assets/image-20250820015816914.png" alt="image-20250820015816914"  />
+</a>
+</div>
+
 </p>
 <p><strong>示例的代码乍一看似乎应该能行：指向首元素的引用为什么要关心向量末尾的变化呢？这个错误源于向量的实现方式：由于向量把值连续地存放在内存里，当向量当前位置旁没有足够的空间时，再向末尾添加新元素就可能需要分配一块新内存，并把旧元素整体复制过去。在这种情况下，原先指向首元素的引用就会指向已被释放的内存。借用规则正是为了防止程序陷入这种境地而设计的。</strong></p>
 <hr>
@@ -6661,7 +7035,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p><code>String</code> 中也存在 <code>push</code> 方法，只不过他只是将一个字符追加到字符串的后面：</p>
+</div><p><strong><code>String</code> 中也存在 <code>push</code> 方法，只不过他只是将一个字符追加到字符串的后面：</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -6678,7 +7052,31 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><hr>
+</div><p><strong>想要使用<code>push_str</code>将一个字符串格式化追加到另一个字符串要这样：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;Old&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;New&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">s</span><span class="p">.</span><span class="n">push_str</span><span class="p">(</span><span class="o">&amp;</span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;-123-</span><span class="si">{s2}</span><span class="s">&#34;</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{s}</span><span class="s">&#34;</span><span class="p">);</span><span class="c1">//打印 Old-123-New
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>这是因为<code>push_str</code>的入参必须是<code>&amp;str</code>，而我们使用格式化宏是返回<code>String</code>类型，所以需要加上<code>&amp;</code>，<code>format!</code>宏接下里就会讲。</strong></p>
+<hr>
 <h3 id="824--操作符和-format-宏">8.2.4 <code>+</code> 操作符和 <code>format!</code> 宏
 </h3><p><strong>刚刚只是简单引入了这两个概念，接下来是更细节的信息。</strong></p>
 <p><strong>当我们想要连接两个字符串的时候，最常用的还是 <code>+</code> 操作：</strong></p>
@@ -6785,6 +7183,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250820200238993.png" alt="image-20250820200238993"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250820200238993.png">
+<img src="./index.assets/image-20250820200238993.png" alt="image-20250820200238993"  />
+</a>
+</div>
+
 </p>
 <p><strong>这个报错告诉我们，Rust 中的字符串并不支持使用索引值来访问。但是为什么呢？为了回答这个问题，我们要先从字符串在内存中的存储说起。</strong></p>
 <hr>
@@ -6890,9 +7297,9 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">let</span><span class="w"> </span><span class="n">hello</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;Здравствуйте&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">hello</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;Здравствуйте&#34;</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">let</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">hello</span><span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">4</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">hello</span><span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">4</span><span class="p">];</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
@@ -6922,6 +7329,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250820203248384.png" alt="image-20250820203248384"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250820203248384.png">
+<img src="./index.assets/image-20250820203248384.png" alt="image-20250820203248384"  />
+</a>
+</div>
+
 </p>
 <p><strong>但是如果我们换成下列的代码又会是可行的了：</strong></p>
 <div class="highlight"><div class="chroma">
@@ -7188,6 +7604,15 @@
   
   
   <img src="/p/rust-self-teach/index.assets/image-20250821005422935.png" alt="image-20250821005422935"  />
+
+
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250821005422935.png">
+<img src="./index.assets/image-20250821005422935.png" alt="image-20250821005422935"  />
+</a>
+</div>
+
 </p>
 <p><strong>温习一下之前的关于仅栈数据(<em>stack-only data</em>)的内容，对于类似于<code>i32</code>这样的只存在于栈上的数据，是实现了<code>copy trait</code>的，意味着它可以在栈上快速创建副本，所以在值传递的时候是传递的副本，而不是所有权的转交，而像字符串这样比较复杂数据类型，那么传递值就是通过所有权转交。所以我们这里<code>field_name</code>和<code>field_value</code>在传入给哈希之后，所有权就哈希所有，我们在后面就不能调用它了。</strong></p>
 <p><strong>如果我们向哈希映射中插入值的引用，这些值不会被移动到哈希映射中。引用指向的值必须至少在哈希映射有效期间保持有效。</strong></p>
@@ -7407,6 +7832,440 @@
 </span></span></span><span class="line"><span class="cl"><span class="cm">/*
 </span></span></span></code></pre></td></tr></table>
 </div>
+</div><p><strong>2. 将字符串转换成 Pig Latin。每个单词的首个辅音被移到词尾并加上 ay，因此 first 变成 irst-fay。以元音开头的单词则在末尾加 hay（apple 变成 apple-hay）。</strong></p>
+<p>方式1：只使用学过的知识</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="c1">//元音表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">const</span><span class="w"> </span><span class="no">VOWELS</span>: <span class="p">[</span><span class="kt">char</span><span class="p">;</span><span class="w"> </span><span class="mi">10</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;e&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;i&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;o&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;u&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;E&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;I&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;O&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;U&#39;</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//判断是否是元音字母 a e i o u
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">fn</span> <span class="nf">is_vowels</span><span class="p">(</span><span class="n">ch</span>: <span class="kp">&amp;</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">bool</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">&amp;</span><span class="no">VOWELS</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">pig_latin</span><span class="p">(</span><span class="n">word</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">String</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">word</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">word</span><span class="p">.</span><span class="n">trim</span><span class="p">();</span><span class="w"> </span><span class="c1">// 去除前后空白
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">word</span><span class="p">.</span><span class="n">is_empty</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">// 如果字符串为空 则返回空的字符串实例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">String</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="c1">//迭代计数器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">flag_vowels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">bool</span>::<span class="n">default</span><span class="p">();</span><span class="w"> </span><span class="c1">//是否是元音标志位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">res_str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">new</span><span class="p">();</span><span class="w"> </span><span class="c1">//返回结果字符串
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">first_letter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">char</span>::<span class="n">default</span><span class="p">();</span><span class="w"> </span><span class="c1">//首字母
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">word</span><span class="p">.</span><span class="n">chars</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">is_vowels</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="c1">//是元音
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">                </span><span class="n">flag_vowels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="c1">//是辅音
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">                </span><span class="n">flag_vowels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">first_letter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">flag_vowels</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">res_str</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">i</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">count</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">flag_vowels</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">//元音 结尾加上 -hay
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{word}</span><span class="s">-hay&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">// 首字母不是元音 首个辅音移到末尾加上ay
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{res_str}</span><span class="s">-</span><span class="si">{first_letter}</span><span class="s">ay&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;apple&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s1s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pig_latin</span><span class="p">(</span><span class="o">&amp;</span><span class="n">s1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;first&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s2s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pig_latin</span><span class="p">(</span><span class="o">&amp;</span><span class="n">s2</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{s1}</span><span class="s"> -&gt; </span><span class="si">{s1s}</span><span class="se">\n</span><span class="si">{s2}</span><span class="s"> -&gt; </span><span class="si">{s2s}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">打印:
+</span></span></span><span class="line"><span class="cl"><span class="cm">apple -&gt; apple-hay
+</span></span></span><span class="line"><span class="cl"><span class="cm">first -&gt; irst-fay
+</span></span></span><span class="line"><span class="cl"><span class="cm">*/</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>方式2：使用高级的方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="c1">//元音表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">const</span><span class="w"> </span><span class="no">VOWELS</span>: <span class="p">[</span><span class="kt">char</span><span class="p">;</span><span class="w"> </span><span class="mi">10</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;e&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;i&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;o&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;u&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;E&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;I&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;O&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;U&#39;</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">// 判断是否是元音字母 a e i o u
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">fn</span> <span class="nf">is_vowels</span><span class="p">(</span><span class="n">ch</span>: <span class="kp">&amp;</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">bool</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">&amp;</span><span class="no">VOWELS</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">pig_latin</span><span class="p">(</span><span class="n">word</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">String</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">word</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">word</span><span class="p">.</span><span class="n">trim</span><span class="p">();</span><span class="w"> </span><span class="c1">// 去除前后空白
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">word</span><span class="p">.</span><span class="n">is_empty</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">// 如果字符串为空 则返回空的字符串实例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">String</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">all_the_chars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">word</span><span class="p">.</span><span class="n">chars</span><span class="p">();</span><span class="w"> </span><span class="c1">//获取所有字符的迭代器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">first_letter</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">all_the_chars</span><span class="p">.</span><span class="n">next</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">// next():获取迭代器中的下一个元素 这里即第一个元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="c1">// 此时all_the_chars就只包含除了第一个元素的所有元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">is_vowels</span><span class="p">(</span><span class="o">&amp;</span><span class="n">first_letter</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// 首字母是元音 结尾加上 -hay即可
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{}</span><span class="s">-hay&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">word</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// 首字母不是元音 首个辅音移到末尾加上ay
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">reset_letters</span>: <span class="nb">String</span> <span class="o">=</span><span class="w"> </span><span class="n">all_the_chars</span><span class="p">.</span><span class="n">collect</span><span class="p">();</span><span class="w"> </span><span class="c1">//收集除首字母的所有字母
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="c1">// collect()将迭代器转换成一个集合
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="c1">// 需要显式指定集合的数据类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{}</span><span class="s">-</span><span class="si">{}</span><span class="s">ay&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">reset_letters</span><span class="p">,</span><span class="w"> </span><span class="n">first_letter</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">//未知错误 返回空的字符串
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">String</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;apple&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s1s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pig_latin</span><span class="p">(</span><span class="o">&amp;</span><span class="n">s1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;first&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s2s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pig_latin</span><span class="p">(</span><span class="o">&amp;</span><span class="n">s2</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{s1}</span><span class="s"> -&gt; </span><span class="si">{s1s}</span><span class="se">\n</span><span class="si">{s2}</span><span class="s"> -&gt; </span><span class="si">{s2s}</span><span class="s">&#34;</span><span class="p">);</span><span class="c1">// \n 是换行符
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">打印:
+</span></span></span><span class="line"><span class="cl"><span class="cm">apple -&gt; apple-hay
+</span></span></span><span class="line"><span class="cl"><span class="cm">first -&gt; irst-fay
+</span></span></span><span class="line"><span class="cl"><span class="cm">*/</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>3. 使用哈希映射和向量，创建一个文本界面，让用户能够把员工姓名添加到公司的某个部门；例如，“Add Sally to Engineering” 或 “Add Amir to Sales”。然后允许用户按部门获取该部门所有人员的列表，或按部门获取全公司所有人员的列表，并按字母序排序。</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">collections</span>::<span class="n">HashMap</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span>::<span class="p">{</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">Write</span><span class="p">};</span><span class="c1">//使用到了flush方法，需要Write模块
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//将员工添加到某个部门
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">fn</span> <span class="nf">add_staff_to</span><span class="p">(</span><span class="n">map</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;</span><span class="nb">String</span><span class="p">,</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">satff</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">dept</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">//entry 会返回键对应值的可变引用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="n">entry</span><span class="p">(</span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="n">dept</span><span class="p">)).</span><span class="n">or_insert</span><span class="p">(</span><span class="nb">Vec</span>::<span class="n">new</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">(</span><span class="o">*</span><span class="n">v</span><span class="p">).</span><span class="n">push</span><span class="p">(</span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="n">satff</span><span class="p">));</span><span class="c1">//解引用的优先级低，所以要用括号
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="p">(</span><span class="o">*</span><span class="n">v</span><span class="p">).</span><span class="n">sort</span><span class="p">();</span><span class="w"> </span><span class="c1">//排序
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//展示某个部门的所有员工
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">fn</span> <span class="nf">show_all_staff_of</span><span class="p">(</span><span class="n">map</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;</span><span class="nb">String</span><span class="p">,</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">dept</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="o">&amp;</span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="n">dept</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// 使用from 将&amp;str -&gt; String
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">//没有这个部门
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">None</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;no this dept&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">//有这个部门
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">unwrap</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">//哈希中get得到的是 Option&lt;T&gt;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="c1">//使用unwarp 方法可以解出 T
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="c1">//但是如果作用于None 会使程序panic
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{i}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//显示公司 所有部门 所有员工
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">fn</span> <span class="nf">show_all</span><span class="p">(</span><span class="n">map</span>: <span class="kp">&amp;</span><span class="nc">HashMap</span><span class="o">&lt;</span><span class="nb">String</span><span class="p">,</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">dept</span>: <span class="nb">Vec</span><span class="o">&lt;&amp;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="n">keys</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">dept</span><span class="p">.</span><span class="n">sort</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{i}</span><span class="s">:&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="o">&amp;</span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="n">i</span><span class="p">)).</span><span class="n">unwrap</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{j}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;----------&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">company</span>: <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nb">String</span><span class="p">,</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HashMap</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">loop</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">print!</span><span class="p">(</span><span class="s">&#34;&gt;&gt;&gt;&#34;</span><span class="p">);</span><span class="w"> </span><span class="c1">//不会自动换行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="n">io</span>::<span class="n">stdout</span><span class="p">().</span><span class="n">flush</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span><span class="w"> </span><span class="c1">//让所有输出缓冲区的全部发送出去
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">io</span>::<span class="n">stdin</span><span class="p">().</span><span class="n">read_line</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">input</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&#34;Fail to Read&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">trim</span><span class="p">();</span><span class="c1">//除掉空格
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">cmd</span><span class="p">.</span><span class="n">eq_ignore_ascii_case</span><span class="p">(</span><span class="s">&#34;quit&#34;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">//eq_ignore_ascii_case 用于判断不论大小写两个字符串是否相等
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">tokens</span>: <span class="nb">Vec</span><span class="o">&lt;&amp;</span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cmd</span><span class="p">.</span><span class="n">split_whitespace</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">// split_whitespace 返回一个去除字符串中的空白的迭代器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="c1">// collect将迭代器转换为一个集合
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="c1">// 最后 tokens 是由 collect 转换的集合创建的一个向量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">match</span><span class="w"> </span><span class="n">tokens</span><span class="p">.</span><span class="n">as_slice</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">//命令解析
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="p">[</span><span class="s">&#34;add&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;to&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">dept</span><span class="p">]</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">add_staff_to</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">company</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">dept</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;add </span><span class="si">{name}</span><span class="s"> to </span><span class="si">{dept}</span><span class="s"> Ok!&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">[</span><span class="s">&#34;ls&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">dept</span><span class="p">]</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;++++++++++&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;staff list:&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">show_all_staff_of</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">company</span><span class="p">,</span><span class="w"> </span><span class="n">dept</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;++++++++++&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">[</span><span class="s">&#34;lsall&#34;</span><span class="p">]</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">++++++++++&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">show_all</span><span class="p">(</span><span class="o">&amp;</span><span class="n">company</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;++++++++++&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">_</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;unkown cmd&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">				
+</span></span></span></code></pre></td></tr></table>
+</div>
 </div>
 </section>
 
@@ -7471,46 +8330,118 @@
      
     
         
-    <link rel="stylesheet" href="https://unpkg.com/vssue/dist/vssue.min.css" />
-
-<div id="vssue"></div>
-
-<script src="https://unpkg.com/vue@2/dist/vue.runtime.min.js"></script>
-<script src="https://unpkg.com/vssue/dist/vssue..min.js"></script>
-
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="00lllooolll00/blog_public"
+    data-repo-id="R_kgDOPhv8YA"
+    data-category="General"
+    data-category-id="DIC_kwDOPhv8YM4Cuegh"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="en"
+    data-loading=""
+    crossorigin="anonymous"
+    async
+></script>
 <script>
-    new Vue({
-        el: "#vssue",
-        render: (h) =>
-            h("Vssue", {
-                props: {
-                    title: "Rust自学笔记",
-                    options: {
-                        autoCreateIssue:  false ,
-                        owner: "",
-                        repo: "",
-                        clientId: "",
-                        clientSecret: "",
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
                     },
                 },
-            }),
-    });
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark');
+            }
+        }
+    })();
 </script>
 
     
 
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-        2025 © 2025 N1ntyNine99. 保留所有权利。
-    </section>
-    
-    <section class="powerby">
-        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
-        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
-    </section>
-</footer>
+    <section class="count_info">
+        <div>
+            本博客已稳定运行
+            <span id="ds" class="running-days"></span>
+            天
+            <span id="hs" class="running-days"></span>
+            小时
+            <span id="ms" class="running-days"></span>
+            分钟
+        </div>
+        <div>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            共发表 8 篇文章 · 总计 79.96 k 字
+        </div>
+        <div>
+            <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+        </div>
+</section>
+
+
+<script>
+    let s1 = '2025-8-21'; 
+    s1 = new Date(s1.replace(/-/g, "/"));
+    let s2 = new Date();
+    let timeDifference = s2.getTime() - s1.getTime();
+
+    let days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    let hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    let minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+    document.getElementById('ds').innerHTML = days;
+    document.getElementById('hs').innerHTML = hours;
+    document.getElementById('ms').innerHTML = minutes;
+
+</script>
 
 
     
@@ -7610,5 +8541,123 @@
     }());
 </script>
 
+<style>
+  #backTopBtn {
+    display: none;                 
+    position: fixed;               
+     
+    bottom: 30px;                  
+    right: 400px;                   
+     
+    z-index: 99;                   
+    cursor: pointer;               
+     
+    width: 60px;                   
+    height: 60px;                  
+     
+    background-image: url(/icons/backTop.svg);  
+    background-size: contain;      
+    background-repeat: no-repeat;  
+    background-position: center;   
+    border-radius: 50%;            
+    background-color: rgba(255, 255, 255, 0.8);  
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);    
+     
+    will-change: transform;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;  
+  }
+
+   
+  #backTopBtn:hover {
+    transform: rotate(360deg);     
+    background-color: rgba(255, 255, 255, 1);  
+  }
+</style>
+
+<script>
+  
+
+  function initScrollTop() {
+    
+    
+    let articleContent = document.querySelector(".main-article") ||
+      document.querySelector(".article-content") ||
+      document.querySelector(".post-content");
+    let isHomePage = document.querySelector(".article-list");
+
+    if (!articleContent || isHomePage) {
+      return; 
+    }
+    
+    let btn = document.createElement("div");
+    btn.id = "backTopBtn";        
+    btn.onclick = backToTop;      
+    document.body.appendChild(btn); 
+
+    
+    window.onscroll = function () {
+      
+      let scrollTop = window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop || 0;
+
+       
+      
+      
+      if (scrollTop > 200) {
+        btn.style.display = "block";  
+      } else {
+        btn.style.display = "none";   
+      }
+       
+    };
+  }
+
+  
+
+  function backToTop() {
+    
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  
+  document.addEventListener('DOMContentLoaded', initScrollTop);
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const loadingOverlay = document.getElementById('page-loading');
+                const mainContent = document.getElementById('main-content');
+                
+                
+                mainContent.style.opacity = '0';
+                mainContent.style.transform = 'translateY(20px)';
+                
+                
+                setTimeout(function() {
+                    
+                    loadingOverlay.style.opacity = '0';
+                    loadingOverlay.style.visibility = 'hidden';
+                    
+                    
+                    mainContent.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateY(0)';
+                    
+                    
+                    setTimeout(function() {
+                        loadingOverlay.remove();
+                    }, 600);
+                }, 800); 
+            });
+        </script>
     </body>
 </html>

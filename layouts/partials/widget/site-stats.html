@@ -1,0 +1,84 @@
+<section class="widget-card site-stats">
+    <div class="widget-header">
+        <h2 class="widget-title">站点统计</h2>
+    </div>
+    <div class="widget-body">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">{{ len (where .Site.RegularPages "Type" "post") }}</div>
+                <div class="stat-label">文章数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ len .Site.Taxonomies.categories }}</div>
+                <div class="stat-label">分类数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ len .Site.Taxonomies.tags }}</div>
+                <div class="stat-label">标签数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ .Site.Params.footer.since | default "2025" }}</div>
+                <div class="stat-label">建站年份</div>
+            </div>
+        </div>
+        <div class="stats-extra">
+            <div class="stat-item-full">
+                <div class="stat-label">最后更新</div>
+                <div class="stat-value">{{ .Site.LastChange.Format "2006-01-02" }}</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.site-stats {
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        background: var(--card-background);
+        border-radius: 8px;
+        border: 1px solid var(--card-border-color);
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--body-text-color);
+            opacity: 0.8;
+        }
+    }
+    
+    .stat-item-full {
+        text-align: center;
+        padding: 1rem;
+        background: var(--card-background);
+        border-radius: 8px;
+        border: 1px solid var(--card-border-color);
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--body-text-color);
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--accent-color);
+        }
+    }
+}
+</style>
