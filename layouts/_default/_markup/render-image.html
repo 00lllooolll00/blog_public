@@ -1,3 +1,10 @@
+{{if .Page.Site.Params.fancybox }}
+<div class="post-img-view">
+<a data-fancybox="gallery" href="{{ .Destination | safeURL }}">
+<img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" {{ with .Title}} title="{{ . }}"{{ end }} />
+</a>
+</div>
+{{ else }}
 {{ if or (hasPrefix .Destination "http://") (hasPrefix .Destination "https://") }}
   <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" {{ with .Title}} title="{{ . }}"{{ end }} />
 {{ else if hasPrefix .Destination "/" }}
@@ -10,11 +17,4 @@
   {{ $postURL := .Page.RelPermalink }}
   <img src="{{ $postURL }}{{ $path }}" alt="{{ .Text }}" {{ with .Title}} title="{{ . }}"{{ end }} />
 {{ end }}
-
-{{if .Page.Site.Params.fancybox }}
-<div class="post-img-view">
-<a data-fancybox="gallery" href="{{ .Destination | safeURL }}">
-<img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" {{ with .Title}} title="{{ . }}"{{ end }} />
-</a>
-</div>
 {{ end }}

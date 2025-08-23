@@ -83,7 +83,7 @@ params:
   rssFullContent: true
 
   # 网站图标路径
-  favicon: /favicon.ico # 将favicon.ico放在static目录下
+  favicon: /favicon.svg # 将favicon.svg放在static目录下
 
   # 页脚配置
   footer:
