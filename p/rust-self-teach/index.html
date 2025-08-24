@@ -503,7 +503,15 @@
         <li><a href="#925-适用于什么地方">9.2.5 <code>?</code>适用于什么地方</a></li>
       </ol>
     </li>
-    <li><a href="#93-是否使用panic">9.3 是否使用<code>panic!</code></a></li>
+    <li><a href="#93-是否使用panic">9.3 是否使用<code>panic!</code></a>
+      <ol>
+        <li><a href="#931-例子原型和测试">9.3.1 例子、原型和测试</a></li>
+        <li><a href="#932-在你可以比编译器获得更多信息的情况下">9.3.2 在你可以比编译器获得更多信息的情况下</a></li>
+        <li><a href="#933-错误处理指南">9.3.3 错误处理指南</a></li>
+        <li><a href="#934-创建用于验证的自定义数据类型">9.3.4 创建用于验证的自定义数据类型</a></li>
+      </ol>
+    </li>
+    <li><a href="#94-总结">9.4 总结</a></li>
   </ol>
 </nav>
         </div>
@@ -592,7 +600,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 155 分钟
+                    阅读时长: 161 分钟
                 </time>
             </div>
         
@@ -790,7 +798,7 @@
 </div>
 
 </p>
-<p>其中格式为 &ldquo;crate 名 + 版本号&rdquo;（Rust 中的 crates 可以简单理解为外部库），这里的 <em>0.8.5</em> 是 <em>^0.8.5</em> 的简写，意味着任何低于 <em>0.9</em> 但是高于等于 <em>0.8.5</em> 的版本。</p>
+<p>其中格式为 &ldquo;crate 名 + 版本号&rdquo;（Rust 中的 crates 可以简单理解为外部库），<strong>这里的 <em>0.8.5</em> 是 <em>^0.8.5</em> 的简写，意味着任何低于 <em>0.9</em> 但是高于等于 <em>0.8.5</em> 的版本</strong>。</p>
 <p>接下来不对代码做任何修改，直接编译运行，我们会发现，它在自己下载相关依赖并且重新编译： 
 <div class="post-img-view">
 <a data-fancybox="gallery" href="./index.assets/image-20250808184537246.png">
@@ -801,7 +809,7 @@
 </p>
 <p>当我们包含外部依赖项时，Cargo 会从 <em>注册表</em> 中获取依赖项所需的所有内容的最新版本， <em>注册表</em> 是 <a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
     >Crates.io</a> 中的数据副本。Crates.io 是 Rust 生态系统中的人们发布他们的开源 Rust 项目供其他人使用的地方。</p>
-<p>Cargo 拥有一种机制，确保每次你或其他人构建代码时都能重新构建相同的工件：Cargo 将仅使用你指定的依赖版本，直到你明确表示更改。例如，假设下周 <code>rand</code> crate 发布了 0.8.6 版本，该版本包含一个重要的错误修复，但也包含一个会导致你的代码出错的回归问题。为了处理这种情况，Rust 在你第一次运行 <code>cargo build</code> 时会创建 <em>Cargo.lock</em> 文件，因此现在我们在 guessing_game 目录中有了这个文件。</p>
+<p>Cargo 拥有一种机制，确保每次你或其他人构建代码时都能重新构建相同的工件：Cargo 将仅使用你指定的依赖版本，直到你明确表示更改。例如，假设下周 <code>rand</code> crate 发布了 0.8.6 版本，该版本包含一个重要的错误修复，但也包含一个会导致你的代码出错的回归问题。为了处理这种情况，Rust 在你第一次运行 <code>cargo build</code> 时会创建 <em>Cargo.lock</em> 文件，因此现在我们在 <em>guessing_game</em> 目录中有了这个文件。</p>
 <p>当你第一次构建项目时，Cargo 会确定所有符合要求的依赖版本，并将这些版本写入 Cargo.lock 文件中。以后当你再次构建项目时，Cargo 会看到 <em>Cargo.lock</em> 文件存在，并使用该文件中指定的版本，而不是重新计算版本。这使得你可以自动获得可重复的构建结果。换句话说，由于 <em>Cargo.lock</em> 文件的存在，你的项目会一直保持在 0.8.5 版本，直到你显式地进行升级。因为 <em>Cargo.lock</em> 文件对于可重复构建非常重要，所以它通常会和其他代码一起被纳入源代码控制中。</p>
 <p>当你需要更新一个 crates 时，Cargo 提供了 <code>update</code> 命令，该命令会忽略 <em>Cargo.lock</em> 文件，并找出所有符合 <em>Cargo.toml</em> 中你指定条件的最新版本。然后 Cargo 会将这些版本写入 <em>Cargo.lock</em> 文件。在这种情况下，Cargo 将只查找版本号大于 0.8.5 且小于 0.9.0 的版本。如果 <code>rand</code> crates 发布了两个新版本 0.8.6 和 0.9.0，当你运行 <code>cargo update</code> 时，你会看到以下内容:</p>
 <div class="highlight"><div class="chroma">
@@ -8485,6 +8493,189 @@
 <h2 id="93-是否使用panic">9.3 是否使用<code>panic!</code>
 </h2><p>那么，你该如何决定何时调用 <code>panic!</code>，何时返回 <code>Result</code> 呢？当代码触发 <code>panic!</code> 时，就无法再恢复。你可以在任何错误场景下直接 <code>panic!</code>，无论是否存在恢复的可能，<strong>但这等于你替调用方做出了“此情况不可恢复”的决定</strong>。而选择返回 <code>Result</code> 值，则把选择权交给调用方：它可以根据自身场景尝试恢复，也可以认定这个 <code>Err</code> 不可恢复，于是调用 <code>panic!</code> 把你原本“可恢复”的错误变成“不可恢复”。因此，<strong>在定义一个可能失败的函数时，把返回 <code>Result</code> 作为默认选择通常是更好的做法</strong>。</p>
 <p>在示例代码、原型代码以及测试代码这类场景里，直接让代码 <code>panic!</code> 往往更合适。接下来我们会探讨原因，并讨论一些编译器无法、<strong>但人类可以断定“失败绝不可能”的情况</strong>。本章最后会给出在库代码中决定是否 <code>panic!</code> 的一般性指导原则。</p>
+<hr>
+<h3 id="931-例子原型和测试">9.3.1 例子、原型和测试
+</h3><p>当你写示例代码来说明某个概念时，如果还加上完善的错误处理，反而会让<strong>示例显得不够清晰</strong>。在示例里，大家都理解像 <code>unwrap</code> 这样可能触发 <code>panic!</code> 的调用只是占位符，代表你真正在应用中处理错误的方式——具体怎么做则取决于代码其余部分的实际需求。</p>
+<p>同理，在原型阶段尚未决定如何处理错误时，<code>unwrap</code> 和 <code>expect</code> 非常方便。它们在你的代码里留下了清晰的标记，提醒你稍后要让程序更健壮。</p>
+<p>如果测试中的某个方法调用失败，即使该方法不是当前正在测试的功能，你也希望整个测试失败。由于 <code>panic!</code> 正是标记测试失败的手段，因此在测试中调用 <code>unwrap</code> 或 <code>expect</code> 恰恰是最合适的选择。</p>
+<hr>
+<h3 id="932-在你可以比编译器获得更多信息的情况下">9.3.2 在你可以比编译器获得更多信息的情况下
+</h3><p>当你通过其他逻辑已经<strong>确保 <code>Result</code> 必定是 <code>Ok</code></strong>，但这种保证编译器无法识别时，调用 <code>expect</code> 也是合适的。此时你仍然得到一个需要处理的 <code>Result</code>：一般而言，被调用的操作仍有失败的可能，只是在你当前的特定情境下逻辑上不可能出错。如果你能人工检查代码并确认永远不会出现 <code>Err</code>，那么使用 <code>expect</code> 并在参数文本中说明你认为不会出错的理由，就是完全可以接受的。示例如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">net</span>::<span class="n">IpAddr</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">home</span>: <span class="nc">IpAddr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;127.0.0.1&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">parse</span><span class="p">()</span><span class="c1">//将字符串类型解析成我们显式指定的类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="p">.</span><span class="n">expect</span><span class="p">(</span><span class="s">&#34;Hardcoded IP address should be valid&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们通过解析一段硬编码的字符串来创建 <code>IpAddr</code> 实例。明显可以看出 <code>127.0.0.1</code> 是一个合法的 IP 地址，因此在这里使用 <code>expect</code> 是合理的。然而，即<strong>使字符串是硬编码且有效的</strong>，<code>parse</code> 方法的返回类型依旧是 <code>Result</code>；编译器仍<strong>强制我们像处理可能出错的情况一样去处理这个 <code>Result</code>，因为它无法聪明到识别出该字符串必然合法</strong>。如果 IP 地址字符串来<strong>自用户输入而非硬编码，从而确实存在失败的可能，我们就必须以更健壮的方式来处理 <code>Result</code></strong>。通过在注释中指出“该 IP 地址是硬编码的”这一假设，将来若需要从其他来源获取 IP 地址，我们会记得把 <code>expect</code> 替换为更完善的错误处理代码。</p>
+<hr>
+<h3 id="933-错误处理指南">9.3.3 错误处理指南
+</h3><p>当代码有可能进入不良状态时，建议让它直接 <code>panic!</code>。这里的“不良状态”指的是某<strong>些假设、保证、约定或不变量被破坏</strong>——例如向你的代码传递了无效值、矛盾值或缺失值——并且满足以下至少一条：</p>
+<ul>
+<li><strong>这种不良状态是意料之外的，而不是像“用户偶尔输错格式”那样可能发生；</strong></li>
+<li><strong>后续逻辑必须建立在“不会进入此状态”之上，而不是每一步都去检查问题；</strong></li>
+<li><strong>无法用你现有的类型系统把这一信息编码出来（第 18 章“将状态和行为编码为类型”会举例说明）。</strong></li>
+</ul>
+<p>如果调用者传入明显不合理的值，最好返回 <code>Result</code>，让库的使用者决定如何处理。但若继续执行会带来安全隐患或危害，就应 <code>panic!</code>，提醒开发者修复 bug。同样，<strong>当你调用不可控的外部代码而它返回无法修复的无效状态时</strong>，<code>panic!</code> 也往往是合适的。</p>
+<p>相反，如果<strong>失败是可预期的</strong>——解析器遇到格式错误的数据、HTTP 请求返回限流状态等——<strong>就应返回 <code>Result</code>，表明失败是调用方必须处理的正常情形</strong>。</p>
+<p>当某操作若使用<strong>无效值会让用户面临风险时，代码应先验证值的有效性，无效则 <code>panic!</code></strong>。这主要是出于安全考虑：在无效数据上操作容易暴露漏洞。标准库对越界内存访问就 <code>panic!</code>，原因即在此。函数往往带有“契约”：<strong>仅当输入满足特定要求时行为才有保障</strong>。违反契约即调用方 bug，不应让调用代码显式处理，也无可恢复，因此 <code>panic!</code> 是合理的。这类契约及其违反时的行为应在 API 文档中写明。</p>
+<p>然而，在每个函数里大量手写检查既啰嗦又烦人。幸运的是，Rust 的类型系统（以及编译器的类型检查）能帮你完成许多检查。例如：</p>
+<ul>
+<li><strong>参数是某具体类型而非 <code>Option&lt;T&gt;</code> 时，你已确保调用者必然提供了值，无需再分 <code>Some</code> / <code>None</code> 两种情况；试图传 <code>None</code> 连编译都过不了。</strong></li>
+<li><strong>使用 <code>u32</code> 等无符号整型，就能保证参数绝不会是负数。</strong></li>
+</ul>
+<hr>
+<h3 id="934-创建用于验证的自定义数据类型">9.3.4 创建用于验证的自定义数据类型
+</h3><p>接下来我们尝试使用Rust的数据类型体系来确保不会出现明显错误，然后再试着创建一个自己的数据类型来对值进行验证。第二章中我们创建的猜数游戏中，我们预期让用户输入一个1~100的值来与我们产生的随机值匹配，但是我们从来没有验证过用户输入的值是不是在合理的范围内；我们只确保了随机数在这个范围内。但是对于我们的猜数游戏来说，这个问题并不严重，因为我们对于大小的判断依旧是有效的，不过限制用户的输入确实可以增强我们程序的逻辑性，让程序对超出我们预设范围的值进行不同的处理。</p>
+<p>有一个有效的方法就是将<code>u32</code>的限制改为<code>i32</code>，然后加上范围判断：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">rand</span>::<span class="n">Rng</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">cmp</span>::<span class="n">Ordering</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">secret_number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span>::<span class="n">thread_rng</span><span class="p">().</span><span class="n">gen_range</span><span class="p">(</span><span class="mi">1</span><span class="o">..=</span><span class="mi">100</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Plz guess a int from 1 to 100&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">loop</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">guess</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">io</span>::<span class="n">stdin</span><span class="p">().</span><span class="n">read_line</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">guess</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&#34;Can`t read line&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">guess</span>:<span class="kt">i32</span> <span class="o">=</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">guess</span><span class="p">.</span><span class="n">trim</span><span class="p">().</span><span class="n">parse</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">//不直接使用expect来终止程序而是使用match处理
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">            </span><span class="nb">Ok</span><span class="p">(</span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">num</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nb">Err</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Must be a number&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">continue</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">//加上范围判断
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">         </span><span class="k">if</span><span class="w"> </span><span class="n">guess</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">guess</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;The secret number will be between 1 and 100.&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">match</span><span class="w"> </span><span class="n">guess</span><span class="p">.</span><span class="n">cmp</span><span class="p">(</span><span class="o">&amp;</span><span class="n">secret_number</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Ordering</span>::<span class="n">Equal</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;u got right answer</span><span class="si">{secret_number}</span><span class="s">&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Ordering</span>::<span class="n">Greater</span><span class="w"> </span><span class="o">=&gt;</span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;guess </span><span class="si">{guess}</span><span class="s"> is bigger than secret number </span><span class="si">{secret_number}</span><span class="s">&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Ordering</span>::<span class="n">Less</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;guess </span><span class="si">{guess}</span><span class="s"> is less than secret number </span><span class="si">{secret_number}</span><span class="s">&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>if</code> 表达式先检查数值是否超出范围，向用户指出问题，并调用 <code>continue</code> 开始下一次循环、重新请求输入。经过 <code>if</code> 之后，我们才能确信 <code>guess</code> 已落在 1 到 100 之间，然后再拿它与秘密数字比较。</p>
+<p>然而，这并不是理想的方案：如果程序必须只在 1 到 100 之间的值上运行，并且有许多函数都有这一要求，那么在每个函数里都写一遍范围检查既繁琐（也可能影响性能）。</p>
+<p>更好的做法是**：在一个独立模块里创建一个新类型，把验证逻辑放在创建该类型实例的函数中，而不是到处重复这些检查。**这样一来，其他函数只要在签名里使用这个新类型，就可以放心地使用收到的值。下面展示了如何定义一个 <code>Guess</code> 类型：只有当 <code>new</code> 函数收到的值介于 1 到 100 之间时，才会创建 <code>Guess</code> 实例。</p>
+<p><em>Filename: src/guessing_game.rs</em></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Guess</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">value</span>: <span class="kt">i32</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="w"> </span><span class="n">Guess</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// 创建一个实例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">value</span>: <span class="kt">i32</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Guess</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="fm">panic!</span><span class="p">(</span><span class="s">&#34;Guess value must be between 1 and 100, got </span><span class="si">{value}</span><span class="s">.&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Guess</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">//获取这个实例的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">value</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">i32</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">value</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>请注意，<strong>这段位于 <code>src/guessing_game.rs</code> 中的代码依赖于在 <code>src/lib.rs</code> 里加上一条我们尚未展示的模块声明 <code>mod guessing_game;</code></strong>。在这个新模块文件里，我们定义了一个名为 <code>Guess</code> 的结构体，其中有一个字段 <code>value</code>，类型为 <code>i32</code>，用来存放具体的数字。</p>
+<p>接着，我们为 <code>Guess</code> 实现了一个关联函数 <code>new</code>，用于创建 <code>Guess</code> 实例。<code>new</code> 函数接收一个名为 <code>value</code> 的 <code>i32</code> 参数，并返回一个 <code>Guess</code>。函数体先检查 <code>value</code> 是否落在 1 到 100 之间；若未通过检查，就调用 <code>panic!</code>，提醒调用者出现了必须修复的 bug，因为用超出此范围的值创建 <code>Guess</code> 会破坏 <code>Guess::new</code> 依赖的约定。<strong><code>Guess::new</code> 可能触发 <code>panic!</code> 的情形应当在其公开的 API 文档中说明</strong>；第 14 章将介绍如何在自建 API 文档中标明 <code>panic!</code> 的可能性。如果 <code>value</code> 通过检查，就用该参数创建一个新的 <code>Guess</code> 并返回。</p>
+<p>随后，我们实现了一个名为 <code>value</code> 的方法，它借用 <code>self</code>，无其他参数，返回一个 <code>i32</code>。<strong>这类方法通常称为 getter，作用是从字段中取出数据并返回</strong>。由于 <code>Guess</code> 结构体的 <code>value</code> 字段是私有的，这个公有方法不可或缺。保持 <code>value</code> 字段私有十分重要，这样可以防止外部代码直接设置 <code>value</code>：外部模块必须通过 <code>Guess::new</code> 创建 <code>Guess</code> 实例，从而确保任何 <code>Guess</code> 的值都经过了 <code>Guess::new</code> 中条件的校验。</p>
+<p>于是，一个只接受或只返回 1 到 100 之间数字的函数，就可以在签名里声明其参数或返回值为 <code>Guess</code> 而非 <code>i32</code>，而无需再在函数体内做任何额外检查。</p>
+<hr>
+<h2 id="94-总结">9.4 总结
+</h2><p><strong>Rust 的错误处理机制旨在帮助你编写更健壮的代码。</strong></p>
+<ul>
+<li><code>panic!</code> 宏用于表明程序已处于一个无法继续正常运行的状态，它通知进程停止，而不是带着无效或错误的值继续执行。</li>
+<li><code>Result</code> 枚举则利用 Rust 的类型系统，指出某些操作可能失败，但你的代码仍有机会从中恢复。你可以用 <code>Result</code> 告诉调用者：必须妥善处理潜在的成功或失败结果。</li>
+</ul>
+<p>在合适的场景下使用 <code>panic!</code> 和 <code>Result</code>，能让你的代码在面对不可避免的问题时更加可靠。</p>
+<p>现在，你已经看到标准库如何通过 <code>Option</code> 和 <code>Result</code> 枚举来运用泛型。接下来，我们将讨论泛型的具体工作机制，以及如何在代码中使用它们。</p>
+<hr>
 
 </section>
 
@@ -8641,7 +8832,7 @@
             
             
             
-            共发表 9 篇文章 · 总计 90.07 k 字
+            共发表 9 篇文章 · 总计 93.15 k 字
         </div>
         <div>
             <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>

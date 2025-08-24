@@ -1463,7 +1463,7 @@
 &lt;/div&gt;
 
 &lt;/p&gt;
-&lt;p&gt;其中格式为 &amp;ldquo;crate 名 + 版本号&amp;rdquo;（Rust 中的 crates 可以简单理解为外部库），这里的 &lt;em&gt;0.8.5&lt;/em&gt; 是 &lt;em&gt;^0.8.5&lt;/em&gt; 的简写，意味着任何低于 &lt;em&gt;0.9&lt;/em&gt; 但是高于等于 &lt;em&gt;0.8.5&lt;/em&gt; 的版本。&lt;/p&gt;
+&lt;p&gt;其中格式为 &amp;ldquo;crate 名 + 版本号&amp;rdquo;（Rust 中的 crates 可以简单理解为外部库），&lt;strong&gt;这里的 &lt;em&gt;0.8.5&lt;/em&gt; 是 &lt;em&gt;^0.8.5&lt;/em&gt; 的简写，意味着任何低于 &lt;em&gt;0.9&lt;/em&gt; 但是高于等于 &lt;em&gt;0.8.5&lt;/em&gt; 的版本&lt;/strong&gt;。&lt;/p&gt;
 &lt;p&gt;接下来不对代码做任何修改，直接编译运行，我们会发现，它在自己下载相关依赖并且重新编译： 
 &lt;div class=&#34;post-img-view&#34;&gt;
 &lt;a data-fancybox=&#34;gallery&#34; href=&#34;./index.assets/image-20250808184537246.png&#34;&gt;
@@ -1474,7 +1474,7 @@
 &lt;/p&gt;
 &lt;p&gt;当我们包含外部依赖项时，Cargo 会从 &lt;em&gt;注册表&lt;/em&gt; 中获取依赖项所需的所有内容的最新版本， &lt;em&gt;注册表&lt;/em&gt; 是 &lt;a class=&#34;link&#34; href=&#34;https://crates.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;Crates.io&lt;/a&gt; 中的数据副本。Crates.io 是 Rust 生态系统中的人们发布他们的开源 Rust 项目供其他人使用的地方。&lt;/p&gt;
-&lt;p&gt;Cargo 拥有一种机制，确保每次你或其他人构建代码时都能重新构建相同的工件：Cargo 将仅使用你指定的依赖版本，直到你明确表示更改。例如，假设下周 &lt;code&gt;rand&lt;/code&gt; crate 发布了 0.8.6 版本，该版本包含一个重要的错误修复，但也包含一个会导致你的代码出错的回归问题。为了处理这种情况，Rust 在你第一次运行 &lt;code&gt;cargo build&lt;/code&gt; 时会创建 &lt;em&gt;Cargo.lock&lt;/em&gt; 文件，因此现在我们在 guessing_game 目录中有了这个文件。&lt;/p&gt;
+&lt;p&gt;Cargo 拥有一种机制，确保每次你或其他人构建代码时都能重新构建相同的工件：Cargo 将仅使用你指定的依赖版本，直到你明确表示更改。例如，假设下周 &lt;code&gt;rand&lt;/code&gt; crate 发布了 0.8.6 版本，该版本包含一个重要的错误修复，但也包含一个会导致你的代码出错的回归问题。为了处理这种情况，Rust 在你第一次运行 &lt;code&gt;cargo build&lt;/code&gt; 时会创建 &lt;em&gt;Cargo.lock&lt;/em&gt; 文件，因此现在我们在 &lt;em&gt;guessing_game&lt;/em&gt; 目录中有了这个文件。&lt;/p&gt;
 &lt;p&gt;当你第一次构建项目时，Cargo 会确定所有符合要求的依赖版本，并将这些版本写入 Cargo.lock 文件中。以后当你再次构建项目时，Cargo 会看到 &lt;em&gt;Cargo.lock&lt;/em&gt; 文件存在，并使用该文件中指定的版本，而不是重新计算版本。这使得你可以自动获得可重复的构建结果。换句话说，由于 &lt;em&gt;Cargo.lock&lt;/em&gt; 文件的存在，你的项目会一直保持在 0.8.5 版本，直到你显式地进行升级。因为 &lt;em&gt;Cargo.lock&lt;/em&gt; 文件对于可重复构建非常重要，所以它通常会和其他代码一起被纳入源代码控制中。&lt;/p&gt;
 &lt;p&gt;当你需要更新一个 crates 时，Cargo 提供了 &lt;code&gt;update&lt;/code&gt; 命令，该命令会忽略 &lt;em&gt;Cargo.lock&lt;/em&gt; 文件，并找出所有符合 &lt;em&gt;Cargo.toml&lt;/em&gt; 中你指定条件的最新版本。然后 Cargo 会将这些版本写入 &lt;em&gt;Cargo.lock&lt;/em&gt; 文件。在这种情况下，Cargo 将只查找版本号大于 0.8.5 且小于 0.9.0 的版本。如果 &lt;code&gt;rand&lt;/code&gt; crates 发布了两个新版本 0.8.6 和 0.9.0，当你运行 &lt;code&gt;cargo update&lt;/code&gt; 时，你会看到以下内容:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -9158,6 +9158,189 @@
 &lt;h2 id=&#34;93-是否使用panic&#34;&gt;9.3 是否使用&lt;code&gt;panic!&lt;/code&gt;
 &lt;/h2&gt;&lt;p&gt;那么，你该如何决定何时调用 &lt;code&gt;panic!&lt;/code&gt;，何时返回 &lt;code&gt;Result&lt;/code&gt; 呢？当代码触发 &lt;code&gt;panic!&lt;/code&gt; 时，就无法再恢复。你可以在任何错误场景下直接 &lt;code&gt;panic!&lt;/code&gt;，无论是否存在恢复的可能，&lt;strong&gt;但这等于你替调用方做出了“此情况不可恢复”的决定&lt;/strong&gt;。而选择返回 &lt;code&gt;Result&lt;/code&gt; 值，则把选择权交给调用方：它可以根据自身场景尝试恢复，也可以认定这个 &lt;code&gt;Err&lt;/code&gt; 不可恢复，于是调用 &lt;code&gt;panic!&lt;/code&gt; 把你原本“可恢复”的错误变成“不可恢复”。因此，&lt;strong&gt;在定义一个可能失败的函数时，把返回 &lt;code&gt;Result&lt;/code&gt; 作为默认选择通常是更好的做法&lt;/strong&gt;。&lt;/p&gt;
 &lt;p&gt;在示例代码、原型代码以及测试代码这类场景里，直接让代码 &lt;code&gt;panic!&lt;/code&gt; 往往更合适。接下来我们会探讨原因，并讨论一些编译器无法、&lt;strong&gt;但人类可以断定“失败绝不可能”的情况&lt;/strong&gt;。本章最后会给出在库代码中决定是否 &lt;code&gt;panic!&lt;/code&gt; 的一般性指导原则。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;931-例子原型和测试&#34;&gt;9.3.1 例子、原型和测试
+&lt;/h3&gt;&lt;p&gt;当你写示例代码来说明某个概念时，如果还加上完善的错误处理，反而会让&lt;strong&gt;示例显得不够清晰&lt;/strong&gt;。在示例里，大家都理解像 &lt;code&gt;unwrap&lt;/code&gt; 这样可能触发 &lt;code&gt;panic!&lt;/code&gt; 的调用只是占位符，代表你真正在应用中处理错误的方式——具体怎么做则取决于代码其余部分的实际需求。&lt;/p&gt;
+&lt;p&gt;同理，在原型阶段尚未决定如何处理错误时，&lt;code&gt;unwrap&lt;/code&gt; 和 &lt;code&gt;expect&lt;/code&gt; 非常方便。它们在你的代码里留下了清晰的标记，提醒你稍后要让程序更健壮。&lt;/p&gt;
+&lt;p&gt;如果测试中的某个方法调用失败，即使该方法不是当前正在测试的功能，你也希望整个测试失败。由于 &lt;code&gt;panic!&lt;/code&gt; 正是标记测试失败的手段，因此在测试中调用 &lt;code&gt;unwrap&lt;/code&gt; 或 &lt;code&gt;expect&lt;/code&gt; 恰恰是最合适的选择。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;932-在你可以比编译器获得更多信息的情况下&#34;&gt;9.3.2 在你可以比编译器获得更多信息的情况下
+&lt;/h3&gt;&lt;p&gt;当你通过其他逻辑已经&lt;strong&gt;确保 &lt;code&gt;Result&lt;/code&gt; 必定是 &lt;code&gt;Ok&lt;/code&gt;&lt;/strong&gt;，但这种保证编译器无法识别时，调用 &lt;code&gt;expect&lt;/code&gt; 也是合适的。此时你仍然得到一个需要处理的 &lt;code&gt;Result&lt;/code&gt;：一般而言，被调用的操作仍有失败的可能，只是在你当前的特定情境下逻辑上不可能出错。如果你能人工检查代码并确认永远不会出现 &lt;code&gt;Err&lt;/code&gt;，那么使用 &lt;code&gt;expect&lt;/code&gt; 并在参数文本中说明你认为不会出错的理由，就是完全可以接受的。示例如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Rust&#34; data-lang=&#34;Rust&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;fn&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;use&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;net&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;IpAddr&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;home&lt;/span&gt;: &lt;span class=&#34;nc&#34;&gt;IpAddr&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;127.0.0.1&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parse&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//将字符串类型解析成我们显式指定的类型
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;expect&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Hardcoded IP address should be valid&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;我们通过解析一段硬编码的字符串来创建 &lt;code&gt;IpAddr&lt;/code&gt; 实例。明显可以看出 &lt;code&gt;127.0.0.1&lt;/code&gt; 是一个合法的 IP 地址，因此在这里使用 &lt;code&gt;expect&lt;/code&gt; 是合理的。然而，即&lt;strong&gt;使字符串是硬编码且有效的&lt;/strong&gt;，&lt;code&gt;parse&lt;/code&gt; 方法的返回类型依旧是 &lt;code&gt;Result&lt;/code&gt;；编译器仍&lt;strong&gt;强制我们像处理可能出错的情况一样去处理这个 &lt;code&gt;Result&lt;/code&gt;，因为它无法聪明到识别出该字符串必然合法&lt;/strong&gt;。如果 IP 地址字符串来&lt;strong&gt;自用户输入而非硬编码，从而确实存在失败的可能，我们就必须以更健壮的方式来处理 &lt;code&gt;Result&lt;/code&gt;&lt;/strong&gt;。通过在注释中指出“该 IP 地址是硬编码的”这一假设，将来若需要从其他来源获取 IP 地址，我们会记得把 &lt;code&gt;expect&lt;/code&gt; 替换为更完善的错误处理代码。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;933-错误处理指南&#34;&gt;9.3.3 错误处理指南
+&lt;/h3&gt;&lt;p&gt;当代码有可能进入不良状态时，建议让它直接 &lt;code&gt;panic!&lt;/code&gt;。这里的“不良状态”指的是某&lt;strong&gt;些假设、保证、约定或不变量被破坏&lt;/strong&gt;——例如向你的代码传递了无效值、矛盾值或缺失值——并且满足以下至少一条：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;这种不良状态是意料之外的，而不是像“用户偶尔输错格式”那样可能发生；&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;后续逻辑必须建立在“不会进入此状态”之上，而不是每一步都去检查问题；&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无法用你现有的类型系统把这一信息编码出来（第 18 章“将状态和行为编码为类型”会举例说明）。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果调用者传入明显不合理的值，最好返回 &lt;code&gt;Result&lt;/code&gt;，让库的使用者决定如何处理。但若继续执行会带来安全隐患或危害，就应 &lt;code&gt;panic!&lt;/code&gt;，提醒开发者修复 bug。同样，&lt;strong&gt;当你调用不可控的外部代码而它返回无法修复的无效状态时&lt;/strong&gt;，&lt;code&gt;panic!&lt;/code&gt; 也往往是合适的。&lt;/p&gt;
+&lt;p&gt;相反，如果&lt;strong&gt;失败是可预期的&lt;/strong&gt;——解析器遇到格式错误的数据、HTTP 请求返回限流状态等——&lt;strong&gt;就应返回 &lt;code&gt;Result&lt;/code&gt;，表明失败是调用方必须处理的正常情形&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;当某操作若使用&lt;strong&gt;无效值会让用户面临风险时，代码应先验证值的有效性，无效则 &lt;code&gt;panic!&lt;/code&gt;&lt;/strong&gt;。这主要是出于安全考虑：在无效数据上操作容易暴露漏洞。标准库对越界内存访问就 &lt;code&gt;panic!&lt;/code&gt;，原因即在此。函数往往带有“契约”：&lt;strong&gt;仅当输入满足特定要求时行为才有保障&lt;/strong&gt;。违反契约即调用方 bug，不应让调用代码显式处理，也无可恢复，因此 &lt;code&gt;panic!&lt;/code&gt; 是合理的。这类契约及其违反时的行为应在 API 文档中写明。&lt;/p&gt;
+&lt;p&gt;然而，在每个函数里大量手写检查既啰嗦又烦人。幸运的是，Rust 的类型系统（以及编译器的类型检查）能帮你完成许多检查。例如：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;参数是某具体类型而非 &lt;code&gt;Option&amp;lt;T&amp;gt;&lt;/code&gt; 时，你已确保调用者必然提供了值，无需再分 &lt;code&gt;Some&lt;/code&gt; / &lt;code&gt;None&lt;/code&gt; 两种情况；试图传 &lt;code&gt;None&lt;/code&gt; 连编译都过不了。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;使用 &lt;code&gt;u32&lt;/code&gt; 等无符号整型，就能保证参数绝不会是负数。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;934-创建用于验证的自定义数据类型&#34;&gt;9.3.4 创建用于验证的自定义数据类型
+&lt;/h3&gt;&lt;p&gt;接下来我们尝试使用Rust的数据类型体系来确保不会出现明显错误，然后再试着创建一个自己的数据类型来对值进行验证。第二章中我们创建的猜数游戏中，我们预期让用户输入一个1~100的值来与我们产生的随机值匹配，但是我们从来没有验证过用户输入的值是不是在合理的范围内；我们只确保了随机数在这个范围内。但是对于我们的猜数游戏来说，这个问题并不严重，因为我们对于大小的判断依旧是有效的，不过限制用户的输入确实可以增强我们程序的逻辑性，让程序对超出我们预设范围的值进行不同的处理。&lt;/p&gt;
+&lt;p&gt;有一个有效的方法就是将&lt;code&gt;u32&lt;/code&gt;的限制改为&lt;code&gt;i32&lt;/code&gt;，然后加上范围判断：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Rust&#34; data-lang=&#34;Rust&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;use&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rand&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;Rng&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;use&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;cmp&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;Ordering&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;use&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;fn&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;secret_number&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rand&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;thread_rng&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gen_range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;..=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;fm&#34;&gt;println!&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Plz guess a int from 1 to 100&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;loop&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;mut&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;guess&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;String&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;stdin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;read_line&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;mut&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;guess&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;).&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;expect&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Can`t read line&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;guess&lt;/span&gt;:&lt;span class=&#34;kt&#34;&gt;i32&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;match&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;guess&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;trim&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parse&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(){&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//不直接使用expect来终止程序而是使用match处理
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;Ok&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;num&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;num&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;Err&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;                &lt;/span&gt;&lt;span class=&#34;fm&#34;&gt;println!&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Must be a number&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;                &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;continue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//加上范围判断
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;         &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;guess&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;||&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;guess&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;fm&#34;&gt;println!&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;The secret number will be between 1 and 100.&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;continue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;match&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;guess&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cmp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;secret_number&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Ordering&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;Equal&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;fm&#34;&gt;println!&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;u got right answer&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{secret_number}&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Ordering&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;Greater&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&#34;fm&#34;&gt;println!&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;guess &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{guess}&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; is bigger than secret number &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{secret_number}&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Ordering&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;Less&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;fm&#34;&gt;println!&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;guess &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{guess}&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; is less than secret number &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{secret_number}&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;if&lt;/code&gt; 表达式先检查数值是否超出范围，向用户指出问题，并调用 &lt;code&gt;continue&lt;/code&gt; 开始下一次循环、重新请求输入。经过 &lt;code&gt;if&lt;/code&gt; 之后，我们才能确信 &lt;code&gt;guess&lt;/code&gt; 已落在 1 到 100 之间，然后再拿它与秘密数字比较。&lt;/p&gt;
+&lt;p&gt;然而，这并不是理想的方案：如果程序必须只在 1 到 100 之间的值上运行，并且有许多函数都有这一要求，那么在每个函数里都写一遍范围检查既繁琐（也可能影响性能）。&lt;/p&gt;
+&lt;p&gt;更好的做法是**：在一个独立模块里创建一个新类型，把验证逻辑放在创建该类型实例的函数中，而不是到处重复这些检查。**这样一来，其他函数只要在签名里使用这个新类型，就可以放心地使用收到的值。下面展示了如何定义一个 &lt;code&gt;Guess&lt;/code&gt; 类型：只有当 &lt;code&gt;new&lt;/code&gt; 函数收到的值介于 1 到 100 之间时，才会创建 &lt;code&gt;Guess&lt;/code&gt; 实例。&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Filename: src/guessing_game.rs&lt;/em&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Rust&#34; data-lang=&#34;Rust&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;pub&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Guess&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;: &lt;span class=&#34;kt&#34;&gt;i32&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;impl&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Guess&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// 创建一个实例
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;pub&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;fn&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;: &lt;span class=&#34;kt&#34;&gt;i32&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;-&amp;gt; &lt;span class=&#34;nc&#34;&gt;Guess&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;||&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;fm&#34;&gt;panic!&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Guess value must be between 1 and 100, got &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{value}&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;.&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Guess&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//获取这个实例的值
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;pub&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;fn&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;bp&#34;&gt;self&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;-&amp;gt; &lt;span class=&#34;kt&#34;&gt;i32&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;bp&#34;&gt;self&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;请注意，&lt;strong&gt;这段位于 &lt;code&gt;src/guessing_game.rs&lt;/code&gt; 中的代码依赖于在 &lt;code&gt;src/lib.rs&lt;/code&gt; 里加上一条我们尚未展示的模块声明 &lt;code&gt;mod guessing_game;&lt;/code&gt;&lt;/strong&gt;。在这个新模块文件里，我们定义了一个名为 &lt;code&gt;Guess&lt;/code&gt; 的结构体，其中有一个字段 &lt;code&gt;value&lt;/code&gt;，类型为 &lt;code&gt;i32&lt;/code&gt;，用来存放具体的数字。&lt;/p&gt;
+&lt;p&gt;接着，我们为 &lt;code&gt;Guess&lt;/code&gt; 实现了一个关联函数 &lt;code&gt;new&lt;/code&gt;，用于创建 &lt;code&gt;Guess&lt;/code&gt; 实例。&lt;code&gt;new&lt;/code&gt; 函数接收一个名为 &lt;code&gt;value&lt;/code&gt; 的 &lt;code&gt;i32&lt;/code&gt; 参数，并返回一个 &lt;code&gt;Guess&lt;/code&gt;。函数体先检查 &lt;code&gt;value&lt;/code&gt; 是否落在 1 到 100 之间；若未通过检查，就调用 &lt;code&gt;panic!&lt;/code&gt;，提醒调用者出现了必须修复的 bug，因为用超出此范围的值创建 &lt;code&gt;Guess&lt;/code&gt; 会破坏 &lt;code&gt;Guess::new&lt;/code&gt; 依赖的约定。&lt;strong&gt;&lt;code&gt;Guess::new&lt;/code&gt; 可能触发 &lt;code&gt;panic!&lt;/code&gt; 的情形应当在其公开的 API 文档中说明&lt;/strong&gt;；第 14 章将介绍如何在自建 API 文档中标明 &lt;code&gt;panic!&lt;/code&gt; 的可能性。如果 &lt;code&gt;value&lt;/code&gt; 通过检查，就用该参数创建一个新的 &lt;code&gt;Guess&lt;/code&gt; 并返回。&lt;/p&gt;
+&lt;p&gt;随后，我们实现了一个名为 &lt;code&gt;value&lt;/code&gt; 的方法，它借用 &lt;code&gt;self&lt;/code&gt;，无其他参数，返回一个 &lt;code&gt;i32&lt;/code&gt;。&lt;strong&gt;这类方法通常称为 getter，作用是从字段中取出数据并返回&lt;/strong&gt;。由于 &lt;code&gt;Guess&lt;/code&gt; 结构体的 &lt;code&gt;value&lt;/code&gt; 字段是私有的，这个公有方法不可或缺。保持 &lt;code&gt;value&lt;/code&gt; 字段私有十分重要，这样可以防止外部代码直接设置 &lt;code&gt;value&lt;/code&gt;：外部模块必须通过 &lt;code&gt;Guess::new&lt;/code&gt; 创建 &lt;code&gt;Guess&lt;/code&gt; 实例，从而确保任何 &lt;code&gt;Guess&lt;/code&gt; 的值都经过了 &lt;code&gt;Guess::new&lt;/code&gt; 中条件的校验。&lt;/p&gt;
+&lt;p&gt;于是，一个只接受或只返回 1 到 100 之间数字的函数，就可以在签名里声明其参数或返回值为 &lt;code&gt;Guess&lt;/code&gt; 而非 &lt;code&gt;i32&lt;/code&gt;，而无需再在函数体内做任何额外检查。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;94-总结&#34;&gt;9.4 总结
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Rust 的错误处理机制旨在帮助你编写更健壮的代码。&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;panic!&lt;/code&gt; 宏用于表明程序已处于一个无法继续正常运行的状态，它通知进程停止，而不是带着无效或错误的值继续执行。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Result&lt;/code&gt; 枚举则利用 Rust 的类型系统，指出某些操作可能失败，但你的代码仍有机会从中恢复。你可以用 &lt;code&gt;Result&lt;/code&gt; 告诉调用者：必须妥善处理潜在的成功或失败结果。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在合适的场景下使用 &lt;code&gt;panic!&lt;/code&gt; 和 &lt;code&gt;Result&lt;/code&gt;，能让你的代码在面对不可避免的问题时更加可靠。&lt;/p&gt;
+&lt;p&gt;现在，你已经看到标准库如何通过 &lt;code&gt;Option&lt;/code&gt; 和 &lt;code&gt;Result&lt;/code&gt; 枚举来运用泛型。接下来，我们将讨论泛型的具体工作机制，以及如何在代码中使用它们。&lt;/p&gt;
+&lt;hr&gt;
 </description>
         </item>
         <item>
