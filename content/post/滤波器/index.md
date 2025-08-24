@@ -3,7 +3,7 @@ title: 滤波器
 description: 嵌入式系统滤波器
 date: 2025-08-21
 slug: 滤波器
-image: pic5.jpg
+image: pic5.png
 categories:
     - 嵌入式
 tags:
