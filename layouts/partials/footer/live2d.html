@@ -1,0 +1,309 @@
+<!-- Live2D 看板娘 -->
+<style>
+    /* Live2D 看板娘样式 - 相对于侧边栏定位 */
+    #live2d-widget {
+        position: fixed;
+        bottom: 80px;
+        /* 相对于暗色模式按钮上方 */
+        left: 20px;
+        /* 与侧边栏左对齐 */
+        z-index: 999;
+        /* 低于侧边栏 */
+        font-size: 0;
+        transition: all 0.5s ease-in-out;
+        opacity: 0;
+        /* 初始隐藏 */
+        transform: translateY(20px) scale(0.8);
+        /* 初始位置和缩放 */
+        pointer-events: none;
+        /* 禁用交互 */
+    }
+
+    /* 加载完成后显示 */
+    #live2d-widget.loaded {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* 响应式缩放 - 根据侧边栏宽度调整 */
+    @media screen and (min-width: 1920px) {
+        #live2d-widget {
+            transform: scale(0.8);
+            transform-origin: bottom left;
+            left: 25px;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.8);
+        }
+    }
+
+    @media screen and (max-width: 1440px) {
+        #live2d-widget {
+            transform: scale(0.9);
+            transform-origin: bottom left;
+            left: 18px;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.9);
+        }
+    }
+
+    @media screen and (max-width: 1200px) {
+        #live2d-widget {
+            transform: scale(0.8);
+            transform-origin: bottom left;
+            left: 15px;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.8);
+        }
+    }
+
+    @media screen and (max-width: 1024px) {
+        #live2d-widget {
+            transform: scale(0.7);
+            left: 12px;
+            bottom: 70px;
+            transform-origin: bottom left;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.7);
+        }
+    }
+
+    /* 平板和移动端隐藏 */
+    @media screen and (max-width: 768px) {
+        #live2d-widget {
+            display: none !important;
+        }
+    }
+
+    /* 超大缩放时隐藏 */
+    @media screen and (min-width: 3000px) {
+        #live2d-widget {
+            display: none !important;
+        }
+    }
+
+    /* 兼容旧的选择器 */
+    #waifu {
+        position: fixed;
+        bottom: 80px;
+        left: 20px;
+        z-index: 999;
+        font-size: 0;
+        transition: all 0.5s ease-in-out;
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+        pointer-events: none;
+    }
+
+    #waifu.loaded {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* 消息提示框样式 */
+    #live2d-message {
+        position: fixed;
+        bottom: 250px;
+        left: 20px;
+        background: linear-gradient(135deg, #ff69b4, #ff1493);
+        border: 2px solid #fff;
+        border-radius: 15px;
+        padding: 10px 15px;
+        font-size: 14px;
+        color: white;
+        max-width: 200px;
+        z-index: 9999;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+    }
+
+    /* Live2D canvas 鼠标样式 */
+    #live2d canvas {
+        cursor: pointer !important;
+    }
+
+    canvas[id*="live2d"] {
+        cursor: pointer !important;
+    }
+
+    /* 添加消息框的小尾巴 */
+    #live2d-message::after {
+        content: '';
+        position: absolute;
+        right: -10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-left: 10px solid #ff1493;
+    }
+
+    #live2d-message.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+
+<!-- Live2D Widget 核心脚本 -->
+<script>
+    // Live2D 配置
+    window.live2d_settings = {
+        // 模型配置
+        modelId: 0,                    // 默认模型ID
+        modelTexturesId: 0,            // 默认材质ID
+
+        // 显示设置
+        showToolMenu: true,            // 显示工具栏
+        canCloseLive2d: true,          // 允许关闭
+        canSwitchModel: true,          // 允许切换模型
+        canSwitchTextures: true,       // 允许切换材质
+
+        // 提示消息
+        showWelcomeMessage: true,      // 显示欢迎消息
+
+        // 工具栏设置
+        waifuSize: '280x250',          // 看板娘尺寸
+        waifuMinWidth: '768px',        // 最小宽度（小于此宽度不显示）
+        waifuDraggable: 'axis-x',      // 拖拽设置
+
+        // 自定义消息
+        welcomeMessage: '欢迎来到N1ntyNine99的博客！',
+        clickMessages: [
+            '你好呀！欢迎访问博客~',
+            '今天过得怎么样呢？',
+            '要不要看看最新的文章？',
+            '记得多喝水哦！',
+            '学习使人快乐！',
+            '代码改变世界！',
+            '写代码要注意休息眼睛哦~',
+            '有什么问题可以在评论区留言~',
+            '技术分享让世界更美好！',
+            '保持好奇心，持续学习！',
+            '每一行代码都是艺术品~',
+            '调试是程序员的必修课！',
+            '开源精神值得敬佩！',
+            '算法优化永无止境~',
+            '团队协作很重要哦！',
+            '文档写得好，维护没烦恼~',
+            '测试驱动开发很棒！',
+            '重构让代码更优雅~',
+            '安全编程不能忽视！',
+            '持续集成提高效率！'
+        ]
+    };
+</script>
+
+<!-- 加载 Live2D Widget -->
+<script src="https://fastly.jsdelivr.net/npm/live2d-widget@3.x/lib/L2Dwidget.min.js"></script>
+<script>
+    // 初始化 Live2D Widget
+    L2Dwidget.init({
+        "model": {
+            // 使用hijiki模型（可爱的看板娘）
+            "jsonPath": "https://unpkg.com/live2d-widget-model-hijiki@1.0.5/assets/hijiki.model.json",
+            "scale": 1.3
+        },
+        "display": {
+            "position": "left",
+            "width": 150,
+            "height": 300,
+            "hOffset": 150,
+            "vOffset": 20
+        },
+        "mobile": {
+            "show": false,              // 移动端不显示
+            "scale": 0.8
+        },
+        "react": {
+            "opacityDefault": 0.8,
+            "opacityOnHover": 1.0
+        },
+        "log": false,
+        "pluginJsPath": "lib/",
+        "pluginModelPath": "assets/",
+        "tagMode": false,
+        "debug": false
+    });
+</script>
+
+<!-- 消息提示框 -->
+<div id="live2d-message"></div>
+
+<!-- 自定义交互脚本 -->
+<script>
+    // Live2D响应式和动画控制
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Live2D Widget loaded without interaction features');
+
+        // 等待Live2D加载完成后显示渐显动画
+        function waitForLive2DAndShow() {
+            const widget = document.getElementById('live2d-widget') || document.querySelector('#live2d-widget');
+            const canvas = document.querySelector('canvas');
+
+            if (canvas && canvas.parentElement) {
+                // 确保父容器有正确的ID
+                const container = canvas.parentElement;
+                if (!container.id) {
+                    container.id = 'live2d-widget';
+                }
+
+                // 延迟显示，创建渐显效果
+                setTimeout(() => {
+                    container.classList.add('loaded');
+                    console.log('Live2D widget fade-in animation started');
+                }, 1000); // 1秒后开始渐显
+
+            } else {
+                // 如果还没加载完成，继续等待
+                setTimeout(waitForLive2DAndShow, 500);
+            }
+        }
+
+        // 开始等待Live2D加载
+        setTimeout(waitForLive2DAndShow, 2000);
+
+        // 监听窗口大小变化，动态调整显示状态
+        let resizeTimer;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                const widget = document.getElementById('live2d-widget') || document.querySelector('canvas')?.parentElement;
+                if (widget) {
+                    // 检查当前视口宽度
+                    const viewportWidth = window.innerWidth;
+
+                    // 在特定宽度范围内重新应用loaded类以确保动画正常
+                    if (viewportWidth > 768 && viewportWidth < 3000) {
+                        widget.classList.add('loaded');
+                    }
+
+                    console.log('Live2D widget responsive adjustment applied, viewport width:', viewportWidth);
+                }
+            }, 250);
+        });
+
+        // 页面可见性变化时的处理
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                // 页面重新可见时，确保动画状态正确
+                setTimeout(() => {
+                    const widget = document.getElementById('live2d-widget') || document.querySelector('canvas')?.parentElement;
+                    if (widget && window.innerWidth > 768 && window.innerWidth < 3000) {
+                        widget.classList.add('loaded');
+                    }
+                }, 500);
+            }
+        });
+    });
+</script>
