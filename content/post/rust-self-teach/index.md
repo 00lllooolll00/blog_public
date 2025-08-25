@@ -6072,3 +6072,392 @@ fn main() {
 ---
 
 ## 10.3 定义共享行为——特征（*trait*）
+
+特征定义了，某个具体类型的功能和可以和其他类型共享的功能。我们可以用一个抽象的方式定义一个特质，并且我们可以使用特征来约束泛型只能成为某些满足这个特征的数据类型。
+
+---
+
+### 10.3.1 定义一个特征
+
+**类型的行为，就是指我们可以在该类型上调用的方法**。如果对于多种类型，我们都能调用相同的方法，那么这些类型就共享了同一种行为。trait 定义把一系列方法签名组合在一起，从而描述为达成某个目的所必需的一组行为。
+
+例如，假设我们有多个结构体，它们分别保存不同形式和数量的文本：`NewsArticle` 结构体保存一篇在特定地点发布的新闻报道；`SocialPost` 结构体最多保存 280 个字符的文本，并附带一些元数据，表明这是一条新帖、转发，还是对另一条帖子的回复。
+
+我们想创建一个名为 `aggregator` 的媒体聚合库 crate，**用来展示可能存放在 `NewsArticle` 或 `SocialPost` 实例中的数据摘要**。为此，我们需要从每种类型获取摘要，并通过在实例上调用 `summarize` 方法来请求该摘要，定义一个特性要使用关键字`trait`：
+
+```Rust
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+```
+
+这个语句就声明了一个`trait`叫做`summary`，同时他也是一个公开的特性，因为我们使用了`pub`关键字；因此基于这个crate的代码也可以使用这个特性。在大括号内，我们定义了一个方法来描述实现了这个特征的数据类型的行为，在这里就是`fn summarize(&self) -> String;`。
+
+在方法的签名之后，和平常的方法不同，我们并没有再写一个大括号来对这个方法进行内部实现，而是直接使用分号结尾；**因为每一个实现了这个特征的类型必须由自己实现具体的行为**。**编译器强制要求任何具有`summary`特性的类型都具有这个`summarize`方法**。
+
+一个特征可以有多个方法，每一个方法都占用一行，使用分号结尾。
+
+---
+
+### 10.3.2 在类型上实现一个特征
+
+现在，我们要如何在一个类型中实现这个`Summary`特征呢？接着上述的例子，我们想要把该特征实现在`NewArticle`和`SocialPost`结构体中。对于`NewArticle`来说，使用标题和作者来作为`summarize`方法的返回值；对于`SocialPost`，把返回值定为用户名后跟帖子的全部文本，假设帖子内容已经限制在 280 个字符以内：
+
+filename:src/lib.rs
+
+```Rust
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{}, by {} ({})", self.headline, self.author, self.location)
+    }
+}
+
+pub struct SocialPost {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub repost: bool,
+}
+
+impl Summary for SocialPost {
+    fn summarize(&self) -> String {
+        format!("{}: {}", self.username, self.content)
+    }
+}
+```
+
+和定义一个方法类似，想要实现一个特征要使用`impl`关键字，只不过还要加上`for`来指示为具体某个类型实现的特征。然后再代码块的内部实现这个特征的行为的具体内容。
+
+现在就有一个实现了库，库中的两个数据类型`SocialPost`和`NewArticle`都是实现了`Summary`特征的；用户可以使用这两个类型的实例中的特征方法，使用方法就和我们使用平常普通的方法一样。**唯一的不同就是用户需要把特征和类型都带入作用域**，这是一个如何使用我们的`aggregator`库的例子：
+
+filename:src/main.rs	
+
+```Rust
+use aggregator::{SocialPost, Summary};
+
+fn main() {
+    let post = SocialPost {
+        username: String::from("horse_ebooks"),
+        content: String::from(
+            "of course, as you probably already know, people",
+        ),
+        reply: false,
+        repost: false,
+    };
+
+    println!("1 new post: {}", post.summarize());
+}
+```
+
+> [!NOTE]
+>
+> 要求创建项目时的名字药叫做 aggregator  才可正常编译
+
+依赖于 aggregator crate 的其他 crate 也可以把 `Summary` trait 引入作用域，**从而在自己的类型上实现 `Summary`**。需要注意的一条限制是，**只有在 trait 或类型（或两者）属于本地 crate 时，我们才能为该类型实现该 trait**。
+
+例如，我们可以在 aggregator crate 中为自定义类型 `SocialPost` 实现标准库 trait `Display`，因为 `SocialPost` 是 aggregator crate 本地的类型；同样，我们也可以在 aggregator crate 中为 `Vec<T>` 实现 `Summary`，因为 `Summary` 是 aggregator crate 本地的 trait。
+
+但是，**我们不能为外部类型实现外部 trai**t。例如，在 aggregator crate 中，不能为 `Vec<T>` 实现标准库的 `Display` trait，因为 `Display` 和 `Vec<T>` 都定义在标准库中，不属于 aggregator crate 本地。**这条限制是所谓“一致性”（*coherence*）的一部分，更具体地称为孤儿规则（*orphan rule*）；之所以叫“孤儿”，是因为“父类型”不存在**。这条规则确保别人的代码不会破坏你的代码，反之亦然。如果没有这条规则，两个 crate 可能为同一个类型实现同一个 trait，而 Rust 将无法决定该使用哪一个实现。
+
+---
+
+### 10.3.3 默认实现
+
+有时候给某些或者所有的特征的方法一个默认行为是很有用的，这样我们就不用给所有的类型都写一遍实现。**有了一个默认的实现之后，当我们为某一个具体的数据类型实现该特征的时候，我们可以保留这个默认行为或者覆写这个默认行为。**
+
+在下面这个例子中，我们为特征`Summary`的 `summarize`方法写了一个默认的实现，让它返回一个字符串。为了达到这个目的，我们需要在代码块中不单单只写函数签名，而是像定义一个平常的方法一样：
+
+filename:src/lib.rs
+
+```Rust
+pub trait Summary {
+    fn summarize(&self) -> String {
+        String::from("(Read more...)")
+    }
+}
+```
+
+**为了在`NewArticle`实例中使用这个方法的默认实现，我们这样写即可：`impl Summary for NewArticle{}`。**
+
+这样，即使我们没有为`NewArticle`具体实现`Summary`特征中的`summarize`方法，我们也可以直接使用方法默认的实现：
+
+filename:src/main.rs
+
+```Rust
+use aggregator::{self, NewsArticle, Summary};
+
+fn main() {
+    let article = NewsArticle {
+        headline: String::from("Penguins win the Stanley Cup Championship!"),
+        location: String::from("Pittsburgh, PA, USA"),
+        author: String::from("Iceburgh"),
+        content: String::from(
+            "The Pittsburgh Penguins once again are the best \
+            hockey team in the NHL.",
+        ),
+    };
+
+    println!("New article available! {}", article.summarize());
+}
+```
+
+这个函数会打印`New article available! (Read more...)`。
+
+**默认实现只是在对于有该特征，但是没有具体实现这个方法的类型，提供了一个默认的行为，他不会影响其他自己实现了该方法的数据类型的自定义实现。所以我们现在对于`SocialPost`来说，之前定义的方法依旧可行**。比如说，我们可以再为`Summary`特征定义一个方法`summarize_author`，要求类型自己去实现其内容，即没有默认实现，而保留`summarize`方法的默认实现：
+
+filename:src/lib.rs
+
+```Rust
+pub trait Summary {
+    fn summarize_author(&self) -> String;//需要类型自己实现这个方法
+
+    fn summarize(&self) -> String {//类型可以不实现方法 则采用默认实现
+        format!("(Read more from {}...)", self.summarize_author())
+    }
+}
+
+pub struct SocialPost {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub repost: bool,
+}
+
+impl Summary for SocialPost {
+    fn summarize_author(&self) -> String {
+        format!("@{}", self.username)
+    }
+}
+```
+
+如实例所示，我们现在只需要实现`summarize_author`方法即可。
+
+在定义了 `summarize_author` 之后，我们可以在 `SocialPost` 结构体的实例上调用 `summarize` ，而 `summarize` 的默认实现将会调用我们提供的 `summarize_author` 的定义。因为我们实现了 `summarize_author` ， `Summary` 特性已经给了我们 `summarize` 方法的功能，而无需我们再编写任何更多代码。这看起来是这样的：
+
+filename:src/main.rs
+
+```Rust
+use aggregator::{self, SocialPost, Summary};
+
+fn main() {
+    let post = SocialPost {
+        username: String::from("horse_ebooks"),
+        content: String::from(
+            "of course, as you probably already know, people",
+        ),
+        reply: false,
+        repost: false,
+    };
+
+    println!("1 new post: {}", post.summarize());
+}
+```
+
+这段代码打印 `1 new post: (Read more from @horse_ebooks...)` 。
+
+---
+
+### 10.3.4 作为参数的特征
+
+既然已经学会了如何定义并实现 trait，我们就可以利用 trait 来编写能够接受多种不同类型的函数了。我们将继续沿用为 `NewsArticle` 和 `SocialPost` 实现的 `Summary` trait，来定义一个 `notify` 函数：**该函数会在其参数 `item`（某个实现了 `Summary` 的类型）上调用 `summarize` 方法**。为此，我们使用 `impl Trait` 语法，像这样：
+
+```Rust
+pub fn notify(item: &impl Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
+```
+
+我们不再为 `item` 参数指定一个具体类型，而是用 `impl` 关键字加上 trait 名。这样，**该参数就能接受任何实现了指定 trait 的类型**。在 `notify` 的函数体里，我们可以调用 `item` 上来自 `Summary` trait 的任何方法，比如 `summarize`。我们可以把 `NewsArticle` 或 `SocialPost` 的实例传给 `notify` 来调用它。**如果用其他没有实现 `Summary` 的类型（如 `String` 或 `i32`）去调用该函数，代码将无法通过编译**。
+
+---
+
+### 10.3.5 特征约束
+
+ `impl Trait`  语法适用于简单场景，**但它本质上只是下面这种更完整写法**（*trait bound*）的语法糖：
+
+> [!TIP]
+>
+> **语法糖（syntactic sugar） 指的是**：
+> 一门编程语言为了让代码写起来更简洁、更直观，而提供的一种**“表面写法”，它在功能上与另一种更底层、更啰嗦**的写法完全等价，只是可读性更好。
+
+```Rust
+pub fn notify<T: Summary>(item: &T) {
+    println!("Breaking news! {}", item.summarize());
+}
+```
+
+这种更长的形式与上一节的示例等效，但更冗长。**我们将特征界限与泛型类型参数的声明一起放在冒号之后和尖括号之内**。
+
+这个`impl Trait`语法在简单的情况下让代码更简洁，但是完整的特征约束语法可以在其他情况下增加表达式的复杂性。比如下面这个函数，我们让函数可以接受两个实现了`Summary`特征的类型。像这样：
+
+```Rust
+pub fn notify(item1: &impl Summary, item2: &impl Summary) {
+```
+
+**使用`impl Trait`在对于想要`item1`，`item2`是不同的数据类型的时候很有用**，前提是这些数据类型都实现了`Summary`特征的。但是如果我们想要这两个参数都是同一个数据类型的话，就要像下面这样表达：
+
+```Rust
+pub fn notify<T: Summary>(item1: &T, item2: &T) {
+```
+
+**指定为 `item1` 和 `item2` 参数类型的泛型类型 `T` 限制了函数**，使得作为 `item1` 和 `item2` 参数的实参传递的值的具体类型必须相同。
+
+我们也可以增加不止一个约束。就比如我们想要`notify`函数的入参既满足格式化输出（`Display`特征）、又满足 `SUmmary`。**那么就可以使用`+`操作符**；就像下面这样：
+
+```Rust
+pub fn notify(item: &(impl Summary + Display)) {
+```
+
+对于泛型来说，`+`也同样适用：
+
+```Rust
+pub fn notify<T: Summary + Display>(item: &T) {
+```
+
+有以上两个特征，`notify`的函数主题就可以使用`summarize`函数，并且可以格式化输出。
+
+---
+
+### 10.3.5 使用`where`闭包（*Clauses*）更明确的声明特征约束
+
+使用过多的约束也会有缺点。如果每一个泛型都有自己的特征约束，一旦泛型多了之后，函数名和其参数列表之间的距离就会很远，让代码不是特别容易阅读。所以，Rust提供了一个替代的语法`where`闭包来处理特征约束，**但是`where`在函数参数列表之后**。就比如下面这个例子：
+
+```Rust
+fn some_function<T: Display + Clone, U: Clone + Debug>(t: &T, u: &U) -> i32 {
+```
+
+我们可以使用`where`来简化这个表达式：
+
+```Rust
+fn some_function<T, U>(t: &T, u: &U) -> i32
+where
+    T: Display + Clone,
+    U: Clone + Debug,
+{
+
+```
+
+这样，函数的签名就更加简单明了，函数名、参数列表和返回类型靠得近。
+
+---
+
+### 10.3.6 返回一个实现了特征的值
+
+我们也可以使用`impl Trait`语法来让函数的返回值也是某个实现了某些特征的数据类型，就像下面这样：
+
+```Rust
+fn returns_summarizable() -> impl Summary {
+    SocialPost {
+        username: String::from("horse_ebooks"),
+        content: String::from(
+            "of course, as you probably already know, people",
+        ),
+        reply: false,
+        repost: false,
+    }
+}
+```
+
+使用`impl Summary`让我们的**函数的返回值不一定是某个具体的数据类型，而只是一个实现了`Summary`特征的类型**。在这个例子中，函数返回的是`SocialPost`类型，但是调用这个函数的代码不需要知道这个。
+
+仅通过 trait 来指定返回值类型的能力，在闭包与迭代器（第 13 章将深入讨论）场景中尤为实用。**闭包和迭代器产生的类型通常只有编译器知道，或者类型名非常冗长；使用 `impl Trait` 语法可以简洁地表明“返回某个实现了 `Iterator` 的类型**”，而无需写出繁琐的具体类型。
+
+但是，`impl Trait` 只能用于返回单一类型。例如，下面这段代码试图根据条件返回 `NewsArticle` 或 `SocialPost`，并把返回类型写成 `impl Summary`，这是不合法的：
+
+```Rust
+fn returns_summarizable(switch: bool) -> impl Summary {
+    if switch {
+        NewsArticle {
+            headline: String::from(
+                "Penguins win the Stanley Cup Championship!",
+            ),
+            location: String::from("Pittsburgh, PA, USA"),
+            author: String::from("Iceburgh"),
+            content: String::from(
+                "The Pittsburgh Penguins once again are the best \
+                 hockey team in the NHL.",
+            ),
+        }
+    } else {
+        SocialPost {
+            username: String::from("horse_ebooks"),
+            content: String::from(
+                "of course, as you probably already know, people",
+            ),
+            reply: false,
+            repost: false,
+        }
+    }
+}
+```
+
+编译结果如下：
+
+​	![image-20250826005407698](./index.assets/image-20250826005407698.png)
+
+**由于编译器在实现 `impl Trait` 语法时的限制，不能让它同时返回 `NewsArticle` 或 `SocialPost` 两种不同类型**。在第 18 章我们会介绍如何编写真正可以返回多种类型的函数。
+
+----
+
+### 10.3.7 使用 Trait Bound 为方法实现加上“条件”
+
+通过在使用泛型类型参数的 `impl `块中使用 trait bound，**我们可以有条件地为实现了指定 trait 的类型实现方法**。例如，示例中的类型 `Pair<T>` 始终实现了 `new` 函数，用于返回一个新的 `Pair<T>` 实例。但在下一个 impl 块中，**只有当内部类型 `T` 实现了用于比较的 `PartialOrd` trait 以及用于打印的 `Display` trait 时，`Pair<T>` 才会实现 `cmp_display` 方法**。
+
+```Rust
+use std::fmt::Display;
+
+struct Pair<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Pair<T> {
+    fn new(x: T, y: T) -> Self {
+        Self { x, y }
+    }
+}
+
+impl<T: Display + PartialOrd> Pair<T> {
+    // 这里限制了 <T: Display + PartialOrd> 才有用
+    fn cmp_display(&self) {
+        if self.x >= self.y {
+            println!("The largest member is x = {}", self.x);
+        } else {
+            println!("The largest member is y = {}", self.y);
+        }
+    }
+}
+```
+
+​	我们还可以为任何实现了指定 trait 的类型有条件地实现某个 trait。**这种对满足 trait bound 的所有类型实现的 trait 称为覆盖实现（*blanket implementations*），在 Rust 标准库中被广泛使用**。例如，标准库为所有实现了 `Display` trait 的类型实现了 `ToString` trait。标准库中的 impl 块大致如下：
+
+```Rust
+impl<T: Display> ToString for T {
+    // something...
+}
+```
+
+因为标准库提供了这一覆盖实现，**我们就可以在任何实现了 `Display` trait 的类型上，调用由 `ToString` trait 定义的 `to_string` 方法**。例如，由于整数实现了 `Display`，我们可以像这样把整数转换成对应的 `String` 值：
+
+```Rust
+let s = 3.to_string();// 将数字3转换成字符串"3"
+```
+
+覆盖实现会出现在该 trait 文档的 “Implementors”（实现者）部分。
+
+Trait 与 trait bound 让我们能够编写使用泛型参数的代码，既减少了重复，又能向编译器表明：**我们希望泛型类型具备特定的行为**。接着编译器会利用 trait bound 信息，**检查所有与我们的代码一起使用的具体类型是否确实提供了正确的行为**。在动态类型语言中，如果我们在某个类型上调用了未定义的方法，要到运行时才会报错；而 Rust 则将这些错误提前到编译期，迫使我们在代码尚未运行之前就必须解决问题。此外，**由于我们已在编译期完成检查，就无需再编写运行时检查行为的代码**。这种做法在保持泛型灵活性的同时，也提升了性能。
+
+---
+
+## 10.4 生命周期（*Lifetime*）

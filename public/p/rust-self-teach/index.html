@@ -525,7 +525,19 @@
         <li><a href="#1025-使用泛型的性能">10.2.5 使用泛型的性能</a></li>
       </ol>
     </li>
-    <li><a href="#103-定义共享行为特征trait">10.3 定义共享行为——特征（<em>trait</em>）</a></li>
+    <li><a href="#103-定义共享行为特征trait">10.3 定义共享行为——特征（<em>trait</em>）</a>
+      <ol>
+        <li><a href="#1031-定义一个特征">10.3.1 定义一个特征</a></li>
+        <li><a href="#1032-在类型上实现一个特征">10.3.2 在类型上实现一个特征</a></li>
+        <li><a href="#1033-默认实现">10.3.3 默认实现</a></li>
+        <li><a href="#1034-作为参数的特征">10.3.4 作为参数的特征</a></li>
+        <li><a href="#1035-特征约束">10.3.5 特征约束</a></li>
+        <li><a href="#1035-使用where闭包clauses更明确的声明特征约束">10.3.5 使用<code>where</code>闭包（<em>Clauses</em>）更明确的声明特征约束</a></li>
+        <li><a href="#1036-返回一个实现了特征的值">10.3.6 返回一个实现了特征的值</a></li>
+        <li><a href="#1037-使用-trait-bound-为方法实现加上条件">10.3.7 使用 Trait Bound 为方法实现加上“条件”</a></li>
+      </ol>
+    </li>
+    <li><a href="#104-生命周期lifetime">10.4 生命周期（<em>Lifetime</em>）</a></li>
   </ol>
 </nav>
         </div>
@@ -614,7 +626,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 172 分钟
+                    阅读时长: 182 分钟
                 </time>
             </div>
         
@@ -9360,6 +9372,565 @@
 </div><p>​	这样，泛型的<code>Option&lt;T&gt;</code>就会被替换成具体的数据类型。正因为Rust将每一个泛型实例都转换成了一个具体的数据类型的实例，所以我们在运行的时候并会有额外的开销。当代码运行时，**它的表现与手动复制每个定义后的表现完全相同。**单例态过程使 Rust 的泛型在运行时非常高效。</p>
 <hr>
 <h2 id="103-定义共享行为特征trait">10.3 定义共享行为——特征（<em>trait</em>）
+</h2><p>特征定义了，某个具体类型的功能和可以和其他类型共享的功能。我们可以用一个抽象的方式定义一个特质，并且我们可以使用特征来约束泛型只能成为某些满足这个特征的数据类型。</p>
+<hr>
+<h3 id="1031-定义一个特征">10.3.1 定义一个特征
+</h3><p><strong>类型的行为，就是指我们可以在该类型上调用的方法</strong>。如果对于多种类型，我们都能调用相同的方法，那么这些类型就共享了同一种行为。trait 定义把一系列方法签名组合在一起，从而描述为达成某个目的所必需的一组行为。</p>
+<p>例如，假设我们有多个结构体，它们分别保存不同形式和数量的文本：<code>NewsArticle</code> 结构体保存一篇在特定地点发布的新闻报道；<code>SocialPost</code> 结构体最多保存 280 个字符的文本，并附带一些元数据，表明这是一条新帖、转发，还是对另一条帖子的回复。</p>
+<p>我们想创建一个名为 <code>aggregator</code> 的媒体聚合库 crate，<strong>用来展示可能存放在 <code>NewsArticle</code> 或 <code>SocialPost</code> 实例中的数据摘要</strong>。为此，我们需要从每种类型获取摘要，并通过在实例上调用 <code>summarize</code> 方法来请求该摘要，定义一个特性要使用关键字<code>trait</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">Summary</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">summarize</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">String</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个语句就声明了一个<code>trait</code>叫做<code>summary</code>，同时他也是一个公开的特性，因为我们使用了<code>pub</code>关键字；因此基于这个crate的代码也可以使用这个特性。在大括号内，我们定义了一个方法来描述实现了这个特征的数据类型的行为，在这里就是<code>fn summarize(&amp;self) -&gt; String;</code>。</p>
+<p>在方法的签名之后，和平常的方法不同，我们并没有再写一个大括号来对这个方法进行内部实现，而是直接使用分号结尾；<strong>因为每一个实现了这个特征的类型必须由自己实现具体的行为</strong>。<strong>编译器强制要求任何具有<code>summary</code>特性的类型都具有这个<code>summarize</code>方法</strong>。</p>
+<p>一个特征可以有多个方法，每一个方法都占用一行，使用分号结尾。</p>
+<hr>
+<h3 id="1032-在类型上实现一个特征">10.3.2 在类型上实现一个特征
+</h3><p>现在，我们要如何在一个类型中实现这个<code>Summary</code>特征呢？接着上述的例子，我们想要把该特征实现在<code>NewArticle</code>和<code>SocialPost</code>结构体中。对于<code>NewArticle</code>来说，使用标题和作者来作为<code>summarize</code>方法的返回值；对于<code>SocialPost</code>，把返回值定为用户名后跟帖子的全部文本，假设帖子内容已经限制在 280 个字符以内：</p>
+<p>filename:src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">Summary</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">summarize</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">String</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">NewsArticle</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">headline</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">location</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">author</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">content</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="w"> </span><span class="n">Summary</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">NewsArticle</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">summarize</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">String</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{}</span><span class="s">, by </span><span class="si">{}</span><span class="s"> (</span><span class="si">{}</span><span class="s">)&#34;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">headline</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">author</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">location</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">SocialPost</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">username</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">content</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">reply</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">repost</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="w"> </span><span class="n">Summary</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">SocialPost</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">summarize</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">String</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{}</span><span class="s">: </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">content</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>和定义一个方法类似，想要实现一个特征要使用<code>impl</code>关键字，只不过还要加上<code>for</code>来指示为具体某个类型实现的特征。然后再代码块的内部实现这个特征的行为的具体内容。</p>
+<p>现在就有一个实现了库，库中的两个数据类型<code>SocialPost</code>和<code>NewArticle</code>都是实现了<code>Summary</code>特征的；用户可以使用这两个类型的实例中的特征方法，使用方法就和我们使用平常普通的方法一样。<strong>唯一的不同就是用户需要把特征和类型都带入作用域</strong>，这是一个如何使用我们的<code>aggregator</code>库的例子：</p>
+<p>filename:src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">aggregator</span>::<span class="p">{</span><span class="n">SocialPost</span><span class="p">,</span><span class="w"> </span><span class="n">Summary</span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">post</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocialPost</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">username</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;horse_ebooks&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">content</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="s">&#34;of course, as you probably already know, people&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">reply</span>: <span class="nc">false</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">repost</span>: <span class="nc">false</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;1 new post: </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">summarize</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>[!NOTE]</p>
+<p>要求创建项目时的名字药叫做 aggregator  才可正常编译</p></blockquote>
+<p>依赖于 aggregator crate 的其他 crate 也可以把 <code>Summary</code> trait 引入作用域，<strong>从而在自己的类型上实现 <code>Summary</code></strong>。需要注意的一条限制是，<strong>只有在 trait 或类型（或两者）属于本地 crate 时，我们才能为该类型实现该 trait</strong>。</p>
+<p>例如，我们可以在 aggregator crate 中为自定义类型 <code>SocialPost</code> 实现标准库 trait <code>Display</code>，因为 <code>SocialPost</code> 是 aggregator crate 本地的类型；同样，我们也可以在 aggregator crate 中为 <code>Vec&lt;T&gt;</code> 实现 <code>Summary</code>，因为 <code>Summary</code> 是 aggregator crate 本地的 trait。</p>
+<p>但是，<strong>我们不能为外部类型实现外部 trai</strong>t。例如，在 aggregator crate 中，不能为 <code>Vec&lt;T&gt;</code> 实现标准库的 <code>Display</code> trait，因为 <code>Display</code> 和 <code>Vec&lt;T&gt;</code> 都定义在标准库中，不属于 aggregator crate 本地。<strong>这条限制是所谓“一致性”（<em>coherence</em>）的一部分，更具体地称为孤儿规则（<em>orphan rule</em>）；之所以叫“孤儿”，是因为“父类型”不存在</strong>。这条规则确保别人的代码不会破坏你的代码，反之亦然。如果没有这条规则，两个 crate 可能为同一个类型实现同一个 trait，而 Rust 将无法决定该使用哪一个实现。</p>
+<hr>
+<h3 id="1033-默认实现">10.3.3 默认实现
+</h3><p>有时候给某些或者所有的特征的方法一个默认行为是很有用的，这样我们就不用给所有的类型都写一遍实现。<strong>有了一个默认的实现之后，当我们为某一个具体的数据类型实现该特征的时候，我们可以保留这个默认行为或者覆写这个默认行为。</strong></p>
+<p>在下面这个例子中，我们为特征<code>Summary</code>的 <code>summarize</code>方法写了一个默认的实现，让它返回一个字符串。为了达到这个目的，我们需要在代码块中不单单只写函数签名，而是像定义一个平常的方法一样：</p>
+<p>filename:src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">Summary</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">summarize</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">String</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;(Read more...)&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>为了在<code>NewArticle</code>实例中使用这个方法的默认实现，我们这样写即可：<code>impl Summary for NewArticle{}</code>。</strong></p>
+<p>这样，即使我们没有为<code>NewArticle</code>具体实现<code>Summary</code>特征中的<code>summarize</code>方法，我们也可以直接使用方法默认的实现：</p>
+<p>filename:src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">aggregator</span>::<span class="p">{</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">NewsArticle</span><span class="p">,</span><span class="w"> </span><span class="n">Summary</span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">article</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NewsArticle</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">headline</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;Penguins win the Stanley Cup Championship!&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">location</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;Pittsburgh, PA, USA&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">author</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;Iceburgh&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">content</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="s">&#34;The Pittsburgh Penguins once again are the best </span><span class="se">\</span><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">            hockey team in the NHL.&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;New article available! </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">article</span><span class="p">.</span><span class="n">summarize</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个函数会打印<code>New article available! (Read more...)</code>。</p>
+<p><strong>默认实现只是在对于有该特征，但是没有具体实现这个方法的类型，提供了一个默认的行为，他不会影响其他自己实现了该方法的数据类型的自定义实现。所以我们现在对于<code>SocialPost</code>来说，之前定义的方法依旧可行</strong>。比如说，我们可以再为<code>Summary</code>特征定义一个方法<code>summarize_author</code>，要求类型自己去实现其内容，即没有默认实现，而保留<code>summarize</code>方法的默认实现：</p>
+<p>filename:src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">Summary</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">summarize_author</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">String</span><span class="p">;</span><span class="c1">//需要类型自己实现这个方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">summarize</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">String</span> <span class="p">{</span><span class="c1">//类型可以不实现方法 则采用默认实现
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;(Read more from </span><span class="si">{}</span><span class="s">...)&#34;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">summarize_author</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">SocialPost</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">username</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">content</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">reply</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">repost</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="w"> </span><span class="n">Summary</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">SocialPost</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">summarize_author</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">String</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;@</span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">username</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>如实例所示，我们现在只需要实现<code>summarize_author</code>方法即可。</p>
+<p>在定义了 <code>summarize_author</code> 之后，我们可以在 <code>SocialPost</code> 结构体的实例上调用 <code>summarize</code> ，而 <code>summarize</code> 的默认实现将会调用我们提供的 <code>summarize_author</code> 的定义。因为我们实现了 <code>summarize_author</code> ， <code>Summary</code> 特性已经给了我们 <code>summarize</code> 方法的功能，而无需我们再编写任何更多代码。这看起来是这样的：</p>
+<p>filename:src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">aggregator</span>::<span class="p">{</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">SocialPost</span><span class="p">,</span><span class="w"> </span><span class="n">Summary</span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">post</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocialPost</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">username</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;horse_ebooks&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">content</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="s">&#34;of course, as you probably already know, people&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">reply</span>: <span class="nc">false</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">repost</span>: <span class="nc">false</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;1 new post: </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">summarize</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这段代码打印 <code>1 new post: (Read more from @horse_ebooks...)</code> 。</p>
+<hr>
+<h3 id="1034-作为参数的特征">10.3.4 作为参数的特征
+</h3><p>既然已经学会了如何定义并实现 trait，我们就可以利用 trait 来编写能够接受多种不同类型的函数了。我们将继续沿用为 <code>NewsArticle</code> 和 <code>SocialPost</code> 实现的 <code>Summary</code> trait，来定义一个 <code>notify</code> 函数：<strong>该函数会在其参数 <code>item</code>（某个实现了 <code>Summary</code> 的类型）上调用 <code>summarize</code> 方法</strong>。为此，我们使用 <code>impl Trait</code> 语法，像这样：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">notify</span><span class="p">(</span><span class="n">item</span>: <span class="kp">&amp;</span><span class="nc">impl</span><span class="w"> </span><span class="n">Summary</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Breaking news! </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">summarize</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们不再为 <code>item</code> 参数指定一个具体类型，而是用 <code>impl</code> 关键字加上 trait 名。这样，<strong>该参数就能接受任何实现了指定 trait 的类型</strong>。在 <code>notify</code> 的函数体里，我们可以调用 <code>item</code> 上来自 <code>Summary</code> trait 的任何方法，比如 <code>summarize</code>。我们可以把 <code>NewsArticle</code> 或 <code>SocialPost</code> 的实例传给 <code>notify</code> 来调用它。<strong>如果用其他没有实现 <code>Summary</code> 的类型（如 <code>String</code> 或 <code>i32</code>）去调用该函数，代码将无法通过编译</strong>。</p>
+<hr>
+<h3 id="1035-特征约束">10.3.5 特征约束
+</h3><p><code>impl Trait</code>  语法适用于简单场景，<strong>但它本质上只是下面这种更完整写法</strong>（<em>trait bound</em>）的语法糖：</p>
+<blockquote>
+<p>[!TIP]</p>
+<p><strong>语法糖（syntactic sugar） 指的是</strong>：
+一门编程语言为了让代码写起来更简洁、更直观，而提供的一种**“表面写法”，它在功能上与另一种更底层、更啰嗦**的写法完全等价，只是可读性更好。</p></blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">notify</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nc">Summary</span><span class="o">&gt;</span><span class="p">(</span><span class="n">item</span>: <span class="kp">&amp;</span><span class="nc">T</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Breaking news! </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">summarize</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这种更长的形式与上一节的示例等效，但更冗长。<strong>我们将特征界限与泛型类型参数的声明一起放在冒号之后和尖括号之内</strong>。</p>
+<p>这个<code>impl Trait</code>语法在简单的情况下让代码更简洁，但是完整的特征约束语法可以在其他情况下增加表达式的复杂性。比如下面这个函数，我们让函数可以接受两个实现了<code>Summary</code>特征的类型。像这样：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">notify</span><span class="p">(</span><span class="n">item1</span>: <span class="kp">&amp;</span><span class="nc">impl</span><span class="w"> </span><span class="n">Summary</span><span class="p">,</span><span class="w"> </span><span class="n">item2</span>: <span class="kp">&amp;</span><span class="nc">impl</span><span class="w"> </span><span class="n">Summary</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>使用<code>impl Trait</code>在对于想要<code>item1</code>，<code>item2</code>是不同的数据类型的时候很有用</strong>，前提是这些数据类型都实现了<code>Summary</code>特征的。但是如果我们想要这两个参数都是同一个数据类型的话，就要像下面这样表达：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">notify</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nc">Summary</span><span class="o">&gt;</span><span class="p">(</span><span class="n">item1</span>: <span class="kp">&amp;</span><span class="nc">T</span><span class="p">,</span><span class="w"> </span><span class="n">item2</span>: <span class="kp">&amp;</span><span class="nc">T</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>指定为 <code>item1</code> 和 <code>item2</code> 参数类型的泛型类型 <code>T</code> 限制了函数</strong>，使得作为 <code>item1</code> 和 <code>item2</code> 参数的实参传递的值的具体类型必须相同。</p>
+<p>我们也可以增加不止一个约束。就比如我们想要<code>notify</code>函数的入参既满足格式化输出（<code>Display</code>特征）、又满足 <code>SUmmary</code>。<strong>那么就可以使用<code>+</code>操作符</strong>；就像下面这样：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">notify</span><span class="p">(</span><span class="n">item</span>: <span class="kp">&amp;</span><span class="p">(</span><span class="k">impl</span><span class="w"> </span><span class="n">Summary</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Display</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>对于泛型来说，<code>+</code>也同样适用：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">notify</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nc">Summary</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Display</span><span class="o">&gt;</span><span class="p">(</span><span class="n">item</span>: <span class="kp">&amp;</span><span class="nc">T</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>有以上两个特征，<code>notify</code>的函数主题就可以使用<code>summarize</code>函数，并且可以格式化输出。</p>
+<hr>
+<h3 id="1035-使用where闭包clauses更明确的声明特征约束">10.3.5 使用<code>where</code>闭包（<em>Clauses</em>）更明确的声明特征约束
+</h3><p>使用过多的约束也会有缺点。如果每一个泛型都有自己的特征约束，一旦泛型多了之后，函数名和其参数列表之间的距离就会很远，让代码不是特别容易阅读。所以，Rust提供了一个替代的语法<code>where</code>闭包来处理特征约束，<strong>但是<code>where</code>在函数参数列表之后</strong>。就比如下面这个例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">some_function</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nc">Display</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Clone</span><span class="p">,</span><span class="w"> </span><span class="n">U</span>: <span class="nb">Clone</span> <span class="o">+</span><span class="w"> </span><span class="n">Debug</span><span class="o">&gt;</span><span class="p">(</span><span class="n">t</span>: <span class="kp">&amp;</span><span class="nc">T</span><span class="p">,</span><span class="w"> </span><span class="n">u</span>: <span class="kp">&amp;</span><span class="nc">U</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">i32</span> <span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们可以使用<code>where</code>来简化这个表达式：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">some_function</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">U</span><span class="o">&gt;</span><span class="p">(</span><span class="n">t</span>: <span class="kp">&amp;</span><span class="nc">T</span><span class="p">,</span><span class="w"> </span><span class="n">u</span>: <span class="kp">&amp;</span><span class="nc">U</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">i32</span>
+</span></span><span class="line"><span class="cl"><span class="nc">where</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">T</span>: <span class="nc">Display</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Clone</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">U</span>: <span class="nb">Clone</span> <span class="o">+</span><span class="w"> </span><span class="n">Debug</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样，函数的签名就更加简单明了，函数名、参数列表和返回类型靠得近。</p>
+<hr>
+<h3 id="1036-返回一个实现了特征的值">10.3.6 返回一个实现了特征的值
+</h3><p>我们也可以使用<code>impl Trait</code>语法来让函数的返回值也是某个实现了某些特征的数据类型，就像下面这样：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">returns_summarizable</span><span class="p">()</span><span class="w"> </span>-&gt; <span class="nc">impl</span><span class="w"> </span><span class="n">Summary</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">SocialPost</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">username</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;horse_ebooks&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">content</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="s">&#34;of course, as you probably already know, people&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">reply</span>: <span class="nc">false</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">repost</span>: <span class="nc">false</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>使用<code>impl Summary</code>让我们的<strong>函数的返回值不一定是某个具体的数据类型，而只是一个实现了<code>Summary</code>特征的类型</strong>。在这个例子中，函数返回的是<code>SocialPost</code>类型，但是调用这个函数的代码不需要知道这个。</p>
+<p>仅通过 trait 来指定返回值类型的能力，在闭包与迭代器（第 13 章将深入讨论）场景中尤为实用。<strong>闭包和迭代器产生的类型通常只有编译器知道，或者类型名非常冗长；使用 <code>impl Trait</code> 语法可以简洁地表明“返回某个实现了 <code>Iterator</code> 的类型</strong>”，而无需写出繁琐的具体类型。</p>
+<p>但是，<code>impl Trait</code> 只能用于返回单一类型。例如，下面这段代码试图根据条件返回 <code>NewsArticle</code> 或 <code>SocialPost</code>，并把返回类型写成 <code>impl Summary</code>，这是不合法的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">returns_summarizable</span><span class="p">(</span><span class="n">switch</span>: <span class="kt">bool</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">impl</span><span class="w"> </span><span class="n">Summary</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">switch</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">NewsArticle</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">headline</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;Penguins win the Stanley Cup Championship!&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">location</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;Pittsburgh, PA, USA&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">author</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;Iceburgh&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">content</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;The Pittsburgh Penguins once again are the best </span><span class="se">\</span><span class="s">
+</span></span></span><span class="line"><span class="cl"><span class="s">                 hockey team in the NHL.&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">SocialPost</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">username</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;horse_ebooks&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">content</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="s">&#34;of course, as you probably already know, people&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">reply</span>: <span class="nc">false</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">repost</span>: <span class="nc">false</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>编译结果如下：</p>
+<p>​	
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250826005407698.png">
+<img src="./index.assets/image-20250826005407698.png" alt="image-20250826005407698"  />
+</a>
+</div>
+
+</p>
+<p><strong>由于编译器在实现 <code>impl Trait</code> 语法时的限制，不能让它同时返回 <code>NewsArticle</code> 或 <code>SocialPost</code> 两种不同类型</strong>。在第 18 章我们会介绍如何编写真正可以返回多种类型的函数。</p>
+<hr>
+<h3 id="1037-使用-trait-bound-为方法实现加上条件">10.3.7 使用 Trait Bound 为方法实现加上“条件”
+</h3><p>通过在使用泛型类型参数的 <code>impl </code>块中使用 trait bound，<strong>我们可以有条件地为实现了指定 trait 的类型实现方法</strong>。例如，示例中的类型 <code>Pair&lt;T&gt;</code> 始终实现了 <code>new</code> 函数，用于返回一个新的 <code>Pair&lt;T&gt;</code> 实例。但在下一个 impl 块中，<strong>只有当内部类型 <code>T</code> 实现了用于比较的 <code>PartialOrd</code> trait 以及用于打印的 <code>Display</code> trait 时，<code>Pair&lt;T&gt;</code> 才会实现 <code>cmp_display</code> 方法</strong>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">fmt</span>::<span class="n">Display</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">struct</span> <span class="nc">Pair</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">x</span>: <span class="nc">T</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">y</span>: <span class="nc">T</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pair</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">x</span>: <span class="nc">T</span><span class="p">,</span><span class="w"> </span><span class="n">y</span>: <span class="nc">T</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Self</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">Self</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nc">Display</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">PartialOrd</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pair</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// 这里限制了 &lt;T: Display + PartialOrd&gt; 才有用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="k">fn</span> <span class="nf">cmp_display</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;The largest member is x = </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">x</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;The largest member is y = </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">y</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>​	我们还可以为任何实现了指定 trait 的类型有条件地实现某个 trait。<strong>这种对满足 trait bound 的所有类型实现的 trait 称为覆盖实现（<em>blanket implementations</em>），在 Rust 标准库中被广泛使用</strong>。例如，标准库为所有实现了 <code>Display</code> trait 的类型实现了 <code>ToString</code> trait。标准库中的 impl 块大致如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nc">Display</span><span class="o">&gt;</span><span class="w"> </span><span class="nb">ToString</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// something...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>因为标准库提供了这一覆盖实现，<strong>我们就可以在任何实现了 <code>Display</code> trait 的类型上，调用由 <code>ToString</code> trait 定义的 <code>to_string</code> 方法</strong>。例如，由于整数实现了 <code>Display</code>，我们可以像这样把整数转换成对应的 <code>String</code> 值：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="kd">let</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.</span><span class="n">to_string</span><span class="p">();</span><span class="c1">// 将数字3转换成字符串&#34;3&#34;
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>覆盖实现会出现在该 trait 文档的 “Implementors”（实现者）部分。</p>
+<p>Trait 与 trait bound 让我们能够编写使用泛型参数的代码，既减少了重复，又能向编译器表明：<strong>我们希望泛型类型具备特定的行为</strong>。接着编译器会利用 trait bound 信息，<strong>检查所有与我们的代码一起使用的具体类型是否确实提供了正确的行为</strong>。在动态类型语言中，如果我们在某个类型上调用了未定义的方法，要到运行时才会报错；而 Rust 则将这些错误提前到编译期，迫使我们在代码尚未运行之前就必须解决问题。此外，<strong>由于我们已在编译期完成检查，就无需再编写运行时检查行为的代码</strong>。这种做法在保持泛型灵活性的同时，也提升了性能。</p>
+<hr>
+<h2 id="104-生命周期lifetime">10.4 生命周期（<em>Lifetime</em>）
 </h2>
 </section>
 
@@ -9516,7 +10087,7 @@
             
             
             
-            共发表 9 篇文章 · 总计 98.75 k 字
+            共发表 9 篇文章 · 总计 103.85 k 字
         </div>
         <div>
             <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
