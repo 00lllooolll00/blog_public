@@ -10,7 +10,7 @@
         <lastBuildDate>Tue, 26 Aug 2025 01:23:29 +0800</lastBuildDate><atom:link href="https://example.com/tags/rust/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Rust自学笔记</title>
         <link>https://example.com/p/rust-self-teach/</link>
-        <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
+        <pubDate>Thu, 21 Aug 2025 00:00:00 +0800</pubDate>
         
         <guid>https://example.com/p/rust-self-teach/</guid>
         <description>&lt;img src="https://example.com/p/rust-self-teach/rust-2.jpg" alt="Featured image of post Rust自学笔记" /&gt;&lt;h1 id=&#34;chapter-1-cargorust-的包管理器&#34;&gt;Chapter 1: Cargo——Rust 的包管理器

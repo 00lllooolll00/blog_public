@@ -4,6 +4,9 @@ baseurl: https://example.com/
 # 网站默认语言编码
 languageCode: en-us
 
+# 时区设置
+timeZone: Asia/Shanghai
+
 # 使用的Hugo主题名称
 theme: hugo-theme-stack
 
