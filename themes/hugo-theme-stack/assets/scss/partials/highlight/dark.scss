@@ -1,14 +1,21 @@
 /*
-*   Style: monokai
-*   https://xyproto.github.io/splash/docs/monokai.html
+*   Style: OneDarkPro
+*   Based on One Dark Pro theme
 */
 
-$color: #f8f8f2;
-$background-color: #272822;
-$error-color: #bb0064;
-$keyword-color: #66d9ef;
+$color: #abb2bf;
+$background-color: #282c34;
+$error-color: #e06c75;
+$keyword-color: #c678dd;
 $text-color: $color;
-$name-color: #a6e22e;
-$literal-color: #e6db74;
+$name-color: #61afef;
+$literal-color: #98c379;
+$comment-color: #5c6370;
+$number-color: #d19a66;
+$operator-color: #56b6c2;
+$preprocessor-color: #c678dd;
+$macro-identifier-color: #d19a66;
+$conditional-identifier-color: #61afef;
+$highlight-background: rgba(255, 255, 255, 0.1);
 
 @import "common.scss";

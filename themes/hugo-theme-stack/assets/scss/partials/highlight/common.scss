@@ -47,14 +47,14 @@
 .chroma .hl {
     display: block;
     width: 100%;
-    background-color: #ffffcc;
+    background-color: $highlight-background;
 }
 
 /* LineNumbersTable */
 .chroma .lnt {
     margin-right: 0.4em;
     padding: 0 0.4em 0 0.4em;
-    color: #7f7f7f;
+    color: $comment-color;
     display: block;
 }
 
@@ -62,7 +62,7 @@
 .chroma .ln {
     margin-right: 0.4em;
     padding: 0 0.4em 0 0.4em;
-    color: #7f7f7f;
+    color: $comment-color;
 }
 
 /* Keyword */
@@ -82,7 +82,7 @@
 
 /* KeywordNamespace */
 .chroma .kn {
-    color: #f92672;
+    color: $keyword-color;
 }
 
 /* KeywordPseudo */
@@ -102,7 +102,7 @@
 
 /* Name */
 .chroma .n {
-    color: $text-color;
+    color: $macro-identifier-color;
 }
 
 /* NameAttribute */
@@ -127,7 +127,7 @@
 
 /* NameConstant */
 .chroma .no {
-    color: $keyword-color;
+    color: $macro-identifier-color;
 }
 
 /* NameDecorator */
@@ -167,7 +167,7 @@
 
 /* NameOther */
 .chroma .nx {
-    color: $name-color;
+    color: $conditional-identifier-color;
 }
 
 /* NameProperty */
@@ -177,7 +177,7 @@
 
 /* NameTag */
 .chroma .nt {
-    color: #f92672;
+    color: $error-color;
 }
 
 /* NameVariable */
@@ -207,7 +207,7 @@
 
 /* Literal */
 .chroma .l {
-    color: #ae81ff;
+    color: $literal-color;
 }
 
 /* LiteralDate */
@@ -237,7 +237,7 @@
 
 /* LiteralStringDelimiter */
 .chroma .dl {
-    color: $literal-color;
+    color: $operator-color;
 }
 
 /* LiteralStringDoc */
@@ -252,7 +252,7 @@
 
 /* LiteralStringEscape */
 .chroma .se {
-    color: #ae81ff;
+    color: $number-color;
 }
 
 /* LiteralStringHeredoc */
@@ -267,7 +267,7 @@
 
 /* LiteralStringOther */
 .chroma .sx {
-    color: $literal-color;
+    color: $operator-color;
 }
 
 /* LiteralStringRegex */
@@ -287,47 +287,47 @@
 
 /* LiteralNumber */
 .chroma .m {
-    color: #ae81ff;
+    color: $number-color;
 }
 
 /* LiteralNumberBin */
 .chroma .mb {
-    color: #ae81ff;
+    color: $number-color;
 }
 
 /* LiteralNumberFloat */
 .chroma .mf {
-    color: #ae81ff;
+    color: $number-color;
 }
 
 /* LiteralNumberHex */
 .chroma .mh {
-    color: #ae81ff;
+    color: $number-color;
 }
 
 /* LiteralNumberInteger */
 .chroma .mi {
-    color: #ae81ff;
+    color: $number-color;
 }
 
 /* LiteralNumberIntegerLong */
 .chroma .il {
-    color: #ae81ff;
+    color: $number-color;
 }
 
 /* LiteralNumberOct */
 .chroma .mo {
-    color: #ae81ff;
+    color: $number-color;
 }
 
 /* Operator */
 .chroma .o {
-    color: #f92672;
+    color: $operator-color;
 }
 
 /* OperatorWord */
 .chroma .ow {
-    color: #f92672;
+    color: $operator-color;
 }
 
 /* Punctuation */
@@ -337,37 +337,39 @@
 
 /* Comment */
 .chroma .c {
-    color: #75715e;
+    color: $comment-color;
 }
 
 /* CommentHashbang */
 .chroma .ch {
-    color: #75715e;
+    color: $comment-color;
 }
 
 /* CommentMultiline */
 .chroma .cm {
-    color: #75715e;
+    color: $comment-color;
 }
 
 /* CommentSingle */
 .chroma .c1 {
-    color: #75715e;
+    color: $comment-color;
 }
 
 /* CommentSpecial */
 .chroma .cs {
-    color: #75715e;
+    color: $comment-color;
 }
 
 /* CommentPreproc */
 .chroma .cp {
-    color: #75715e;
+    color: $preprocessor-color;
+    font-weight: bold;
 }
 
 /* CommentPreprocFile */
 .chroma .cpf {
-    color: #75715e;
+    color: $literal-color;
+    font-weight: bold;
 }
 
 /* Generic */
@@ -376,7 +378,7 @@
 
 /* GenericDeleted */
 .chroma .gd {
-    color: #f92672;
+    color: $error-color;
 }
 
 /* GenericEmph */
@@ -412,7 +414,7 @@
 
 /* GenericSubheading */
 .chroma .gu {
-    color: #75715e;
+    color: $comment-color;
 }
 
 /* GenericTraceback */

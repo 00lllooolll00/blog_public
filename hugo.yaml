@@ -318,6 +318,7 @@ markup:
     lineNos: true # 是否显示行号
     lineNumbersInTable: true # 是否在表格中显示行号
     tabWidth: 4 # 制表符宽度
+    style: onedark # 语法高亮主题
 
 # 数学公式支持（推荐使用Hugo内置的数学模块）
 math:
