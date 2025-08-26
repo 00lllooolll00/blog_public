@@ -10,7 +10,7 @@
 <meta property='og:description' content="根据官网学习Rust时做的笔记">
 <meta property='og:url' content='https://example.com/p/rust-self-teach/'>
 <meta property='og:site_name' content='N1ntyNine99'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-08-26T01:23:29&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-08-27T02:48:20&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
 <meta name="twitter:title" content="Rust自学笔记">
 <meta name="twitter:description" content="根据官网学习Rust时做的笔记"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://example.com/p/rust-self-teach/rust-2.jpg' />
@@ -537,7 +537,21 @@
         <li><a href="#1037-使用-trait-bound-为方法实现加上条件">10.3.7 使用 Trait Bound 为方法实现加上“条件”</a></li>
       </ol>
     </li>
-    <li><a href="#104-生命周期lifetime">10.4 生命周期（<em>Lifetime</em>）</a></li>
+    <li><a href="#104-生命周期lifetime">10.4 生命周期（<em>Lifetime</em>）</a>
+      <ol>
+        <li><a href="#1041-使用生命周期避免悬挂引用">10.4.1 使用生命周期避免悬挂引用</a></li>
+        <li><a href="#1042-借用检查器borrow-checker">10.4.2 借用检查器（<em>Borrow Checker</em>）</a></li>
+        <li><a href="#1043-函数中的泛型生命周期">10.4.3 函数中的泛型生命周期</a></li>
+        <li><a href="#1044-显式声明生命周期">10.4.4 显式声明生命周期</a></li>
+        <li><a href="#1045--在函数签名中声明生命周期">10.4.5  在函数签名中声明生命周期</a></li>
+        <li><a href="#1046-从生命周期的角度思考">10.4.6 从生命周期的角度思考</a></li>
+        <li><a href="#1047-在结构体中声明生命周期">10.4.7 在结构体中声明生命周期</a></li>
+        <li><a href="#1048-生命周期推断">10.4.8 生命周期推断</a></li>
+        <li><a href="#1049-在方法中声明生命周期">10.4.9 在方法中声明生命周期</a></li>
+        <li><a href="#10410-静态生命周期">10.4.10 静态生命周期</a></li>
+        <li><a href="#10411-泛型特征约束生命周期">10.4.11 泛型、特征约束、生命周期</a></li>
+      </ol>
+    </li>
   </ol>
 </nav>
         </div>
@@ -628,7 +642,7 @@
 
 
             <time class="article-time--reading">
-                阅读时长: 182 分钟
+                阅读时长: 197 分钟
             </time>
         </div>
         
@@ -640,8 +654,8 @@
 <path d="M15 6L18 9" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M13 20H21" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-            <time class="article-time--updated" datetime=" 2025-08-26T01:23:29.000Z">
-                2025年8月26日 01:23
+            <time class="article-time--updated" datetime=" 2025-08-27T02:48:20.000Z">
+                2025年8月27日 02:48
             </time>
         </div>
         
@@ -8228,15 +8242,15 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span>::<span class="n">ErrorKind</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">greeting_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span>::<span class="n">open</span><span class="p">(</span><span class="s">&#34;hello.txt&#34;</span><span class="p">).</span><span class="n">unwrap_or_else</span><span class="p">(</span><span class="o">|</span><span class="n">error</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">error</span><span class="p">.</span><span class="n">kind</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">ErrorKind</span>::<span class="n">NotFound</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">File</span>::<span class="n">create</span><span class="p">(</span><span class="s">&#34;hello.txt&#34;</span><span class="p">).</span><span class="n">unwrap_or_else</span><span class="p">(</span><span class="o">|</span><span class="n">error</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="fm">panic!</span><span class="p">(</span><span class="s">&#34;Problem creating the file: </span><span class="si">{error:?}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">})</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="fm">panic!</span><span class="p">(</span><span class="s">&#34;Problem opening the file: </span><span class="si">{error:?}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">greeting_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span>::<span class="n">open</span><span class="p">(</span><span class="s">&#34;hello.txt&#34;</span><span class="p">).</span><span class="n">unwrap_or_else</span><span class="p">(</span><span class="o">|</span><span class="n">error</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">     </span><span class="k">if</span><span class="w"> </span><span class="n">error</span><span class="p">.</span><span class="n">kind</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">ErrorKind</span>::<span class="n">NotFound</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">         </span><span class="n">File</span>::<span class="n">create</span><span class="p">(</span><span class="s">&#34;hello.txt&#34;</span><span class="p">).</span><span class="n">unwrap_or_else</span><span class="p">(</span><span class="o">|</span><span class="n">error</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">             </span><span class="fm">panic!</span><span class="p">(</span><span class="s">&#34;Problem creating the file: </span><span class="si">{error:?}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">         </span><span class="p">})</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">     </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">         </span><span class="fm">panic!</span><span class="p">(</span><span class="s">&#34;Problem opening the file: </span><span class="si">{error:?}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">     </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> </span><span class="p">});</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
@@ -9945,7 +9959,611 @@
 <p>Trait 与 trait bound 让我们能够编写使用泛型参数的代码，既减少了重复，又能向编译器表明：<strong>我们希望泛型类型具备特定的行为</strong>。接着编译器会利用 trait bound 信息，<strong>检查所有与我们的代码一起使用的具体类型是否确实提供了正确的行为</strong>。在动态类型语言中，如果我们在某个类型上调用了未定义的方法，要到运行时才会报错；而 Rust 则将这些错误提前到编译期，迫使我们在代码尚未运行之前就必须解决问题。此外，<strong>由于我们已在编译期完成检查，就无需再编写运行时检查行为的代码</strong>。这种做法在保持泛型灵活性的同时，也提升了性能。</p>
 <hr>
 <h2 id="104-生命周期lifetime">10.4 生命周期（<em>Lifetime</em>）
-</h2>
+</h2><p>生命周期其实本质也是一种泛型。<strong>但是生命周期不是用于确保一个类型有我们想要的行为，而是确保我们使用引用的时候引用是有效的。</strong></p>
+<p>在第四章介绍引用和借用的时候，我们有一个点没有提到，就是在Rust中每一个引用的都有一个生命周期，即其有效的作用域。就和变量类型一样，大多数时间是不用显式声明的，而是由编译器来推断的；只有当面临很多不同类型同时适用的时候，我们才需要显式指定。同样的，<strong>只有当生命周期有很多不同的方式的时候，我们才需要显示指定</strong>。Rust 要求我们使用泛型生命周期参数来标注这些关系，以确保在运行时实际使用的引用一定是有效的。</p>
+<p>对于其他很多语言，显式指定生命周期都不是一个内容，所以这会让我们有点陌生。尽管我们不会在本章全面介绍生命周期，但我们会讨论你可能遇到的生命周期语法的一些常见方式，以便你熟悉这个概念。</p>
+<hr>
+<h3 id="1041-使用生命周期避免悬挂引用">10.4.1 使用生命周期避免悬挂引用
+</h3><p>​	<strong>生命周期是为了避免引用到我们不想引用到的数据上</strong>，比如下面这个程序：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">r</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="c1">//进入 x 的作用域
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="c1">//x 被编译器 drop 掉了 &amp;X 不再是一个有效的引用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;r: </span><span class="si">{r}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>编译结果如下：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250826224437287.png">
+<img src="./index.assets/image-20250826224437287.png" alt="image-20250826224437287"  />
+</a>
+</div>
+
+</p>
+<p>这个程序尝试让变量<code>r</code>引用<code>x</code>，但是在使用这个引用的时候，<code>x</code>由于超出其作用域，已经被drop了，这就导致此时的<code>r</code>指向了一块未知的内存。所以我们可以看到编译器报错告诉我们：<code>x</code>没有存活足够长的时间。</p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>注意：清单 10-16、10-17 和 10-23 中的示例在声明变量时没有给出初始值，因此变量名存在于外部作用域。乍看之下，这似乎与 Rust“没有空值”的原则相矛盾。然而，如果我们试图在赋值之前就使用该变量，编译器会在编译时报错，这恰恰说明 Rust 确实不允许空值。</p></blockquote>
+<hr>
+<h3 id="1042-借用检查器borrow-checker">10.4.2 借用检查器（<em>Borrow Checker</em>）
+</h3><p>Rust 编译器有一个借用检查器，它会比较作用域以确定所有借用是否有效。查看下面对于上面代码的一些注释，有助于更好的理解生命周期：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">r</span><span class="p">;</span><span class="w">                </span><span class="c1">// ---------+-- &#39;a
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">                          </span><span class="c1">//          |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="p">{</span><span class="w">                     </span><span class="c1">//          |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">        </span><span class="c1">// -+-- &#39;b  |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">;</span><span class="w">           </span><span class="c1">//  |       |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="p">}</span><span class="w">                     </span><span class="c1">// -+       |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">                          </span><span class="c1">//          |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;r: </span><span class="si">{r}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">   </span><span class="c1">//          |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">                         </span><span class="c1">// ---------+
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在这里，我们为 <code>r</code> 的生命周期标注了 <code>'a</code>，为 <code>x</code> 的生命周期标注了 <code>'b</code>。如你所见，内部的 <code>'b</code> 块比外部的 <code>'a</code> 生命周期块要小得多。在编译时，<strong>Rust 会比较这两个生命周期的大小，发现 <code>r</code> 具有 <code>'a</code> 的生命周期，却引用了只有 <code>'b</code> 生命周期的内存</strong>。程序因此被拒绝：<strong>因为 <code>'b</code> 比 <code>'a</code> 短——被引用的对象存活得没有引用本身久</strong>。</p>
+<p>解决这个问题也很简单：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">            </span><span class="c1">// ----------+-- &#39;b
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">                          </span><span class="c1">//           |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">;</span><span class="w">           </span><span class="c1">// --+-- &#39;a  |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">                          </span><span class="c1">//   |       |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;r: </span><span class="si">{r}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">   </span><span class="c1">//   |       |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">                          </span><span class="c1">// --+       |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">                         </span><span class="c1">// ----------+
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样，<code>'b</code>的生命周期就是明显大于<code>’a</code>的，<strong>所以引用的对象存活的肯定比其引用久</strong>。</p>
+<p>既然你已经知道了引用的生命周期位于何处，也明白了 Rust 如何通过分析生命周期来确保引用始终有效，接下来就让我们在函数的上下文中，探讨泛型生命周期参数以及返回值中的生命周期。</p>
+<hr>
+<h3 id="1043-函数中的泛型生命周期">10.4.3 函数中的泛型生命周期
+</h3><p>我们将要写一个函数，返回两个字符串较长的那个字符串的切片。函数接收两个字符串但是只返回一个字符串切片。我们让这个函数叫做<code>longest</code>，其效果就是下面这样，最后应该会打印<code>The longest string is abcd</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">string1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;abcd&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">string2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;xyz&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">longest</span><span class="p">(</span><span class="n">string1</span><span class="p">.</span><span class="n">as_str</span><span class="p">(),</span><span class="w"> </span><span class="n">string2</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;The longest string is </span><span class="si">{result}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>从上面的例子就可以看到，我们希望函数接收的是切片，而不是字符串，而切片就是一种引用；<strong>因为我们不希望函数直接获取所有权</strong>。如果我们按照下面这样实现函数，编译不会成功：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">longest</span><span class="p">(</span><span class="n">x</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">y</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">y</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>编译如下：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250826232223463.png">
+<img src="./index.assets/image-20250826232223463.png" alt="image-20250826232223463"  />
+</a>
+</div>
+
+</p>
+<p>帮助信息指出，<strong>返回类型需要一个泛型生命周期参数，因为 Rust 无法判断返回的引用究竟指向 <code>x</code> 还是 <code>y</code></strong>。事实上，我们也不知道——函数体中的 <code>if</code> 块返回 <code>x</code> 的引用，而 <code>else</code> 块返回 <code>y</code> 的引用！</p>
+<p>在定义这个函数时，我们并不知道实际会传入哪些具体值，因此无法确定执行的是 <code>if</code> 分支还是 <code>else</code> 分支。<strong>我们同样不知道传入引用的具体生命周期</strong>，也就不能像之前那样通过查看作用域来判断返回的引用是否始终有效。<strong>借用检查器也无法推断这一点，因为它不知道 <code>x</code> 和 <code>y</code> 的生命周期与返回值的生命周期之间的关系</strong>。要消除这个错误，我们需要添加泛型生命周期参数，<strong>明确定义这些引用之间的关系</strong>，从而让借用检查器能够进行正确的分析。</p>
+<hr>
+<h3 id="1044-显式声明生命周期">10.4.4 显式声明生命周期
+</h3><p><strong>生命周期标注并不会改变任何引用的实际存活时长</strong>。<strong>它们只是描述多个引用生命周期之间的关系，而不会对这些生命周期本身产生任何影响</strong>。正如函数在签名中指定泛型类型参数后，可以接收任何类型的参数一样；<strong>函数在指定泛型生命周期参数后，也可以接收任何生命周期的引用。</strong></p>
+<p>生命周期标注的语法略显特别：<strong>生命周期参数的名称必须以单个单引号（&rsquo;）开头</strong>，通常全部使用小写字母且非常简短，这一点与泛型类型相似。大多数人会为第一个生命周期标注使用名称 <code>'a</code>。我<strong>们把生命周期参数标注放在引用的 <code>&amp;</code> 之后，并用空格将其与引用的类型隔开</strong>。</p>
+<p>下面是一些例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="o">&amp;</span><span class="kt">i32</span><span class="w">        </span><span class="c1">// 一个普通的 i32 的不可变引用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="o">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">i32</span><span class="w">     </span><span class="c1">// 一个有显式生命周期声明的 i32 的不可变引用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="o">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="c1">// 一个有显式生命周期声明的 i32 的可变引用
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>单独的一个生命周期标注本身并没有太大意义，因为这些标注的目的在于告诉 Rust：<strong>多个引用所对应的泛型生命周期参数之间如何相互关联</strong>。现在，让我们在 <code>longest</code> 函数的上下文中，来考察这些生命周期标注是如何彼此关联的。</p>
+<hr>
+<h3 id="1045--在函数签名中声明生命周期">10.4.5  在函数签名中声明生命周期
+</h3><p>要在函数签名中使用生命周期标注，<strong>我们需要在函数名与参数列表之间的尖括号内声明泛型生命周期参数</strong>，做法与声明泛型类型参数相同。</p>
+<p>我们希望签名表达如下约束：<strong>只要两个参数都有效，返回的引用就有效</strong>。这就是参数生命周期与返回值生命周期之间的关系。我们将该生命周期命名为 <code>'a</code>，然后把它加到每一处引用上，如下所示：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">longest</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">y</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">y</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>现在这个代码就是可以正常编译运行的了。</p>
+<p>现在，函数签名告诉 Rust：对于某个生命周期 <code>'a</code>，该函数接受两个参数，<strong>这两个参数都是至少与生命周期 <code>'a</code> 一样长的字符串切片</strong>；函数签名还告诉 Rust，<strong>函数返回的字符串切片也至少与生命周期 <code>'a</code> 一样长</strong>。在实践中，<strong>这意味着 <code>longest</code> 函数返回的引用的生命周期等于函数参数所引用值的较小生命周期</strong>。这些关系就是我们在分析这段代码时希望 Rust 采纳的规则。</p>
+<p>请记住，当我们在函数签名中指定生命周期参数时，并没有改变传入或返回的任何值的实际生命周期，而只是告诉借用检查器：<strong>拒绝任何不满足这些约束的值</strong>。注意，<code>longest</code> 函数并不需要精确知道 <code>x</code> 和 <code>y</code> 会活多久，<strong>它只知道存在某个作用域可以替代 <code>'a</code>，从而满足此签名即可</strong>。</p>
+<p><strong>在函数中标注生命周期时，标注应放在函数签名里，而非函数体中</strong>。生命周期标注会成为函数契约的一部分，就像签名中的类型一样。让函数签名包含生命周期契约意味着 Rust 编译器所做的分析可以更简单。如果函数标注或调用方式存在问题，编译器就能更精确地指出我们代码中的具体位置以及相关的约束。相反，如果 Rust 编译器需要更多推断我们期望的生命周期关系，它可能只能在远离问题根源的许多步骤之后，才指向我们代码的某一处使用。</p>
+<p>当我们向 <code>longest</code> 传入具体引用时，被替换到 <code>'a</code> 的具体生命周期就是 <code>x</code> 的作用域与 <code>y</code> 的作用域重叠的部分。换句话说，<strong>泛型生命周期 <code>'a</code> 将获得等于 <code>x</code> 与 <code>y</code> 中较小生命周期的具体生命周期</strong>。因为我们用同一个生命周期参数 <code>'a</code> 标注了返回的引用，所以返回的引用也将在 <code>x</code> 和 <code>y</code> 中较小生命周期的长度内保持有效。</p>
+<p>接下来，让我们通过传入具有不同具体生命周期的引用，来看看生命周期标注是如何限制 <code>longest</code> 函数的。下面这个例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">string1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;long string is long&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">string2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;xyz&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">longest</span><span class="p">(</span><span class="n">string1</span><span class="p">.</span><span class="n">as_str</span><span class="p">(),</span><span class="w"> </span><span class="n">string2</span><span class="p">.</span><span class="n">as_str</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;The longest string is </span><span class="si">{result}</span><span class="s">&#34;</span><span class="p">);</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="c1">// string2 和 result drop
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">longest</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">y</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">y</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在这个例子里，<code>string1</code> 的作用域从第 2 行一直延续到第 9 行，而 <code>string2</code> 仅存活于第 5～8 行，<code>result</code> 也只活在这段区间。</p>
+<p><strong>此时 <code>'a</code> 被推断为 两者作用域的交集（即第 5～8 行）</strong>，<code>result</code> 的使用范围恰好落在这个交集之内，所以编译通过，打印 <code>The longest string is long string is long</code>。</p>
+<p>现在我们修改代码，让 <code>result</code> 的生命域超出 <code>string2</code> 的结束点，但仍不超出 <code>string1</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">string1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;long string is long&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">string2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;xyz&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">longest</span><span class="p">(</span><span class="n">string1</span><span class="p">.</span><span class="n">as_str</span><span class="p">(),</span><span class="w"> </span><span class="n">string2</span><span class="p">.</span><span class="n">as_str</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="c1">// string2 drop
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;The longest string is </span><span class="si">{result}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时 <code>string2</code> 在第 7 行就被释放，而 <code>result</code> 却想活到第 9 行的 <code>println!</code>。</p>
+<p><strong>无论实际上 <code>longest</code> 返回的是 <code>x</code> 还是 <code>y</code>，Rust 都要求“返回值只能与两入参中更短的寿命一样长”。</strong></p>
+<p>由于 <code>string2</code> 的寿命就是更短的那一方，<strong><code>result</code> 若超出它就必然悬空</strong>，因此编译器拒绝这段代码，产生借用检查错误：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250827003929641.png">
+<img src="./index.assets/image-20250827003929641.png" alt="image-20250827003929641"  />
+</a>
+</div>
+
+</p>
+<p>再看下面这个例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">string1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;long string is long&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">string2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;xyz&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">longest</span><span class="p">(</span><span class="n">string1</span><span class="p">.</span><span class="n">as_str</span><span class="p">(),</span><span class="w"> </span><span class="n">string2</span><span class="p">.</span><span class="n">as_str</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;The longest string is </span><span class="si">{result}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">longest</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">y</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">y</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个代码是可以编译的，但是我们肉眼看上去很明显<code>result</code>的生命周期比<code>string2</code>要长，那为什么可以编译呢？</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">string1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">…</span><span class="p">;</span><span class="w">           </span><span class="c1">// ---------+-- &#39;s1  (到 main 结束)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w">                </span><span class="c1">//          |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">                               </span><span class="c1">//          |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">string2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">…</span><span class="p">;</span><span class="w">           </span><span class="c1">// -+-- &#39;s2 | (同样到 main 结束)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">longest</span><span class="p">(</span><span class="err">…</span><span class="p">);</span><span class="w">       </span><span class="c1">//  |       |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="err">…</span><span class="p">);</span><span class="w">               </span><span class="c1">//  |       |
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">                              </span><span class="c1">// -+-------+-- 同时结束
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在这段代码里，<code>string1</code> 与 <code>string2</code> 的作用域完全重叠、都持续到 <code>main</code> 结束，因此编译器把 <code>'a</code> 推断成这个交集；<code>result</code> 的生命周期恰好等于 <code>string2</code>，并未超出，所以满足“返回值 ≤ 较短生命周期”的条件，自然不会报错。<strong>简单来说，虽然<code>result</code>比<code>string2</code>先声明，但是通过函数获得引用之后，使用这个引用的时候，<code>string1</code>和<code>string2</code>都还是有效的，不会造成悬挂引用，所以是有效的。</strong></p>
+<p>“返回值的生命周期 ≤ 两个入参中较短的生命周期”——<strong>这里的“较短”指的是作用域的交集</strong>；“较短”<strong>并不是字面意义上谁早结束，而是“两个入参引用共同还能活着的那一段重叠区间”</strong>；在这段区间里，两个引用都必须有效，因此返回值也只能在这段区间里用。</p>
+<hr>
+<h3 id="1046-从生命周期的角度思考">10.4.6 从生命周期的角度思考
+</h3><p>需要怎样标注生命周期参数，完全取决于函数实际做了什么。例如，如果我们把 <code>longest</code> 的实现改成总是返回第一个参数，而不再比较长度，那么就不必给第二个参数 <code>y</code> 标注生命周期。下面的代码就能通过编译：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">longest</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">y</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">x</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们只给参数 <code>x</code> 和返回类型指定了生命周期参数 <code>'a</code>，而没有给参数 <code>y</code> 指定，<strong>因为 <code>y</code> 的生命周期与 <code>x</code> 或返回值的生命周期没有任何关系</strong>。</p>
+<p>**从函数返回引用时，返回类型的生命周期参数必须与某个参数的生命周期参数保持一致。**如果返回的引用并不指向任何一个参数，<strong>那它只能指向函数内部新创建的值；然而，这将导致悬垂引用，因为该值会在函数结束时离开作用域而被释放</strong>。下面这个试图实现的 <code>longest</code> 函数就无法通过编译：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">longest</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">y</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;really long string&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">result</span><span class="p">.</span><span class="n">as_str</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="c1">// 返回的引用的值在这个地方就 drop了 将返回一个 &#34;野指针&#34; Rust不允许
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>编译如下：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250827011015391.png">
+<img src="./index.assets/image-20250827011015391.png" alt="image-20250827011015391"  />
+</a>
+</div>
+
+</p>
+<p>归根结底，<strong>生命周期语法所做的只是把函数各参数与返回值的生命周期连接起来</strong>；一旦连接完成，Rust 就拥有了足够的信息去允许那些内存安全的操作，同时拒绝任何会产生悬垂指针或破坏内存安全的操作。</p>
+<hr>
+<h3 id="1047-在结构体中声明生命周期">10.4.7 在结构体中声明生命周期
+</h3><p>目前为止，我们声明的结构体中都是拥有值的类型。但是现在接触了生命周期，我们就可以在结构体中声明引用了，<strong>我们需要在结构体的定义中显式声明每一个引用的生命周期</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">ImportantExcerpt</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">part</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">novel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;Call me Ishmael. Some years ago...&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">first_sentence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">novel</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="sc">&#39;.&#39;</span><span class="p">).</span><span class="n">next</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ImportantExcerpt</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">part</span>: <span class="nc">first_sentence</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个结构体只有一个字段 <code>part</code>，它保存一个字符串切片，也就是一个引用**。与泛型数据类型一样，我们在结构体名称后的尖括号内声明泛型生命周期参数的名字**，以便在结构体定义体内使用这一生命周期参数。该标注意味着：<strong>一个 <code>ImportantExcerpt</code> 实例的存活时间不能超过其 <code>part</code> 字段所持有引用的生命周期</strong>。</p>
+<p>这里的 <code>main</code> 函数创建了一个 <code>ImportantExcerpt</code> 实例，它持有一个指向 <code>novel</code> 所拥有 <code>String</code> 中第一句的引用。<code>novel</code> 中的数据在 <code>ImportantExcerpt</code> 实例创建之前就已存在；此外，<code>novel</code> 直到 <code>ImportantExcerpt</code> 离开作用域之后才离开作用域，因此 <code>ImportantExcerpt</code> 实例中的引用始终有效。</p>
+<h3 id="1048-生命周期推断">10.4.8 生命周期推断
+</h3><p>现在我们已经找到了每一个引用都有其自己的生命周期；当我们在函数、结构体中使用到了引用的时候，我们需要显式声明生命周期。但是我们来看下面一个函数，他是可以被成功编译的，但是他与我们想的好像有点出入：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">first_word</span><span class="p">(</span><span class="n">s</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">as_bytes</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">item</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">bytes</span><span class="p">.</span><span class="n">iter</span><span class="p">().</span><span class="n">enumerate</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sa">b</span><span class="sc">&#39; &#39;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">&amp;</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="n">i</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">&amp;</span><span class="n">s</span><span class="p">[</span><span class="o">..</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>之所以这段函数在没有显式生命周期标注的情况下仍能编译，是出于历史原因：在 Rust 1.0 之前的早期版本中，这段代码无法通过编译，因为那时每个引用都必须显式写出生命周期。当时的函数签名需要写成这样：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">first_word</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">s</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在大量编写 Rust 代码后，Rust 团队发现，程序员在特定场景下总是反复填写同样的生命周期标注。<strong>这些场景是可预测的，并遵循若干确定的模式</strong>。于是开发者把这些模式直接编进了编译器，使得借用检查器能够在这些情况下自动推断生命周期，无需再手写标注。</p>
+<p>这段历史之所以重要，是因为未来可能还会出现更多可确定的模式，并被继续加入编译器——届时需要显式标注的情况会进一步减少。</p>
+<p>这些被固化到 Rust 引用分析里的模式称为生命周期省略规则（l<em>ifetime elision rules</em>）。它们不是给程序员遵守的规则，而是编译器在遇到特定情形时会自动应用的判断；<strong>只要代码符合这些情形，就不必显式写出生命周期</strong>。</p>
+<p>省略规则并不提供完全推断。<strong>如果 Rust 应用规则后仍存在歧义，编译器不会靠猜测来决定剩余引用的生命周期，而是报出错误，提示你通过显式标注来解决</strong>。</p>
+<p>函数或方法参数上的生命周期称为输入生命周期（<em>input lifetimes</em>），返回值上的生命周期称为输出生命周期（<em>output lifetimes</em>）。</p>
+<p>编译器在没有显式标注时，通过三条规则推断引用的生命周期。前两条规则覆盖所有 <code>fn</code> 和 <code>impl</code>，<strong>规则 1 处理输入生命周期，规则 2、3 处理输出生命周期</strong>；若三条规则用完后仍有引用生命周期无法确定，编译器就报错：</p>
+<ol>
+<li>
+<p><strong>给每个引用型参数都分配一个独立的生命周期参数。</strong></p>
+<ul>
+<li><strong>单参数：<code>fn foo&lt;'a&gt;(x: &amp;'a i32)</code></strong></li>
+<li><strong>双参数：<code>fn foo&lt;'a, 'b&gt;(x: &amp;'a i32, y: &amp;'b i32)</code></strong></li>
+</ul>
+<p><strong>以此类推</strong>。</p>
+</li>
+<li>
+<p><strong>如果只有一个输入生命周期参数，则该参数被赋给所有输出生命周期。</strong></p>
+<p><strong>例：<code>fn foo&lt;'a&gt;(x: &amp;'a i32) -&gt; &amp;'a i32</code></strong></p>
+</li>
+<li>
+<p><strong>如果有多个输入生命周期，但其中一个是 <code>&amp;self</code> 或 <code>&amp;mut self</code>（即方法），就把 <code>self</code> 的生命周期赋给所有输出生命周期。这让方法签名更简洁。</strong></p>
+<p><em>注意：规则2和规则3是或的关系，不是和的关系</em></p>
+</li>
+</ol>
+<p>现在让我们扮演一次编译器，用这三条规则为 <code>first_word</code> 函数的签名推断生命周期。初始签名不带任何生命周期信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">first_word</span><span class="p">(</span><span class="n">s</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>首先看第一条规则，为每一个参数都分配一个独立的生命周期参数，现在函数签名是这样的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">first_word</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">s</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后看第二个规则，由于入参只有一个<code>s</code>，所以符合第二个规则，签名变成这样：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">first_word</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">s</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>到此为止，函数的所有相关参数都有了生命周期，所以编译器可以正常编译而不需要程序员显式指定生命周期。</p>
+<p>再来看另一个例子，这次使用我们之前的<code>longest</code>函数，但是没有声明生命周期：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">longest</span><span class="p">(</span><span class="n">x</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">y</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>规则一处理之后就会变成这样：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">longest</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="p">,</span><span class="na">&#39;b</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">y</span>: <span class="kp">&amp;</span><span class="na">&#39;b</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>处理规则二的时候，明显发现，有多个输入生命周期，不符合规则二。同样也不适用于规则三，所以编译器会报错，让程序显式指定生命周期。</p>
+<p>因为第三条规则实际上只适用于方法签名，接下来我们将在方法的上下文中查看生命周期，从而理解为什么这条规则让我们几乎不必在方法签名里手动标注生命周期。</p>
+<hr>
+<h3 id="1049-在方法中声明生命周期">10.4.9 在方法中声明生命周期
+</h3><p>在为带有生命周期的结构体实现方法时，<strong>我们使用与泛型类型参数相同的语法</strong>。生命周期参数该在何处声明、如何使用，取决于它们是与结构体字段相关，还是与方法参数及返回值相关。</p>
+<p><strong>结构体字段用到的生命周期名称必须写在 <code>impl</code> 关键字之后的尖括号里，并在结构体名后再写一次</strong>，因为这些生命周期本就是结构体类型的一部分。</p>
+<p>在 <code>impl</code> 块中的方法签名里，<strong>引用既可能与结构体字段中的引用共享同一生命周期，也可能是独立的</strong>。此外，生命周期省略规则常常<strong>让我们无需在方法签名里再写任何生命周期标注</strong>。下面用之前定义的 <code>ImportantExcerpt</code> 结构体举例说明。</p>
+<p>首先，我们实现一个名为 <code>level</code> 的方法：它唯一的参数是对 <code>self</code> 的引用，返回值是 <code>i32</code>（并非任何引用）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">ImportantExcerpt</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">part</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ImportantExcerpt</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">level</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">i32</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="mi">3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在 <code>impl</code> 之后必须写上生命周期参数，并在类型名后再写一次；但不需要给 <code>&amp;self</code> 标注生命周期，因为第一条生命周期省略规则已经帮我们处理好了。</p>
+<p>下面是一个<strong>第三条生命周期省略规则生效</strong>的例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">impl</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ImportantExcerpt</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">announce_and_return_part</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">announcement</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="kt">str</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Attention please: </span><span class="si">{announcement}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">part</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时有两个输入生命周期，于是 Rust 先按第一条生命周期省略规则，为 <code>&amp;self</code> 和 <code>announcement</code> 各分配一个独立的生命周期；接着，由于其中一个参数是 <code>&amp;self</code>，第三条规则便将 <code>&amp;self</code> 的生命周期赋给返回类型。至此，所有生命周期均已确定，无需额外标注。</p>
+<hr>
+<h3 id="10410-静态生命周期">10.4.10 静态生命周期
+</h3><p>我们需要讨论的一种特殊生命周期是 <code>'static</code>，<strong>它表示该引用可以存活于整个程序运行期间</strong>。所有字符串字面量都具有 <code>'static</code> 生命周期，可以这样标注：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="kd">let</span><span class="w"> </span><span class="n">s</span>: <span class="kp">&amp;</span><span class="nb">&#39;static</span> <span class="kt">str</span> <span class="o">=</span><span class="w"> </span><span class="s">&#34;I have a static lifetime.&#34;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>这段字符串的文本会直接存储在程序的二进制文件中，因此始终可用</strong>；所以所有字符串字面量的生命周期都是 <code>'static</code>。</p>
+<p>你可能在错误提示里看到建议使用 <code>'static</code> 生命周期。但在把 <code>'static</code> 指定为某个引用的生命周期之前，先想一想：你手里的引用是否真的会、并且你希望它在整个程序运行期间都存活？<strong>绝大多数情况下，错误提示让你用 <code>'static</code>，是因为你试图创建悬垂引用，或者可用的生命周期不匹配——这时候应当修正这些问题，而不是简单地加上 <code>'static</code></strong>。</p>
+<hr>
+<h3 id="10411-泛型特征约束生命周期">10.4.11 泛型、特征约束、生命周期
+</h3><p>让我们通过一个函数将本章的所学的全部结合起来：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">fmt</span>::<span class="n">Display</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">longest_with_an_announcement</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// &lt;&#39;a, T&gt; 将生命周期和泛型声明
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="n">x</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">y</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">ann</span>: <span class="nc">T</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span>
+</span></span><span class="line"><span class="cl"><span class="nc">where</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">T</span>: <span class="nc">Display</span><span class="p">,</span><span class="c1">//限制 T 必须要实现 Display trait
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Announcement! </span><span class="si">{ann}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">y</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这就是之前的 <code>longest</code> 函数，它返回两个字符串切片中较长的一个；但现在新增了一个名为 <code>ann</code> 的泛型参数 <code>T</code>，该参数由 <code>where</code> 子句限定为任何实现了 <code>Display</code> trait 的类型。这个额外参数将使用 <code>{}</code> 打印，因此必须要求 <code>Display</code> trait bound。</p>
+<p><strong>由于生命周期本身也是一种泛型，生命周期参数 <code>'a</code> 和泛型类型参数 <code>T</code> 的声明被放在同一列表中，写在函数名后的尖括号里。</strong></p>
+<hr>
+
 </section>
 
 
@@ -10104,7 +10722,7 @@
             
             
             
-            共发表 9 篇文章 · 总计 104.02 k 字
+            共发表 9 篇文章 · 总计 111.52 k 字
         </div>
         <div>
             最近一次更新时间：<span id="last-commit-time">加载中...</span>
@@ -10128,7 +10746,7 @@
     
     
     
-    document.getElementById('last-commit-time').innerHTML = '2025-08-26 17:16';
+    document.getElementById('last-commit-time').innerHTML = '2025-08-27 02:48';
 
 </script>
 
