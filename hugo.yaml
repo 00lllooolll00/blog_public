@@ -10,6 +10,15 @@ theme: hugo-theme-stack
 # 启用Git信息功能
 enableGitInfo: true
 
+# Front matter配置
+frontmatter:
+  lastmod:
+    - ":git"
+    - "lastmod"
+    - ":fileModTime"
+    - "date"
+    - "publishDate"
+
 # 网站标题
 title: N1ntyNine99`s Blog
 
