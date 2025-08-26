@@ -73,6 +73,9 @@ permalinks:
 
 # 主题参数配置
 params:
+  # 启用Git信息功能
+  enableGitInfo: true
+  
   # 主要内容区域配置
   mainSections:
     - post # 主要内容区域显示post部分
@@ -95,8 +98,8 @@ params:
 
   # 日期格式
   dateFormat:
-    published: Jan 02, 2006 # 发布日期格式
-    lastUpdated: Jan 02, 2006 15:04 MST # 最后更新日期格式
+    published: 2006年1月2日 # 发布日期格式
+    lastUpdated: 2006年1月2日 15:04 MST # 最后更新日期格式
 
   # 侧边栏配置
   sidebar:

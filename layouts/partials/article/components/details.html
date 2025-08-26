@@ -1,0 +1,79 @@
+<div class="article-details">
+    {{ if .Params.categories }}
+    <header class="article-category">
+        {{ range (.GetTerms "categories") }}
+        <a href="{{ .RelPermalink }}" {{ with .Params.style
+            }}style="background-color: {{ .background }}; color: {{ .color }};" {{ end }}>
+            {{ .LinkTitle }}
+        </a>
+        {{ end }}
+    </header>
+    {{ end }}
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="{{ .RelPermalink }}">
+                {{- .Title -}}
+            </a>
+        </h2>
+
+        {{ with .Params.description }}
+        <h3 class="article-subtitle">
+            {{ . }}
+        </h3>
+        {{ end }}
+    </div>
+
+    {{ $showReadingTime := .Params.readingTime | default (.Site.Params.article.readingTime) }}
+    {{ $showDate := not .Date.IsZero }}
+    {{ $showLastMod := and .GitInfo .GitInfo.AuthorDate }}
+    {{ $showUpdateTime := or $showLastMod .Site.Params.enableGitInfo }}
+    {{ $showFooter := or $showDate $showReadingTime $showUpdateTime }}
+    {{ if $showFooter }}
+    <footer class="article-time">
+        {{ if $showDate }}
+        <div>
+            {{ partial "helper/icon" "date" }}
+            <time class="article-time--published">
+                {{- .Date | time.Format (or .Site.Params.dateFormat.published "2006年1月2日") -}}
+            </time>
+        </div>
+        {{ end }}
+
+        {{ if $showReadingTime }}
+        <div>
+            {{ partial "helper/icon" "clock" }}
+            <time class="article-time--reading">
+                {{ T "article.readingTime" .ReadingTime }}
+            </time>
+        </div>
+        {{ end }}
+        
+        {{ if $showUpdateTime }}
+         <div>
+             {{ partial "helper/icon" "edit" }}
+             {{ if $showLastMod }}
+             <time class="article-time--updated" datetime="{{ .GitInfo.AuthorDate.Format "2006-01-02T15:04:05.000Z" }}">
+                 {{ .GitInfo.AuthorDate.Format "2006年1月2日 15:04" }}
+             </time>
+             {{ else }}
+             <time class="article-time--updated" datetime="{{ .Date.Format "2006-01-02T15:04:05.000Z" }}">
+                 {{ .Date.Format "2006年1月2日 15:04" }}
+             </time>
+             {{ end }}
+         </div>
+         {{ end }}
+    </footer>
+    {{ end }}
+
+    {{ if .IsTranslated }}
+    <footer class="article-translations">
+        {{ partial "helper/icon" "language" }}
+        <div>
+            {{ range .Translations }}
+            <a href="{{ .Permalink }}" class="link">{{ .Language.LanguageName }}</a>
+            {{ end }}
+        </div>
+    </footer>
+    {{ end }}
+</div>
