@@ -10,7 +10,7 @@
 <meta property='og:description' content="一个电子、编程苦逼爱好者">
 <meta property='og:url' content='https://example.com/tags/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/'>
 <meta property='og:site_name' content='N1ntyNine99'>
-<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2025-08-23T00:00:00&#43;00:00 '/><meta property='og:image' content='https://example.com/' />
+<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2025-08-26T01:23:29&#43;08:00 '/><meta property='og:image' content='https://example.com/' />
 <meta name="twitter:title" content="Tag: 任务调度器 - N1ntyNine99">
 <meta name="twitter:description" content="一个电子、编程苦逼爱好者"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://example.com/' /><link rel="alternate" type="application/rss&#43;xml" href="https://example.com/tags/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/index.xml">
@@ -474,10 +474,10 @@
             
             
             
-            共发表 9 篇文章 · 总计 103.85 k 字
+            共发表 9 篇文章 · 总计 104.02 k 字
         </div>
         <div>
-            <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+            最近一次更新时间：<span id="last-commit-time">加载中...</span>
         </div>
 </section>
 
@@ -494,6 +494,11 @@
     document.getElementById('ds').innerHTML = days;
     document.getElementById('hs').innerHTML = hours;
     document.getElementById('ms').innerHTML = minutes;
+
+    
+    
+    
+    document.getElementById('last-commit-time').innerHTML = '2025-08-26 07:10';
 
 </script>
 
@@ -638,6 +643,31 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
 <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+    $(document).ready(function () {
+        
+        $('.article-content img').each(function () {
+            var $img = $(this);
+            var src = $img.attr('src');
+
+            
+            $img.wrap('<a href="' + src + '" data-fancybox="gallery" data-caption="' + ($img.attr('alt') || '') + '"></a>');
+        });
+
+        
+        $('[data-fancybox]').fancybox({
+            buttons: [
+                'zoom',
+                'slideShow',
+                'fullScreen',
+                'download',
+                'close'
+            ],
+            loop: true,
+            protect: true
+        });
+    });
+</script>
 
 
 

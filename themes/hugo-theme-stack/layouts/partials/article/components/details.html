@@ -45,6 +45,15 @@
                 </time>
             </div>
         {{ end }}
+
+        {{ if .GitInfo }}
+            <div>
+                {{ partial "helper/icon" "edit" }}
+                <time class="article-time--updated">
+                    {{ .GitInfo.AuthorDate | time.Format (or .Site.Params.dateFormat.published "Jan 02, 2006") }}
+                </time>
+            </div>
+        {{ end }}
     </footer>
     {{ end }}
 

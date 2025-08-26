@@ -7,6 +7,9 @@ languageCode: en-us
 # 使用的Hugo主题名称
 theme: hugo-theme-stack
 
+# 启用Git信息功能
+enableGitInfo: true
+
 # 网站标题
 title: N1ntyNine99`s Blog
 

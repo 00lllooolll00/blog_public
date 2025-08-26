@@ -7,21 +7,13 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>© 2025 N1ntyNine99. 保留所有权利。</copyright>
-        <lastBuildDate>Sat, 23 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://example.com/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 26 Aug 2025 01:23:29 +0800</lastBuildDate><atom:link href="https://example.com/categories/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>碎碎念</title>
         <link>https://example.com/categories/%E7%A2%8E%E7%A2%8E%E5%BF%B5/</link>
         <pubDate>Sat, 23 Aug 2025 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/categories/%E7%A2%8E%E7%A2%8E%E5%BF%B5/</guid>
         <description></description>
-        </item>
-        <item>
-        <title>Rust</title>
-        <link>https://example.com/categories/rust/</link>
-        <pubDate>Thu, 21 Aug 2025 00:00:00 +0000</pubDate>
-        
-        <guid>https://example.com/categories/rust/</guid>
-        <description>&lt;img src="https://example.com/categories/rust/Rust_Logo.jpg" alt="Featured image of post Rust" /&gt;</description>
         </item>
         <item>
         <title>编程语言</title>
@@ -38,6 +30,14 @@
         
         <guid>https://example.com/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/</guid>
         <description>&lt;img src="https://example.com/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/R.png" alt="Featured image of post 嵌入式" /&gt;</description>
+        </item>
+        <item>
+        <title>Rust</title>
+        <link>https://example.com/categories/rust/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://example.com/categories/rust/</guid>
+        <description>&lt;img src="https://example.com/categories/rust/Rust_Logo.jpg" alt="Featured image of post Rust" /&gt;</description>
         </item>
         
     </channel>

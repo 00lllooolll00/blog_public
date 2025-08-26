@@ -16,7 +16,7 @@
             {{ T "footer.count1" }} {{ len (where .Site.RegularPages "Section" "post") }} {{ T "footer.count2" }} {{ div ($scratch.Get "total") 1000.0 | lang.FormatNumber 2 }} k {{ T "footer.count3" }}
         </div>
         <div>
-            <span id="busuanzi_container_site_pv">{{ T "footer.pv1" }}<span id="busuanzi_value_site_pv"></span>{{ T "footer.pv2" }}</span>
+            最近一次更新时间：<span id="last-commit-time">加载中...</span>
         </div>
 </section>
 
@@ -33,5 +33,12 @@
     document.getElementById('ds').innerHTML = days;
     document.getElementById('hs').innerHTML = hours;
     document.getElementById('ms').innerHTML = minutes;
+
+    // 获取最后一次Git提交时间
+    {{ $lastCommitTime := now.Format "2006-01-02 15:04" }}
+    {{ with .GitInfo }}
+        {{ $lastCommitTime = .AuthorDate.Format "2006-01-02 15:04" }}
+    {{ end }}
+    document.getElementById('last-commit-time').innerHTML = '{{ $lastCommitTime }}';
 
 </script>

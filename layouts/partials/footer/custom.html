@@ -124,6 +124,31 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
 <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // 为所有文章内容中的图片添加fancybox效果
+        $('.article-content img').each(function () {
+            var $img = $(this);
+            var src = $img.attr('src');
+
+            // 创建包装链接
+            $img.wrap('<a href="' + src + '" data-fancybox="gallery" data-caption="' + ($img.attr('alt') || '') + '"></a>');
+        });
+
+        // 初始化fancybox
+        $('[data-fancybox]').fancybox({
+            buttons: [
+                'zoom',
+                'slideShow',
+                'fullScreen',
+                'download',
+                'close'
+            ],
+            loop: true,
+            protect: true
+        });
+    });
+</script>
 {{ end }}
 
 <!-- 引入 Live2D 看板娘 -->
