@@ -2406,7 +2406,7 @@ fn main() {
 
 ---
 
-## 5.2 使用结构体的编程
+## 5.2 使用结构体
 
 要了解我们何时可能需要使用结构体，让我们编写一个计算矩形面积的程序。我们将从使用单个变量开始，然后重构程序，直到使用结构体为止。
 
@@ -2686,9 +2686,9 @@ fn main() {
    
    impl Rectangle {
        // 公开的 getter 方法
-   pub fn width(&self) -> u32 {
-       self.width
-   }
+       pub fn width(&self) -> u32 {
+           self.width
+       }
    }
    ```
 
@@ -6927,3 +6927,496 @@ where
 
 ---
 
+# Chapter 11：自动化测试（*Automated Tests*）
+
+程序的正确性，**是指代码在多大程度上准确地完成了我们意图让它做的事**。Rust 在设计之初就对正确性给予了极高关注，可正确性本身错综复杂、难以证明。Rust 的类型系统承担了其中极大一部分工作，但类型系统并非万能。正因如此，Rust 内置了对自动化软件测试的支持。
+
+假设我们写一个 `add_two` 函数，它把传进来的数加 2。该函数签名接收一个整数参数并返回一个整数结果。当我们实现并编译它时，Rust 会进行迄今所学的全部类型检查和借用检查，确保例如不会把 `String` 或悬垂引用传进去。然**而，Rust 无法验证该函数是否真的返回“参数 + 2”，而不是“参数 + 10”或“参数 − 50”！**这正是测试的用武之地。
+
+我们可以编写断言（*assert*）：例如，当把 3 传给 `add_two` 时，返回值应为 5。此后每次修改代码，都能运行这些测试，确保既有的正确行为未被破坏。
+
+测试是一门复杂技艺：虽然本章无法在细节上穷尽“如何写好测试”，但我们会讨论 Rust 测试机制的基础用法——包括编写测试时可用的注解与宏、测试运行的默认行为与可选参数，以及如何把测试组织成单元测试和集成测试。
+
+----
+
+## 11.1 如何编写一个测试
+
+测试本质也是一些函数，**它的作用是用来测试我们自己编写的函数是否可以达到我们想要的结果**。测试主要执行下面三个行为：
+
+- **设置需要用到的数据或者状态**
+- **运行你想要测试的代码**
+- **通过断言来判断代码结果是不是所预期的**
+
+Rust提供了很多专门为测试设计的特性和一些宏，比如`should_panic`。接下来我们将一一查看。
+
+---
+
+### 11.1.1 测试函数的结构
+
+最简单的一个测试函数的结构就是显式声明`test`属性，所谓属性就是Rust代码中的一些元代码（*metadata*），就比如我们之前结构体那一章用过的`derive`。**我们在 `fn`关键字之前用 `#[test]`来声明下面的函数是测试代码**。然后我们在终端中运行`cargo test`就可以进行测试了。
+
+当我们使用`cargo new xxx --lib`的时候，会自动创建一个库crate，里面的*src/lib.rs*默认的内容就是Rust为我们提供的默认测试模块：
+
+```rust
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+```
+
+模板中默认给了一个`add`函数，将两个整数加起来的和返回。紧接着就是一个`mod`专门用于测试，由于我们模块内部要引用外面的`add`函数，**所以使用`use super::*`表示导入父级的所有函数和数据结构**，紧接着就是`#[test]`来声明了一个测试函数`it_works`，这个函数就是用于测试我们`add`函数是符合我们的预期：首先使用`result`把函数返回值获取到，最后再通过断言`assert_eq!`来判断是不是我们想要的值，如果是的话我们运行`cargo test`会看到以下输出：
+
+![image-20250827225248447](./index.assets/image-20250827225248447.png)
+
+Cargo 编译并运行了测试。我们能看到一行 `running 1 test`，下一行显示了生成的测试函数名 `tests::it_works`，并提示该测试的结果是 `ok`。总结中的 `test result: ok.` 表示所有测试都通过了；`1 passed; 0 failed` 则统计了通过和失败的测试数量。
+
+**你还可以把某个测试标记为忽略，这样在默认情况下它不会运行**；本章稍后一节会讲到这一点。因为我们这里没有做任何忽略，所以总结里显示了 `0 ignored`。你也可以给 `cargo test` 传入参数，只运行名称与某个字符串匹配的测试，这叫做过滤；我们将在“按名称运行部分测试”一节介绍。这里我们没有过滤，所以总结末尾显示 `0 filtered out`。
+
+`0 measured` 这一统计留给基准测试（benchmark tests），它们用于衡量性能。**截至目前，基准测试只在 nightly Rust 中可用；如需了解详情，请查阅基准测试的文档**。
+
+从 `Doc-tests adder` 开始的下一部分输出，**展示的是文档测试的结果**。我们目前还没有任何文档测试，但 **Rust 会编译 API 文档中出现的任何代码示例**。这一功能有助于保持文档与代码同步！我们将在第 14 章讨论如何编写文档测试。目前，先忽略 `Doc-tests` 的输出即可。
+
+同样我们可以自定义测试函数的名字：
+
+```rust
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn exploration() {
+        // 函数名从 it_works -> exploration
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+```
+
+现在再次测试看看编译结果：
+
+![image-20250827230250396](./index.assets/image-20250827230250396.png)
+
+可以看到代码测试依旧通过，只是函数名字变化了而已。
+
+现在我们手动让它断言错误看看：
+
+```rust
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 5);// 将 4 改为 5 显然2+2 != 5 所以会断言失败
+    }
+}
+```
+
+再运行`cargo test`可以看到如下：
+
+![image-20250827225543082](./index.assets/image-20250827225543082.png)
+
+可以看到我们的测试失败，并且`thread 'tests::it_works' panicked at src/lib.rs:12:9:`告诉我们错误出在*src/lib.rs*中的第12行的第9个字，断言失败的原因就是左边不等于右边，然后把左边右边的值都给我们打印出来了。**所以我们可以知道`assert_eq!`宏返回`true`的时候会正常运行，错误的时候会让代码panic，然后告诉错误原因和相关部分的值**。
+
+当然我们也可以再添加一个测试代码，我们让这个新代码中直接`panic!`，并填入我们的自定义错误信息：
+
+```rust
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+
+    #[test]
+    fn my_test(){
+        panic!("It`s my panic!");
+    }
+}
+```
+
+再次查看测试结果：
+
+![image-20250827230539591](./index.assets/image-20250827230539591.png)
+
+我们自定义的测试部分就显示了`FAILED`，说明测试不通过。在*failures*中可以看到在panic相关的地方显示了我们自定义的错误消息：*It`s my panic*。最后做了一个总结，我们有一个测试不通过，一个测试通过。
+
+---
+
+### 11.1.2 `assert!`宏
+
+`assert!`是由标准库提供的一个宏，用于确保在测试中某些条件是`true`。这个宏的入参是一个布尔类型，如果这个入参的结果是`true`，那么就无事发生，如果是`false`，那么程序就会painc导致测试失败。
+
+借用之前第五章的`Rectangle`结构体，我们为其定义了一个`can_hold`方法：
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: f64,
+    height: f64,
+}
+
+impl Rectangle {
+    fn can_hold(&self, another: &Rectangle) -> bool {
+        self.width >= another.width && self.height >= another.height
+    }
+}
+```
+
+这个方法的返回值正好就是布尔值，所以我们可以编写以下的测试：
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;// 使用 super 
+
+    #[test]
+    fn larger_can_hold_smaller() {
+        let larger = Rectangle {
+            width: 8.0,
+            height: 7.0,
+        };
+
+        let samller = Rectangle {
+            width: 5.0,
+            height: 1.0,
+        };
+
+        assert!(larger.can_hold(&samller));
+    }
+}
+```
+
+现在我们测试一下看看结果：
+
+![image-20250827232254456](./index.assets/image-20250827232254456.png)
+
+成功通过测试，再添加一个测试`smaller_cannot_hold_larger`：
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn larger_can_hold_smaller() {
+        let larger = Rectangle {
+            width: 8.0,
+            height: 7.0,
+        };
+
+        let samller = Rectangle {
+            width: 5.0,
+            height: 1.0,
+        };
+
+        assert!(larger.can_hold(&samller));
+    }
+
+    #[test]
+    fn samller_cannot_hold_larger() {
+        let larger = Rectangle {
+            width: 8.0,
+            height: 7.0,
+        };
+
+        let samller = Rectangle {
+            width: 5.0,
+            height: 1.0,
+        };
+
+        assert!(!samller.can_hold(&larger));//使用 !将 false -> true
+    }
+}
+```
+
+测试结果如下：
+
+![image-20250827232537224](./index.assets/image-20250827232537224.png)
+
+两条都成功通过测试了！我们现在人为制造一个错误：
+
+```rust
+impl Rectangle {
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width < other.width && self.height >= other.height
+        // 将逻辑反过来了
+    }
+}
+```
+
+现在再看编译结果：
+
+![image-20250827232803021](./index.assets/image-20250827232803021.png)
+
+我们的测试成功捕获了这个 bug！因为 `larger.width` 是 8.0，而 `smaller.width` 是 5.0，所以 `can_hold` 中对宽度的比较现在返回 `false`：8.0 不小于 5.0。
+
+---
+
+### 11.1.3 `assert_eq!`宏和`assert_ne!`宏
+
+测试有个常见的用法就是`assert!(actual == expect)`和`assert!(actual != expect)`，用来判断相等和不等的情况。**所以Rust为这种情况专门设立了两个宏，`assert_eq!`用于判断`==`，`assert_ne!`用于判断`!=`的情况**。并且在返回值为`false`的情况下，会将把对应的值打印出来，方便我们测试。
+
+现在写一个函数`add_two`，传入一个整型，然后返回这个值+2：
+
+```rust
+fn add_two(n: i32) -> i32 {
+    n + 2
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_adds_two() {
+        let result = add_two(2);
+        assert_eq!(result, 4);
+    }
+}
+```
+
+测试结果如下：
+
+![image-20250827234852818](./index.assets/image-20250827234852818.png)
+
+现在修改函数内容，人造一个bug，我们将`+2`改为`+3`：
+
+```rust
+fn add_two(n: i32) -> i32 {
+    n + 3
+}
+```
+
+再次测试：
+
+![image-20250827235034178](./index.assets/image-20250827235034178.png)
+
+可以看到，和`assert!`的区别就是，告诉我们是哪里错了，然后会将`left`和`right`的值打印出来。`assert_ne!`就是判断不等于的情况。
+
+请注意，在某些语言和测试框架中，相等断言函数的参数被称为 `expected` 和 `actual`，并且指定参数的顺序很重要。然而，在 **Rust 中，它们被称为 `left` 和 `right`，我们指定预期值和代码产生的值的顺序并不重要**。我们可以将测试中的断言写成 `assert_eq!(4, result)`，这将产生相同的失败消息，显示 `assertion \`left == right\` failed`。
+
+`assert_ne!` **宏会在我们提供的两个值不相等时通过，在相等时失败**。这个宏在我们不确定某个值具体是什么，但明确知道它绝对不应该是什么时最有用。例如，如果我们正在测试一个函数，该函数保证会以某种方式修改其输入，但具体如何修改取决于我们运行测试的星期几，那么最好的断言可能是确保函数的输出不等于其输入。
+
+在底层，`assert_eq!` 和 `assert_ne!` **宏分别使用 `==` 和 `!=` 运算符**。当断言失败时，这**些宏会使用调试格式打印其参数，这意味着被比较的值必须实现 `PartialEq` 和 `Debug` 特征**。所有原始类型和大多数标准库类型都实现了这些特征。**对于你自己定义的 `struct` 和 `enum`，你需要实现 `PartialEq` 才能对这些类型进行相等性断言**。你还需要实现 `Debug`，以便在断言失败时打印值。由于这两个特征都是可派生特征，正如第 5 章所提到的，通**常只需在你的 `struct` 或 `enum` 定义上添加 `#[derive(PartialEq, Debug)]` 注解即可**。
+
+---
+
+### 	11.1.4 自定义错误信息
+
+**我们的`assert_eq!`和`assert_ne!`还可以附带一个错误信息**，比如下面这个例子判断函数返回的字符串是否包含我们输入的参数：
+
+```rust
+pub fn greeting(name: &str) -> String {
+    String::from(format!("Hello {name}!"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn greeting_contains_name() {
+        let result = greeting("N1netyNine99");
+        assert!(result.contains("N1netyNine99"));
+    }
+}
+```
+
+这个程序的需求尚未最终敲定，我们几乎肯定问候语开头的 “Hello” 文字会改动。我们决定不在需求变更时再去更新测试，因此不再检查 `greeting` 函数返回值的完全相等，而是断言其输出中包含传入参数的那段文字。
+
+现在人为加一个bug，并且加上自定义错误信息：
+
+```rust
+pub fn greeting(name: &str) -> String {
+    String::from(format!("Hello!"))//将name删除掉了
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn greeting_contains_name() {
+        let result = greeting("N1netyNine99");
+        assert!(result.contains("N1netyNine99"),
+            "Greeting did not contain name, value was `{result}`");
+    }
+}
+```
+
+测试报错如下：
+
+![image-20250828005105473](./index.assets/image-20250828005105473.png)
+
+可以看到我们自定义的信息成功输出！
+
+---
+
+### 11.1.5 使用`should_panic`检查panic
+
+除了检查返回值之外，**验证代码在错误条件下的行为也至关重要**。例如，回顾我们在第 9 章创建的 `Guess` 类型：使用 `Guess` 的其他代码都依赖于一个保证——`Guess` 实例只能包含 1 到 100 之间的值。我们可以编写一个测试，**确保当试图用超出该范围的值创建 `Guess` 实例时，程序会触发 panic**。
+
+为此，**我们在测试函数上添加 `should_panic` 属性**。**如果函数体内的代码发生 panic，测试通过；如果未发生 panic，测试失败**。
+
+展示了一个测试，用于验证 `Guess::new` 的错误条件是否在我们预期的情况下发生：
+
+```rust
+pub struct Guess {
+    value: i32,
+}
+
+impl Guess {
+    pub fn new(value: i32) -> Guess {
+        if value < 1 || value > 100 {
+            // 输入不在1~100范围内就panic
+            panic!("Guess value must be between 1 and 100, got {value}.");
+        }
+
+        Guess { value }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    fn greater_than_100() {
+        Guess::new(200);// 超过 1~100 此时会panic 但是由于 #[should_panic] 所以 panic 说明测试通过
+    }
+}
+```
+
+我们将`#[should_panic]`添加到`#[test]`之下，函数`fn`之上，然后测试看看结果：
+
+![image-20250828005827955](./index.assets/image-20250828005827955.png)
+
+现在我们再修改一下`new`函数，将范围修改为`< 1`，这样200是符合要求的，所以不会测试通过：
+
+```rust
+impl Guess {
+    pub fn new(value: i32) -> Guess {
+        if value < 1 {
+            // < 1
+            panic!("Guess value must be between 1 and 100, got {value}.");
+        }
+
+        Guess { value }
+    }
+}
+```
+
+测试结果如下：
+
+![image-20250828010332792](./index.assets/image-20250828010332792.png)
+
+在这种情况下，我们并没有得到一条很有帮助的提示。**但当我们查看测试函数时，会发现它带有 `#[should_panic]` 注解。测试失败说明函数体内的代码并未触发 panic。**
+
+使用 `should_panic` 的测试可能不够精确——即使测试因与我们预期不同的原因 panic，也会通过。为了让 `should_panic` 测试更精确，**可以给属性添加可选的 `expected` 参数。测试框架会确保失败信息中包含指定的文本**。例如，下面对 `Guess` 做了修改，`new` 函数会在值过小时和过大时分别触发不同的 panic 消息。
+
+```rust
+pub struct Guess {
+    value: i32,
+}
+
+impl Guess {
+    pub fn new(value: i32) -> Guess {
+        if value < 1 {
+            panic!(
+                "Guess value must be greater than or equal to 1, got {value}."
+            );
+        } else if value > 100 {
+            panic!(
+                "Guess value must be less than or equal to 100, got {value}."
+            );
+        }
+
+        Guess { value }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic(expected = "less than or equal to 100")]
+    fn greater_than_100() {
+        Guess::new(200);
+    }
+}
+```
+
+测试结果发现：
+
+![image-20250828010814131](./index.assets/image-20250828010814131.png)
+
+**这条失败信息表明测试确实如我们预期那样触发了 panic，但 panic 消息中并不包含我们期望的子串 `less than or equal to 100`**。实际得到的 panic 消息是 `Guess value must be greater than or equal to 1, got 200`。现在，我们就可以着手定位 bug 了！
+
+---
+
+### 11.1.6 在测试中使用`Result<T,E>`
+
+到目前为止，我们编写的测试在失败时都会 panic。**其实我们也可以写使用 `Result<T, E>` 的测试！**下面是把之前的测试改写成使用 `Result<T, E>`，并在失败时返回 `Err` 而非直接 panic：
+
+```rust
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() -> Result<(), String> {
+        let result = add(2, 2);
+
+        if result == 4 {
+            Ok(())
+        } else {
+            Err(String::from("two plus two does not equal four"))
+        }
+    }
+}
+```
+
+`it_works` 函数的返回类型现在改成了 `Result<(), String>`。函数体内不再调用 `assert_eq!` 宏，而**是在测试通过时返回 `Ok(())`，在测试失败时返回一个包含 `String` 的 `Err**`。
+
+让测试返回 `Result<T, E>` 后，便可在测试函数体内使用 `?` 运算符。**当其中任何操作返回 `Err` 变体时，测试会自动失败，这种方式写起来非常方便**。
+
+对于使用 `Result<T, E>` 的测试，不能加 `#[should_panic]` 注解。若想断言某操作返回 `Err` 变体，不要在对应的 `Result<T, E>` 上使用 `?` 运算符，而应使用 `assert!(value.is_err())`。
+
+现在你已经掌握了多种编写测试的方法，接下来让我们看看运行测试时到底发生了什么，并探索可与 `cargo test` 搭配使用的各种选项。
+
+---
+
+## 11.2 控制测试运行的方式
