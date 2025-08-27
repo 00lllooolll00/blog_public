@@ -7,7 +7,138 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>© 2025 N1ntyNine99. 保留所有权利。</copyright>
-        <lastBuildDate>Wed, 27 Aug 2025 12:44:51 +0800</lastBuildDate><atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Wed, 27 Aug 2025 13:08:33 +0800</lastBuildDate><atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Typora风格警告框渲染测试</title>
+        <link>https://example.com/p/typora-alert-test/</link>
+        <pubDate>Mon, 20 Jan 2025 00:00:00 +0800</pubDate>
+        
+        <guid>https://example.com/p/typora-alert-test/</guid>
+        <description>&lt;h1 id=&#34;typora风格警告框渲染测试&#34;&gt;Typora风格警告框渲染测试
+&lt;/h1&gt;&lt;p&gt;本页面用于测试Typora风格警告框的渲染效果。以下展示了五种不同类型的警告框：&lt;/p&gt;
+&lt;h2 id=&#34;note-类型警告框&#34;&gt;NOTE 类型警告框
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;[!NOTE]
+这是一个NOTE类型的警告框。用于显示一般性的注意事项和说明信息。&lt;/p&gt;
+&lt;p&gt;支持多行内容，可以包含&lt;strong&gt;粗体&lt;/strong&gt;、&lt;em&gt;斜体&lt;/em&gt;等Markdown格式。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;tip-类型警告框&#34;&gt;TIP 类型警告框
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;[!TIP]
+这是一个TIP类型的警告框。用于提供有用的提示和建议。&lt;/p&gt;
+&lt;p&gt;例如：使用快捷键 &lt;code&gt;Ctrl+C&lt;/code&gt; 可以快速复制内容。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;important-类型警告框&#34;&gt;IMPORTANT 类型警告框
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;[!IMPORTANT]
+这是一个IMPORTANT类型的警告框。用于强调重要信息。&lt;/p&gt;
+&lt;p&gt;重要信息通常需要用户特别关注，比如：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;关键的配置步骤&lt;/li&gt;
+&lt;li&gt;必须遵守的规则&lt;/li&gt;
+&lt;li&gt;影响系统行为的设置&lt;/li&gt;
+&lt;/ul&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;warning-类型警告框&#34;&gt;WARNING 类型警告框
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;[!WARNING]
+这是一个WARNING类型的警告框。用于警告可能的风险或问题。&lt;/p&gt;
+&lt;p&gt;⚠️ 执行此操作前请确保已备份重要数据！&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;caution-类型警告框&#34;&gt;CAUTION 类型警告框
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;[!CAUTION]
+这是一个CAUTION类型的警告框。用于提醒用户需要谨慎操作。&lt;/p&gt;
+&lt;p&gt;请仔细阅读文档后再进行操作，避免造成不可逆的损失。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;自定义标题的警告框&#34;&gt;自定义标题的警告框
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;[!NOTE] 自定义标题
+警告框支持自定义标题，只需在类型后添加空格和标题文本即可。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[!TIP] 专业提示
+这个功能让警告框更加灵活，可以根据具体内容设置合适的标题。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;包含代码的警告框&#34;&gt;包含代码的警告框
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;[!IMPORTANT] 代码示例
+警告框中也可以包含代码块：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;showAlert&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;message&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;alert&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;message&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;以及行内代码：&lt;code&gt;console.log(&#39;Hello World&#39;)&lt;/code&gt;&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;包含链接的警告框&#34;&gt;包含链接的警告框
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;[!NOTE] 相关链接
+更多信息请参考：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://gohugo.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Hugo官方文档&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.markdownguide.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Markdown语法指南&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://typora.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Typora官网&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;技术实现说明&#34;&gt;技术实现说明
+&lt;/h2&gt;&lt;p&gt;本警告框功能通过以下技术实现：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;CSS样式&lt;/strong&gt;：在 &lt;code&gt;assets/scss/custom.scss&lt;/code&gt; 中定义了完整的警告框样式&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;JavaScript解析&lt;/strong&gt;：通过 &lt;code&gt;assets/js/typora-alerts.js&lt;/code&gt; 解析 &lt;code&gt;&amp;gt;[!TYPE]&lt;/code&gt; 语法&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Hugo配置&lt;/strong&gt;：启用了 &lt;code&gt;unsafe: true&lt;/code&gt; 允许HTML渲染&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;支持的警告框类型&#34;&gt;支持的警告框类型
+&lt;/h3&gt;&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;类型&lt;/th&gt;
+          &lt;th&gt;语法&lt;/th&gt;
+          &lt;th&gt;用途&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;NOTE&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;&amp;gt;[!NOTE]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;一般注意事项&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;TIP&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;&amp;gt;[!TIP]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;有用提示&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;IMPORTANT&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;&amp;gt;[!IMPORTANT]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;重要信息&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;WARNING&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;&amp;gt;[!WARNING]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;警告信息&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;CAUTION&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;&amp;gt;[!CAUTION]&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;谨慎提醒&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;使用方法&#34;&gt;使用方法
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;在Markdown文件中使用 &lt;code&gt;&amp;gt;[!TYPE]&lt;/code&gt; 语法&lt;/li&gt;
+&lt;li&gt;可选择性添加自定义标题：&lt;code&gt;&amp;gt;[!TYPE] 自定义标题&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;在下一行开始编写警告框内容&lt;/li&gt;
+&lt;li&gt;支持多行内容和Markdown格式&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[!TIP] 最佳实践
+建议根据内容的重要程度和性质选择合适的警告框类型，以提供更好的用户体验。&lt;/p&gt;&lt;/blockquote&gt;
+</description>
+        </item>
+        <item>
         <title>落叶收藏馆</title>
         <link>https://example.com/p/%E8%90%BD%E5%8F%B6%E6%94%B6%E8%97%8F%E9%A6%86/</link>
         <pubDate>Sat, 23 Aug 2025 00:00:00 +0800</pubDate>
