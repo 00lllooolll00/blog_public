@@ -287,6 +287,72 @@
     }
 }
 
+// Enhanced Rust syntax highlighting for OneDarkPro theme
+.chroma {
+  // Rust keywords (use, fn, let, mut, etc.)
+  .k, .kd, .kn, .kp, .kr, .kt {
+    color: #c678dd !important; // Purple for keywords
+    font-weight: 500;
+  }
+  
+  // Function names and method calls
+  .nf, .fm {
+    color: #61afef !important; // Blue for functions
+  }
+  
+  // Types and structs
+  .kt, .nc {
+    color: #e5c07b !important; // Yellow for types
+  }
+  
+  // String literals
+  .s, .s1, .s2, .sb, .sc, .sd, .se, .sh, .si, .sx {
+    color: #98c379 !important; // Green for strings
+  }
+  
+  // Numbers
+  .m, .mb, .mf, .mh, .mi, .mo {
+    color: #d19a66 !important; // Orange for numbers
+  }
+  
+  // Comments
+  .c, .c1, .cm, .cp, .cpf, .cs {
+    color: #5c6370 !important; // Gray for comments
+    font-style: italic;
+  }
+  
+  // Variables and identifiers
+  .n, .na, .nb, .bp, .nv {
+    color: #e06c75 !important; // Red for variables
+  }
+  
+  // Operators
+  .o, .ow {
+    color: #56b6c2 !important; // Cyan for operators
+  }
+  
+  // Macros (println!, etc.)
+  .fm {
+    color: #e5c07b !important; // Yellow for macros
+    font-weight: 600;
+  }
+  
+  // Attributes (#[derive], etc.)
+  .nd {
+    color: #d19a66 !important; // Orange for attributes
+  }
+  
+  // Lifetime parameters ('a, 'static)
+  .nl {
+    color: #c678dd !important; // Purple for lifetimes
+  }
+  
+  // Punctuation and delimiters
+  .p {
+    color: #abb2bf !important; // Light gray for punctuation
+  }
+}
+
 
 
 // --------------------------------
@@ -504,12 +570,12 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(10px);
-    
+
     &:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
     }
-    
+
     &::before {
         content: '';
         position: absolute;
@@ -520,7 +586,7 @@
         background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
         border-radius: 12px 12px 0 0;
     }
-    
+
     .alert-title {
         font-weight: 700;
         margin: 0 0 12px 0;
@@ -529,7 +595,7 @@
         gap: 10px;
         font-size: 1.1em;
         letter-spacing: 0.025em;
-        
+
         &::before {
             content: '';
             width: 20px;
@@ -541,24 +607,24 @@
             filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
             transition: transform 0.2s ease;
         }
-        
+
         &:hover::before {
             transform: scale(1.1);
         }
     }
-    
+
     .alert-content {
         margin: 0;
         color: rgba(0, 0, 0, 0.85);
-        
+
         p {
             margin: 0;
-            
+
             &:not(:last-child) {
                 margin-bottom: 10px;
             }
         }
-        
+
         code {
             background-color: rgba(0, 0, 0, 0.08);
             padding: 3px 6px;
@@ -567,217 +633,217 @@
             font-weight: 500;
             border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        
+
         strong {
             font-weight: 600;
         }
-        
+
         a {
             text-decoration: none;
             border-bottom: 1px solid currentColor;
             transition: all 0.2s ease;
-            
+
             &:hover {
                 opacity: 0.8;
                 border-bottom-style: dashed;
             }
         }
     }
-    
+
     // NOTE 样式 - 精致蓝色主题
     &.alert-note {
         background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
         border-left-color: #0066cc;
         border: 1px solid rgba(0, 102, 204, 0.15);
-        
+
         .alert-title {
             color: #0052a3;
             text-shadow: 0 1px 2px rgba(0, 82, 163, 0.1);
-            
+
             &::before {
                 background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggMTVBNyA3IDAgMSAwIDggMWE3IDcgMCAwIDAgMCAxNFptMC0xMWEuNzUuNzUgMCAwIDEgLjc1Ljc1djMuNWEuNzUuNzUgMCAwIDEtMS41IDBWNC43NUEuNzUuNzUgMCAwIDEgOCA0Wm0wIDhhMSAxIDAgMSAxIDAtMiAxIDEgMCAwIDEgMCAyWiIgZmlsbD0iIzAwNTJhMyIvPgo8L3N2Zz4K');
             }
         }
-        
+
         .alert-content {
             color: #1a365d;
         }
     }
-    
+
     // TIP 样式 - 精致绿色主题
     &.alert-tip {
         background: linear-gradient(135deg, #f0fff4 0%, #e6ffed 100%);
         border-left-color: #22c55e;
         border: 1px solid rgba(34, 197, 94, 0.15);
-        
+
         .alert-title {
             color: #166534;
             text-shadow: 0 1px 2px rgba(22, 101, 52, 0.1);
-            
+
             &::before {
                 background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggMTVBNyA3IDAgMSAwIDggMWE3IDcgMCAwIDAgMCAxNFptMy4yNS01LjI1TDguNzUgMTJhLjc1Ljc1IDAgMCAxLTEuMDYgMEw0LjI1IDguNTZhLjc1Ljc1IDAgMSAxIDEuMDYtMS4wNkw4IDEwLjE5bDIuNjktMi42OWEuNzUuNzUgMCAxIDEgMS4wNiAxLjA2WiIgZmlsbD0iIzE2NjUzNCIvPgo8L3N2Zz4K');
             }
         }
-        
+
         .alert-content {
             color: #14532d;
         }
     }
-    
+
     // IMPORTANT 样式 - 精致紫色主题
     &.alert-important {
         background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
         border-left-color: #a855f7;
         border: 1px solid rgba(168, 85, 247, 0.15);
-        
+
         .alert-title {
             color: #7c2d12;
             text-shadow: 0 1px 2px rgba(124, 45, 18, 0.1);
-            
+
             &::before {
                 background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgOGE4IDggMCAxIDEgMTYgMEE4IDggMCAwIDEgMCA4Wm04LTYuNWEuNzUuNzUgMCAwIDAtLjc1Ljc1djMuNWEuNzUuNzUgMCAwIDAgMS41IDBWMi4yNUEuNzUuNzUgMCAwIDAgOCAxLjVabTAgOS41YTEgMSAwIDEgMCAwLTIgMSAxIDAgMCAwIDAgMloiIGZpbGw9IiM3YzJkMTIiLz4KPC9zdmc+Cg==');
             }
         }
-        
+
         .alert-content {
             color: #581c87;
         }
     }
-    
+
     // WARNING 样式 - 精致橙色主题
     &.alert-warning {
         background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
         border-left-color: #f59e0b;
         border: 1px solid rgba(245, 158, 11, 0.15);
-        
+
         .alert-title {
             color: #92400e;
             text-shadow: 0 1px 2px rgba(146, 64, 14, 0.1);
-            
+
             &::before {
                 background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTYuNDU3IDEuMDQ3Yy4zNTktLjY1IDEuMjI3LS42NSAxLjU4NiAwbDYuNTQgMTEuOTc4Yy4zNjkuNjc2LS4yMjkgMS40NzUtLjc5MyAxLjQ3NUgxLjIxYy0uNTY0IDAtMS4xNjItLjc5OS0uNzkzLTEuNDc1TDYuNDU3IDEuMDQ3Wk04IDVhLjc1Ljc1IDAgMCAxIC43NS43NXYyLjVhLjc1Ljc1IDAgMCAxLTEuNSAwVjUuNzVBLjc1Ljc1IDAgMCAxIDggNVptMCA2YTEgMSAwIDEgMSAwLTIgMSAxIDAgMCAxIDAgMloiIGZpbGw9IiM5MjQwMGUiLz4KPC9zdmc+Cg==');
             }
         }
-        
+
         .alert-content {
             color: #78350f;
         }
     }
-    
+
     // CAUTION 样式 - 精致红色主题
     &.alert-caution {
         background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
         border-left-color: #ef4444;
         border: 1px solid rgba(239, 68, 68, 0.15);
-        
+
         .alert-title {
             color: #991b1b;
             text-shadow: 0 1px 2px rgba(153, 27, 27, 0.1);
-            
+
             &::before {
                 background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQuNDcuMjJBLjc1Ljc1IDAgMCAxIDUuMDQgMGg1LjkyYS43NS43NSAwIDAgMSAuNTcuMjJsNC4xNSA0LjE1YS43NS43NSAwIDAgMSAuMjIuNTd2NS45MmEuNzUuNzUgMCAwIDEtLjIyLjU3bC00LjE1IDQuMTVhLjc1Ljc1IDAgMCAxLS41Ny4yMkg1LjA0YS43NS43NSAwIDAgMS0uNTctLjIyTC4zMiAxMS4zNmEuNzUuNzUgMCAwIDEtLjIyLS41N1Y1LjA0YS43NS43NSAwIDAgMSAuMjItLjU3TDQuNDcuMjJaTTggNGEuNzUuNzUgMCAwIDEgLjc1Ljc1djIuNWEuNzUuNzUgMCAwIDEtMS41IDBWNC43NUEuNzUuNzUgMCAwIDEgOCA0Wm0wIDhhMSAxIDAgMSAxIDAtMiAxIDEgMCAwIDEgMCAyWiIgZmlsbD0iIzk5MWIxYiIvPgo8L3N2Zz4K');
             }
         }
-        
+
         .alert-content {
             color: #7f1d1d;
         }
     }
-    
+
     // 暗色模式适配 - 精致暗色主题
     [data-scheme="dark"] & {
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
-        
+
         &:hover {
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.25);
         }
-        
+
         &::before {
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
         }
-        
+
         &.alert-note {
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
             border: 1px solid rgba(59, 130, 246, 0.25);
             border-left-color: #60a5fa;
-            
+
             .alert-title {
                 color: #93c5fd;
                 text-shadow: 0 1px 3px rgba(147, 197, 253, 0.3);
             }
-            
+
             .alert-content {
                 color: #dbeafe;
             }
         }
-        
+
         &.alert-tip {
             background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.1) 100%);
             border: 1px solid rgba(34, 197, 94, 0.25);
             border-left-color: #4ade80;
-            
+
             .alert-title {
                 color: #86efac;
                 text-shadow: 0 1px 3px rgba(134, 239, 172, 0.3);
             }
-            
+
             .alert-content {
                 color: #dcfce7;
             }
         }
-        
+
         &.alert-important {
             background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(147, 51, 234, 0.1) 100%);
             border: 1px solid rgba(168, 85, 247, 0.25);
             border-left-color: #a78bfa;
-            
+
             .alert-title {
                 color: #c4b5fd;
                 text-shadow: 0 1px 3px rgba(196, 181, 253, 0.3);
             }
-            
+
             .alert-content {
                 color: #f3e8ff;
             }
         }
-        
+
         &.alert-warning {
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%);
             border: 1px solid rgba(245, 158, 11, 0.25);
             border-left-color: #fbbf24;
-            
+
             .alert-title {
                 color: #fcd34d;
                 text-shadow: 0 1px 3px rgba(252, 211, 77, 0.3);
             }
-            
+
             .alert-content {
                 color: #fef3c7;
             }
         }
-        
+
         &.alert-caution {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.1) 100%);
             border: 1px solid rgba(239, 68, 68, 0.25);
             border-left-color: #f87171;
-            
+
             .alert-title {
                 color: #fca5a5;
                 text-shadow: 0 1px 3px rgba(252, 165, 165, 0.3);
             }
-            
+
             .alert-content {
                 color: #fee2e2;
             }
         }
-        
+
         .alert-content {
             code {
                 background-color: rgba(255, 255, 255, 0.12);
                 border: 1px solid rgba(255, 255, 255, 0.08);
                 color: #e5e7eb;
             }
-            
+
             strong {
                 color: inherit;
                 filter: brightness(1.2);
