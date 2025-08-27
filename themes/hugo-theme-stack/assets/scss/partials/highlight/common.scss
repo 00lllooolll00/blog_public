@@ -102,7 +102,7 @@
 
 /* Name */
 .chroma .n {
-    color: $macro-identifier-color;
+    color: $variable-color;
 }
 
 /* NameAttribute */
@@ -182,27 +182,27 @@
 
 /* NameVariable */
 .chroma .nv {
-    color: $text-color;
+    color: $variable-color;
 }
 
 /* NameVariableClass */
 .chroma .vc {
-    color: $text-color;
+    color: $variable-color;
 }
 
 /* NameVariableGlobal */
 .chroma .vg {
-    color: $text-color;
+    color: $variable-color;
 }
 
 /* NameVariableInstance */
 .chroma .vi {
-    color: $text-color;
+    color: $variable-color;
 }
 
 /* NameVariableMagic */
 .chroma .vm {
-    color: $text-color;
+    color: $variable-color;
 }
 
 /* Literal */
