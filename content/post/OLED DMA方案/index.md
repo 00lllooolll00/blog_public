@@ -2,6 +2,7 @@
 title: OLED DMA高刷驱动
 description: 使用HAL库 DMA实现的OLED驱动
 date: 2025-08-21
+lastmod: 2025-08-22
 slug: oled dma方案
 image: OLED.jpg
 categories:

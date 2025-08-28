@@ -2,6 +2,7 @@
 title: Rust自学笔记
 description: 根据官网学习Rust时做的笔记
 date: 2025-08-21
+lastmod: 2025-08-28
 slug: rust-self-teach
 image: rust-2.jpg
 comments: true

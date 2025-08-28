@@ -1,26 +1,27 @@
 <section class="count_info">
-        <div>
-            {{ T "footer.runtime1" }}
-            <span id="ds" class="running-days"></span>
-            {{ T "footer.runtime2" }}
-            <span id="hs" class="running-days"></span>
-            {{ T "footer.runtime3" }}
-            <span id="ms" class="running-days"></span>
-            {{ T "footer.runtime4" }}
-        </div>
-        <div>
-            {{$scratch := newScratch}}
-            {{ range (where .Site.Pages "Kind" "page" )}}
-            {{$scratch.Add "total" .WordCount}}
-            {{ end }}
-            {{ T "footer.count1" }} {{ len (where .Site.RegularPages "Section" "post") }} {{ T "footer.count2" }} {{ div ($scratch.Get "total") 1000.0 | lang.FormatNumber 2 }} k {{ T "footer.count3" }}
-        </div>
-        <div>
-            {{/* 直接使用当前时间作为最后更新时间 */}}
-            {{ $lastCommitTime := now.Format "2006-01-02 15:04" }}
-            
-            最近一次更新时间：<span id="last-commit-time">{{ $lastCommitTime }}</span>
-        </div>
+    <div>
+        {{ T "footer.runtime1" }}
+        <span id="ds" class="running-days"></span>
+        {{ T "footer.runtime2" }}
+        <span id="hs" class="running-days"></span>
+        {{ T "footer.runtime3" }}
+        <span id="ms" class="running-days"></span>
+        {{ T "footer.runtime4" }}
+    </div>
+    <div>
+        {{$scratch := newScratch}}
+        {{ range (where .Site.Pages "Kind" "page" )}}
+        {{$scratch.Add "total" .WordCount}}
+        {{ end }}
+        {{ T "footer.count1" }} {{ len (where .Site.RegularPages "Section" "post") }} {{ T "footer.count2" }} {{ div
+        ($scratch.Get "total") 1000.0 | lang.FormatNumber 2 }} k {{ T "footer.count3" }}
+    </div>
+    <div>
+        {{/* 直接使用当前时间作为最后更新时间 */}}
+        {{ $lastCommitTime := now.Format "2006-01-02 15:04" }}
+
+        最近一次更新时间：<span id="last-commit-time">{{ $lastCommitTime }}</span>
+    </div>
 </section>
 
 <!-- Add blog running time -->

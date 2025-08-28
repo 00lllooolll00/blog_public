@@ -2,6 +2,7 @@
 title: HWT101 驱动
 description: 基于HAL库串口空闲中断的HWT101的驱动
 date: 2025-08-21
+lastmod: 2025-08-22
 slug: hwt101陀螺仪
 image: HWT101.jpg
 categories:

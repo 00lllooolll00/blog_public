@@ -2,6 +2,7 @@
 title: 串口格式化发送+环形缓冲区
 description: 基于HAL库实现
 date: 2025-08-21
+lastmod: 2025-08-21
 slug: 串口
 image: pic3.jpg
 categories:

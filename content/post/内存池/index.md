@@ -2,6 +2,7 @@
 title: 嵌入式系统内存池
 description: 内存池
 date: 2025-08-21
+lastmod: 2025-08-22
 slug: 内存池
 image: pic6.png
 categories:
