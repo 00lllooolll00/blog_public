@@ -35,9 +35,18 @@
     document.getElementById('ms').innerHTML = minutes;
 
     // 获取最后一次Git提交时间
-    {{ $lastCommitTime := now.Format "2006-01-02 15:04" }}
-    {{ with .GitInfo }}
-        {{ $lastCommitTime = .AuthorDate.Format "2006-01-02 15:04" }}
+    {{ $lastCommitTime := "" }}
+    {{ $latestTime := time "1970-01-01T00:00:00Z" }}
+    {{ range .Site.Pages }}
+        {{ with .GitInfo }}
+            {{ if .AuthorDate.After $latestTime }}
+                {{ $latestTime = .AuthorDate }}
+                {{ $lastCommitTime = .AuthorDate.Format "2006-01-02 15:04" }}
+            {{ end }}
+        {{ end }}
+    {{ end }}
+    {{ if eq $lastCommitTime "" }}
+        {{ $lastCommitTime = now.Format "2006-01-02 15:04" }}
     {{ end }}
     document.getElementById('last-commit-time').innerHTML = '{{ $lastCommitTime }}';
 
