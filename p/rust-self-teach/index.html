@@ -10,7 +10,7 @@
 <meta property='og:description' content="根据官网学习Rust时做的笔记">
 <meta property='og:url' content='https://example.com/p/rust-self-teach/'>
 <meta property='og:site_name' content='N1ntyNine99'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-08-29T01:54:41&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-08-30T02:08:01&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
 <meta name="twitter:title" content="Rust自学笔记">
 <meta name="twitter:description" content="根据官网学习Rust时做的笔记"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://example.com/p/rust-self-teach/rust-2.jpg' />
@@ -595,6 +595,16 @@
       </ol>
     </li>
   </ol>
+
+  <ol>
+    <li><a href="#121-接收命令行参数">12.1 接收命令行参数</a>
+      <ol>
+        <li><a href="#1211-读取参数的值">12.1.1 读取参数的值</a></li>
+        <li><a href="#1212-将命令行参数保存到变量中">12.1.2 将命令行参数保存到变量中</a></li>
+      </ol>
+    </li>
+    <li><a href="#122-读取文件">12.2 读取文件</a></li>
+  </ol>
 </nav>
         </div>
     </section>
@@ -684,7 +694,7 @@
 
 
             <time class="article-time--reading">
-                阅读时长: 214 分钟
+                阅读时长: 219 分钟
             </time>
         </div>
         
@@ -696,8 +706,8 @@
 <path d="M15 6L18 9" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M13 20H21" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-            <time class="article-time--updated" datetime=" 2025-08-29T01:54:41.000Z">
-                2025年8月29日 01:54
+            <time class="article-time--updated" datetime=" 2025-08-30T02:08:01.000Z">
+                2025年8月30日 02:08
             </time>
         </div>
         
@@ -11873,8 +11883,181 @@
 </h4><p>如果项目只是一个二进制 crate，只有 <code>src/main.rs</code> 而没有 <code>src/lib.rs</code>，<strong>就不能在 tests 目录里写集成测试并用 <code>use</code> 把 <code>src/main.rs</code> 里的函数导入作用域</strong>。<strong>只有库 crate 才能暴露供其他 crate 使用的函数；二进制 crate 设计为独立运行</strong>。</p>
 <p><strong>这也是很多提供可执行文件的 Rust 项目会把逻辑放在 <code>src/lib.rs</code>，再由简洁的 <code>src/main.rs</code> 去调用的原因</strong>。这样一来，集成测试就能 <code>use</code> 库 crate 来验证核心功能；核心功能正常，那一点 <code>main.rs</code> 里的代码自然也不会出错，无需单独测试。</p>
 <hr>
-<h1 id="chapter-11一个-io-项目构建一个命令行程序">Chapter 11：一个 I/O 项目：构建一个命令行程序
-</h1>
+<h1 id="chapter-12一个-io-项目构建一个命令行程序">Chapter 12：一个 I/O 项目：构建一个命令行程序
+</h1><p>本章将回顾你到目前为止学到的众多技能，并探讨更多标准库特性。我们将构建一个命令行工具，它能与文件和命令行输入/输出进行交互，以此来练习一些你已掌握的Rust概念。</p>
+<p>Rust的速度、安全性、单一二进制输出以及跨平台支持使其成为创建命令行工具的理想语言，因此在我们的项目中，我们将打造经典命令行搜索工具<code>grep</code>（<em><strong>g</strong>lobally search a <strong>r</strong>egular <strong>e</strong>xpression and <strong>p</strong>rint</em>，即全局搜索正则表达式并打印）的自有版本。在最简单的使用场景中，<code>grep</code>在指定文件中搜索指定字符串。<strong>为此，<code>grep</code>接收文件路径和字符串作为参数。然后它读取文件，找出文件中包含该字符串参数的行，并打印这些行。</strong></p>
+<p>在此过程中，我们将展示如何让我们的命令行工具使用许多其他命令行工具所采用的终端功能。我们会读取环境变量的值，以便用户配置我们工具的行为。我们还会将错误消息打印到标准错误控制台流（<code>stderr</code>），而不是标准输出（<code>stdout</code>），这样一来，例如，用户可以将成功的输出重定向到文件，同时仍能在屏幕上看到错误消息。</p>
+<p>我们将会用到从第七章到第十一章的知识，并简单介绍一下迭代器（<em>iterators</em>）、闭包（<em>closures</em>）、特征对象（<em>trait objects</em>）这些概念。</p>
+<hr>
+<h2 id="121-接收命令行参数">12.1 接收命令行参数
+</h2><p>首先，我们创建一个名为<code>minigrep</code>的新项目，使用<code>cargo new minigrep</code>，我们将使用<code>minigrep</code>和我们系统自带的<code>grep</code>做区别。</p>
+<p>项目的第一个要求就是，我们的可执行文件可以从终端接收两个命令行参数：要查询的文件路径和我们要查询的字符串。<strong>也就是说，我们希望能够通过<code>cargo run</code>运行程序，用两个连字符表示后面的参数是给我们的程序的，而不是给<code>cargo</code>的</strong>，还需要一个要搜索的字符串和一个要搜索的文件的路径，就像这样：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="cp">$</span><span class="w"> </span><span class="n">cargo</span><span class="w"> </span><span class="n">run</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="n">searchstring</span><span class="w"> </span><span class="n">example</span><span class="o">-</span><span class="n">filename</span><span class="p">.</span><span class="n">txt</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是现在我们的程序还不能接收命令行的参数，我们将从0开始搭建这个过程。</p>
+<hr>
+<h3 id="1211-读取参数的值">12.1.1 读取参数的值
+</h3><p><strong>我们需要使用<code>std::env::args</code>来让程序可以读取到我们传入的参数值，这个函数会返回一个包含命令行参数的迭代器对象</strong>。迭代器将在十三章中详细解释，现在只需要明白，<strong>迭代器会产生一系列的值，我们可以使用<code>collect</code>方法将这些值转换成一个集合</strong>。</p>
+<p>就比如下面这样：</p>
+<p>filename:src/main.rs:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">env</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">args</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">args</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">dbg!</span><span class="p">(</span><span class="n">args</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们先把<code>std::env</code>引入到我们的作用域，以便我们使用他的<code>args</code>函数，然后再对其产生的迭代器进行<code>collect</code>产生一个集合；由于我们显式指定了<code>Vec&lt;String&gt;</code>，所以这个产生的结合就是一个字符串的向量。<strong>因为<code>collect</code>必须式指定数据类型，和数据类型强转一个道理</strong>。最后我们是使用了<code>dbg!</code>宏来将向量的值打印出来。</p>
+<blockquote>
+<p>[!WARNING]</p>
+<p>请注意，如果任何参数包含无效的Unicode，<code>std::env::args</code>将会 panic。如果你的程序需要接受包含无效Unicode的参数，请改用<code>std::env::args_os</code>。该函数返回一个迭代器，产生的是<code>OsString</code>值而非<code>String</code>值。我们在此选择使用<code>std::env::args</code>是为了简便，因为<code>OsString</code>值因平台而异，且比<code>String</code>值更难处理。</p></blockquote>
+<p>我们可以先看看没有命令行参数的输出是什么样的：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250830002304648.png">
+<img src="./index.assets/image-20250830002304648.png" alt="image-20250830002304648"  />
+</a>
+</div>
+
+</p>
+<p>再来看看添加了命令行参数的：
+
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250830002244953.png">
+<img src="./index.assets/image-20250830002244953.png" alt="image-20250830002244953"  />
+</a>
+</div>
+
+</p>
+<p>注意，向量中的第一个值是<code>&quot;target/debug/minigrep&quot;</code>，<strong>这是我们二进制文件的名称</strong>。这与C语言中参数列表的行为相符，允许程序在执行时使用调用它们的名称。<strong>如果需要在消息中打印程序名称，或者根据调用程序时使用的命令行别名来更改程序行为，那么能够访问程序名称通常会很方便</strong>。但就本章而言，我们会忽略它，只保存我们需要的两个参数。</p>
+<hr>
+<h3 id="1212-将命令行参数保存到变量中">12.1.2 将命令行参数保存到变量中
+</h3><p>之前的内容我们将命令行参数保留到了一个集合中；为了后续更加方便的使用，我们将他们分别保存到不同的变量中就可以了。方法也很简单，直接使用向量的索引就行了：</p>
+<p>filename:src/main.rs:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">env</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">args</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">args</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">file_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Searching for </span><span class="si">{query}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;In file </span><span class="si">{file_path}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>正如我们打印向量时所看到的，程序名称占据了向量中<code>args[0]</code>处的第一个值，因此我们从索引1开始处理参数。<code>minigrep</code>接收的第一个参数是我们要搜索的字符串，所以我们将第一个参数的引用存入变量<code>query</code>中。第二个参数是文件路径，因此我们将第二个参数的引用存入变量<code>file_path</code>中。</p>
+<p>我们可以暂时打印一下这两个参数的值看看：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250830013619841.png">
+<img src="./index.assets/image-20250830013619841.png" alt="image-20250830013619841"  />
+</a>
+</div>
+
+</p>
+<p>可以看到我们的两个参数正确的打印出来了。</p>
+<hr>
+<h2 id="122-读取文件">12.2 读取文件
+</h2><p>现在我们将添加功能来读取<code>file_path</code>参数中指定的文件。首先，我们需要一个示例文件来进行测试：我们将使用一个包含少量文本的文件，这些文本分布在多行中，并且有一些重复的单词。在你的项目根目录下创建一个名为<em>poem.txt</em>的文件，并输入诗歌《断章》：</p>
+<p>Filename: poem.txt：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="err">断章</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">卞之琳</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">你站在桥上看风景，</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">看风景人在楼上看你。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">明月装饰了你的窗子，</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">你装饰了别人的梦。</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>之后，我们再修改代码来读取这个文件。</p>
+<p>Filename: src/main.rs：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="p">{</span><span class="n">env</span><span class="p">,</span><span class="w"> </span><span class="n">fs</span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">args</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">args</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">file_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">contents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fs</span>::<span class="n">read_to_string</span><span class="p">(</span><span class="n">file_path</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&#34;Should have been able to read the file&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;With text:</span><span class="se">\n</span><span class="si">{contents}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>首先我们需要引用<code>fs</code>获取文件处理的相关操作。在主函数中，<code>fs::read_to_string</code>将文件路径<code>file_path</code>作为参数，将该路径下的文件中的内容以字符串格式读取出来，<code>expect</code>用于无法打开或者文件不存在时终止程序。最后通过<code>prinln!</code>将读取到的文件内容打印到终端中，我们可以运行<code>cargo run -- placeholder poem.txt</code>（<strong>这里的第一个参数没有使用，所以写什么都无所谓</strong>）来观察现象：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250830020559966.png">
+<img src="./index.assets/image-20250830020559966.png" alt="image-20250830020559966"  />
+</a>
+</div>
+
+</p>
+<p>太好了！这段代码读取并打印了文件内容。但它存在一些缺陷。<strong>目前，<code>main</code>函数承担了多项职责：通常来说，如果每个函数只负责一个功能，函数会更清晰、更易于维护</strong>。另一个问题是我们对错误的处理还不够完善。这个程序现在还很小，所以这些缺陷不算大问题，但随着程序不断扩大，要干净利落地修复它们会变得更加困难。<strong>在开发程序时，尽早开始重构是个好习惯，因为重构少量代码要容易得多</strong>。接下来我们就这么做。</p>
+<hr>
+
 </section>
 
 
@@ -12033,13 +12216,13 @@
         
         
         
-        共发表 9 篇文章 · 总计 120.35 k 字
+        共发表 9 篇文章 · 总计 122.79 k 字
     </div>
     <div>
         
         
 
-        最近一次更新时间：<span id="last-commit-time">2025-08-29 01:55</span>
+        最近一次更新时间：<span id="last-commit-time">2025-08-30 02:08</span>
     </div>
 </section>
 
