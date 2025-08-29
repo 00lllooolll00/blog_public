@@ -26,6 +26,11 @@
 }
 
 
+/* 段落首行缩进样式 */
+.article-content p {
+    text-indent: 2em; /* 首行缩进2个字符 */
+}
+
 /* 返回顶部按钮样式 */
 #back-to-top {
     display: none;
