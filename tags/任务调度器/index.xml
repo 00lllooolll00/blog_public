@@ -7,7 +7,7 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>© 2025 N1ntyNine99. 保留所有权利。</copyright>
-        <lastBuildDate>Fri, 22 Aug 2025 00:00:00 +0800</lastBuildDate><atom:link href="https://example.com/tags/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sat, 30 Aug 2025 00:00:00 +0800</lastBuildDate><atom:link href="https://example.com/tags/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>任务调度器</title>
         <link>https://example.com/p/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/</link>
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0800</pubDate>
@@ -17,7 +17,7 @@
 &lt;/h1&gt;&lt;p&gt;一个轻量级、可配置的任务调度管理系统，专为嵌入式系统设计。支持多任务定时调度、优先级管理、动态调整和低功耗模式。&lt;/p&gt;
 &lt;h2 id=&#34;-功能特性&#34;&gt;📋 功能特性
 &lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;多任务管理&lt;/strong&gt;：支持最多 20 个并发任务&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;多任务管理&lt;/strong&gt;：可自定义配置最大任务数目&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;优先级调度&lt;/strong&gt;：数值越小优先级越高（0 为最高优先级）&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;动态时间调整&lt;/strong&gt;：可根据任务执行时间自动调整调度间隔（可选）&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;低功耗支持&lt;/strong&gt;：在空闲时进入低功耗模式（可选）&lt;/li&gt;
@@ -253,7 +253,7 @@
 &lt;/div&gt;
 &lt;/div&gt;&lt;h2 id=&#34;-注意事项&#34;&gt;⚠️ 注意事项
 &lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;时间精度&lt;/strong&gt;：依赖准确的系统时钟，建议使用硬件定时器&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;时间精度&lt;/strong&gt;：依赖准确的系统时钟，使用硬件定时器&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;任务执行时间&lt;/strong&gt;：单个任务执行时间不应超过最小任务间隔&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;优先级冲突&lt;/strong&gt;：同优先级任务按创建顺序执行&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;中断安全&lt;/strong&gt;：非线程安全，不要在中断中调用API函数&lt;/li&gt;
@@ -261,7 +261,7 @@
 &lt;/ol&gt;
 &lt;h2 id=&#34;-性能优化建议&#34;&gt;🔍 性能优化建议
 &lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;启用动态调整&lt;/strong&gt;：设置 &lt;code&gt;DYNAMIC_MODIFY 1&lt;/code&gt; 自动优化任务间隔&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;启用动态调整&lt;/strong&gt;：设置 &lt;code&gt;DYNAMIC_MODIFY 1&lt;/code&gt; 自动优化任务间隔（不完善）&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;合理设置优先级&lt;/strong&gt;：关键任务设置更高优先级&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;使用低功耗模式&lt;/strong&gt;：在电池供电设备中设置 &lt;code&gt;LOW_POWER 1&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;监控任务耗时&lt;/strong&gt;：定期检查 &lt;code&gt;MaxUsed&lt;/code&gt; 避免任务超时&lt;/li&gt;

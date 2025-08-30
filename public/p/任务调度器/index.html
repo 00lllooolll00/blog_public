@@ -10,7 +10,7 @@
 <meta property='og:description' content="基于定时器的任务调度器">
 <meta property='og:url' content='https://example.com/p/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/'>
 <meta property='og:site_name' content='N1ntyNine99'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='任务调度器' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-08-22T00:00:00&#43;08:00'/><meta property='og:image' content='https://example.com/p/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/pic8.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='任务调度器' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-08-30T00:00:00&#43;08:00'/><meta property='og:image' content='https://example.com/p/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/pic8.jpg' />
 <meta name="twitter:title" content="任务调度器">
 <meta name="twitter:description" content="基于定时器的任务调度器"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://example.com/p/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/pic8.jpg' />
@@ -396,8 +396,8 @@
 <path d="M15 6L18 9" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M13 20H21" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-            <time class="article-time--updated" datetime=" 2025-08-22T00:00:00.000Z">
-                2025年8月22日 00:00
+            <time class="article-time--updated" datetime=" 2025-08-30T00:00:00.000Z">
+                2025年8月30日 00:00
             </time>
         </div>
         
@@ -415,7 +415,7 @@
 </h1><p>一个轻量级、可配置的任务调度管理系统，专为嵌入式系统设计。支持多任务定时调度、优先级管理、动态调整和低功耗模式。</p>
 <h2 id="-功能特性">📋 功能特性
 </h2><ul>
-<li><strong>多任务管理</strong>：支持最多 20 个并发任务</li>
+<li><strong>多任务管理</strong>：可自定义配置最大任务数目</li>
 <li><strong>优先级调度</strong>：数值越小优先级越高（0 为最高优先级）</li>
 <li><strong>动态时间调整</strong>：可根据任务执行时间自动调整调度间隔（可选）</li>
 <li><strong>低功耗支持</strong>：在空闲时进入低功耗模式（可选）</li>
@@ -651,7 +651,7 @@
 </div>
 </div><h2 id="-注意事项">⚠️ 注意事项
 </h2><ol>
-<li><strong>时间精度</strong>：依赖准确的系统时钟，建议使用硬件定时器</li>
+<li><strong>时间精度</strong>：依赖准确的系统时钟，使用硬件定时器</li>
 <li><strong>任务执行时间</strong>：单个任务执行时间不应超过最小任务间隔</li>
 <li><strong>优先级冲突</strong>：同优先级任务按创建顺序执行</li>
 <li><strong>中断安全</strong>：非线程安全，不要在中断中调用API函数</li>
@@ -659,7 +659,7 @@
 </ol>
 <h2 id="-性能优化建议">🔍 性能优化建议
 </h2><ol>
-<li><strong>启用动态调整</strong>：设置 <code>DYNAMIC_MODIFY 1</code> 自动优化任务间隔</li>
+<li><strong>启用动态调整</strong>：设置 <code>DYNAMIC_MODIFY 1</code> 自动优化任务间隔（不完善）</li>
 <li><strong>合理设置优先级</strong>：关键任务设置更高优先级</li>
 <li><strong>使用低功耗模式</strong>：在电池供电设备中设置 <code>LOW_POWER 1</code></li>
 <li><strong>监控任务耗时</strong>：定期检查 <code>MaxUsed</code> 避免任务超时</li>
@@ -967,7 +967,7 @@
         
         
 
-        最近一次更新时间：<span id="last-commit-time">2025-08-30 15:15</span>
+        最近一次更新时间：<span id="last-commit-time">2025-08-30 21:37</span>
     </div>
 </section>
 
