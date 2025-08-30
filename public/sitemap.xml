@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://example.com/categories/</loc>
-    <lastmod>2025-08-30T21:37:34+08:00</lastmod>
+    <lastmod>2025-08-30T21:45:49+08:00</lastmod>
   </url><url>
     <loc>https://example.com/post/</loc>
     <lastmod>2025-08-30T15:11:19+08:00</lastmod>
@@ -81,15 +81,15 @@
     <lastmod>2025-08-21T19:23:51+08:00</lastmod>
   </url><url>
     <loc>https://example.com/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/</loc>
-    <lastmod>2025-08-30T21:37:34+08:00</lastmod>
+    <lastmod>2025-08-30T21:45:49+08:00</lastmod>
   </url><url>
     <loc>https://example.com/%E5%85%B3%E4%BA%8E/</loc>
     <lastmod>2025-08-21T22:31:55+08:00</lastmod>
   </url><url>
     <loc>https://example.com/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/</loc>
-    <lastmod>2025-08-30T21:37:34+08:00</lastmod>
+    <lastmod>2025-08-30T21:45:49+08:00</lastmod>
   </url><url>
     <loc>https://example.com/categories/%E7%A2%8E%E7%A2%8E%E5%BF%B5/</loc>
-    <lastmod>2025-08-30T21:37:34+08:00</lastmod>
+    <lastmod>2025-08-30T21:45:49+08:00</lastmod>
   </url>
 </urlset>
