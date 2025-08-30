@@ -2,7 +2,7 @@
 title: Rust自学笔记
 description: 根据官网学习Rust时做的笔记
 date: 2025-08-21
-lastmod: 2025-08-30
+lastmod: 2025-08-31
 slug: rust-self-teach
 image: rust-2.jpg
 comments: true
@@ -8019,6 +8019,8 @@ fn parse_config(args: &[String]) -> Config {
 
 既然`parse_config`函数的作用是创建一个`Config`实例，**我们可以将`parse_config`从一个普通函数改为一个名为`new`的函数，并将其与`Config`结构体相关联**。这样的修改会让代码更符合惯例。我们可以通过调用`String::new`来创建标准库中类型的实例，比如`String`。同样，通过将`parse_config`改为与`Config`相关联的`new`函数，我们将能够通过调用`Config::new`来创建`Config`的实例：
 
+Filename: src/main.rs
+
 ```Rust
 use std::{env, fs};
 
@@ -8118,6 +8120,380 @@ impl Config {
 我们对函数体做了两处修改：当用户没有传递足够的参数时，**不再调用`panic!`，而是返回一个`Err`值**；同时，我们将`Config`返回值包装在了`Ok`中。这些修改使该函数符合其新的类型签名。	
 
 从`Config::build`返回`Err`值，能让`main`函数处理从`build`函数返回的`Result`值，并在出现错误时更干净地退出进程。
+
+---
+
+#### 调用`Config::build`之后处理错误
+
+现在我们的构建函数会返回一个`Result`类型，所以我们的错误处理逻辑就轮到了我们调用函数来，更新我们的*src/main.rs*，像下面的例子一样：
+
+Filename: src/main.rs
+
+```Rust
+use std::{env, fs, process};
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let config_value;
+    if let Ok(value) = Config::build(&args){
+        // 有值就解析这个值
+        config_value = value
+    }else {
+        // 无值就退出
+        process::exit(1);
+    }
+
+    println!("Searching for {}", config_value.query);
+    println!("In file {}", config_value.file_path);
+
+    let contents =
+        fs::read_to_string(config_value.file_path).expect("Should have been able to read the file");
+    
+    println!("With text:\n{contents}");
+}
+```
+
+这就是很常见的一种使用`if let ... else`的方式来处理`Result`，但是还有像下面这种：
+
+Filename: src/main.rs
+
+```Rust
+use std::{env, fs, process};
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config_value = Config::build(&args).unwrap_or_else(|err| {
+        println!("Problem parsing arguments: {err}");
+        process::exit(1);
+    });
+
+    println!("Searching for {}", config_value.query);
+    println!("In file {}", config_value.file_path);
+
+    let contents =
+        fs::read_to_string(config_value.file_path).expect("Should have been able to read the file");
+
+    println!("With text:\n{contents}");
+}
+```
+
+我们使用了一种尚未详细介绍的方法：`unwrap_or_else`，它由标准库在`Result<T, E>`上定义。使用`unwrap_or_else`允许我们定义一些自定义的、非`panic!`的错误处理。**如果`Result`是一个`Ok`值，该方法的行为与`unwrap`类似：它会返回`Ok`所包裹的内部值。然而，如果该值是一个`Err`值，此方法会调用闭包（*closure*）中的代码，闭包是我们定义并作为参数传递给`unwrap_or_else`的匿名函数**。我们将在第13章更详细地介绍闭包。目前，你只需要知道`unwrap_or_else`会将`Err`的内部值（在这种情况下，就是我们添加的静态字符串`"not enough arguments"`）**传递给竖线之间的参数`err`所对应的闭包**。闭包中的代码在运行时就可以使用这个`err`值了。
+
+我们添加了一个新的`use`行，将标准库中的`process`引入作用域。在错误情况下运行的闭包中的代码只有两行：我们打印`err`值，然后调用`process::exit`。`**process::exit`函数会立即停止程序，并返回作为退出状态码传递的数字**。这与我们之前的基于`panic!`的处理方式类似，但我们不会再得到所有额外的输出：
+
+![image-20250830220709560](./index.assets/image-20250830220709560.png)
+
+现在这个输出界面就对用户来说更加友好了。
+
+---
+
+#### 将逻辑层从`main`函数中提取出来
+
+现在，我们将有关命令行处理的逻辑单独封装成一个`run`函数，这个函数只负责接收解析好的命令行然后处理逻辑即可。这样的好处就是将获取命令行参数和命令行操作分开，更易于后期的维护，并且一定程度上解耦：
+
+Filename: src/main.rs
+
+```Rust
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config_value = Config::build(&args).unwrap_or_else(|err| {
+        println!("Problem parsing arguments: {err}");
+        process::exit(1);
+    });
+
+    println!("Searching for {}", config_value.query);
+    println!("In file {}", config_value.file_path);
+
+    run(config_value);
+}
+
+fn run(config: Config) {
+    let contents =
+        fs::read_to_string(config.file_path).expect("Should have been able to read the file");
+
+    println!("With text:\n{contents}");
+}
+```
+
+`run`函数现在包含了来自`main`的所有剩余逻辑，从读取文件开始。
+
+---
+
+#### 从`run`函数中返回错误
+
+接下来，要对`run`函数返回一个状态来表示执行情况，因为涉及到打开文件、读取文件等操作。并不是每一次操作都是成功的，有的情况会失败；所以我们接下来要让`run`函数返回一个`Result<T,E>`类型的数据来指示当前的情况：
+
+```Rust
+use std::error::Error;
+
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.file_path)?;
+
+    println!("With text:\n{contents}");
+
+    Ok(())
+}
+```
+
+我们在这里做了三处重大修改。首先，我们将`run`函数的返回类型改为了`Result<(), Box<dyn Error>>`。该函数之前返回的是单元类型`()`，现在我们在`Ok`情况中仍然返回该值。
+
+对于错误类型，我们使用了特征对象（*trait object*）`Box<dyn Error>`（并且我们已经通过顶部的`use`语句将`std::error::Error`引入作用域）。我们将在第十八章具体介绍特征对象，目前，只需知道 `Box<dyn Error>` **意味着该函数将返回一个实现了 `Error` trait 的类型，但我们不必指定返回值具体是什么类型。这使我们能够灵活地返回在不同错误情况下可能属于不同类型的错误值**。`dyn` 关键字是 *dynamic* 的缩写。
+
+其次，我们使用了`?`操作符来替代`expect`；如同第九章中提到的，**`?`操作符在错误的时候会直接返回错误值，由调用者处理，而不是让程序panic**。
+
+第三，`run`函数现在在成功的情况下会返回一个`Ok`值。**我们在签名中已将`run`函数的成功类型声明为`()`，这意味着我们需要将单元类型值包装在`Ok`值中**。这种`Ok(())`语法起初可能看起来有点奇怪，但像这样使用`()`是一种惯用方式，用于表明我们调用`run`只是为了其副作用，**它不会返回我们需要的值**。
+
+现在我们运行这个代码会看到一个警告：
+
+![image-20250830222528405](./index.assets/image-20250830222528405.png)
+
+**Rust 告诉我们，我们的代码忽略了 `Result` 值，而 `Result` 值可能表明发生了错误**。但我们没有检查是否存在错误，编译器提醒我们，这里或许本应有一些错误处理代码！现在让我们纠正这个问题。
+
+我们按照`Config::build`一样的逻辑来处理这个错误：
+
+```Rust
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config_value = Config::build(&args).unwrap_or_else(|err| {
+        println!("Problem parsing arguments: {err}");
+        process::exit(1);
+    });
+
+    println!("Searching for {}", config_value.query);
+    println!("In file {}", config_value.file_path);
+
+    if let Err(e) = run(config_value) {
+        println!("Application error:{e}");
+        process::exit(1);
+    }
+}
+```
+
+这样，如果`run`函数返回的是一个错误值，将会和`if let`匹配，打印相关信息之后退出程序；如果是`Ok`则无事发生。这里使用`if let`而不是使用闭包是因为，**这里的`Ok`包含的值是一个单元值，并没有任何意义，我们不需要使用他**。在这两种情况下，`if let`和`unwrap_or_else`函数的主体是相同的：我们打印错误并退出。
+
+----
+
+#### 将代码放到库中
+
+目前为止我们的`minigrep`初具雏形。但是所有的代码都放到了*src/main.rs*中，现在我们将部分代码放到*src/lib.rs*中，这样方便我们测试。
+
+让我们在*src/lib.rs*中定义一个搜索文本的代码，这将使我们（或任何使用我们的`minigrep`库的人）能够从比我们的`minigrep`二进制文件更多的场景中调用搜索函数。首先，让我们如代码下所示，在*src/lib.rs*中定义`search`函数签名，其函数体调用`unimplemented!`宏，表示当前函数没有实现。我们将在填充实现时更详细地解释该签名：
+
+Filename: src/lib.rs
+
+```Rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    unimplemented!();
+}
+```
+
+我们在函数定义上使用了`pub`关键字，将`search`指定为我们库 crate 的公共 API 的一部分。现在我们有了一个库 crate，可以从二进制 crate 中使用它，也可以对其进行测试！
+
+现在我们需要将*src/lib.rs*中定义的代码引入到*src/main.rs*中二进制 crate 的作用域内并调用它：
+
+Filename: src/main.rs
+
+```Rust
+use std::error::Error;
+use std::{env, fs, process};
+use minigrep::search;
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config_value = Config::build(&args).unwrap_or_else(|err| {
+        println!("Problem parsing arguments: {err}");
+        process::exit(1);
+    });
+
+    if let Err(e) = run(config_value) {
+        println!("Application error:{e}");
+        process::exit(1);
+    }
+}
+
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.file_path)?;
+
+    //将文件中搜索到的关键字打印出来
+    for line in search(&config.query,&contents){
+        println!("{line}");
+    }
+
+
+    Ok(())
+}
+
+struct Config {
+    query: String,
+    file_path: String,
+}
+
+impl Config {
+    fn build(args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+
+        let result = Config {
+            query: args[1].clone(),
+            file_path: args[2].clone(),
+        };
+        Ok(result)
+    }
+}
+
+```
+
+我们添加了一行`use minigrep::search`，**将库 crate 中的`search`函数引入到二进制 crate 的作用域中**。然后，在`run`函数里，我们不再打印文件内容，而是调用`search`函数，**并将`config.query`的值和`contents`的引用作为参数传入**。接着，`run`会使用一个`for`循环来打印从`search`返回的与查询匹配的每一行。此时，也应该移除`main`函数中用于显示查询内容和文件路径的`println!`调用，这样我们的程序就只会打印搜索结果（如果没有发生错误的话）。
+
+**请注意，搜索功能会在进行任何打印操作之前，将所有结果收集到一个向量中。**在搜索大型文件时，这种实现方式可能会导致结果显示缓慢，因为结果不会在找到时立即打印出来；我们将在第13章讨论一种使用迭代器来解决这个问题的可能方法。
+
+现在处理错误变得容易多了，而且我们让代码更模块化了。从现在开始，我们几乎所有的工作都将在*src/lib.rs*中完成。让我们利用这种新发现的模块化特性来做一件事，这件事在旧代码中很难实现，但在新代码中却很容易：**我们要编写一些测试**！
+
+---
+
+## 12.4 TDD（*Test-Driven Development* 测试驱动）
+
+既然我们已经将搜索逻辑放在了*src/lib.rs*中，与`main`函数分离，那么为代码的核心功能编写测试就容易多了。**我们可以直接用各种参数调用函数并检查返回值，而不必从命令行调用我们的二进制文件**。
+
+在本节中，我们将使用测试驱动开发（TDD）流程，通过以下步骤向`minigrep`程序添加搜索逻辑：
+
+1. **编写一个会失败的测试，然后运行它，以确保它是因为你预期的原因而失败**。
+2. **编写或修改足够的代码，使新测试通过**。
+3. **重构你刚刚添加或修改的代码，并确保测试继续通过**。
+4. **从步骤1开始重复**。
+
+虽然测试驱动开发只是众多编写软件的方法之一，**但它有助于推动代码设计**。在编写能让测试通过的代码之前先编写测试，有助于在整个过程中保持较高的测试覆盖率。
+
+我们将试运行这一功能的实现，该功能会实际在文件内容中搜索查询字符串，并生成与查询匹配的行列表。我们会将此功能添加到一个名为`search`的函数中。
+
+---
+
+### 12.4.1 编写一个错误的测试
+
+在*src/lib.rs*中，我们将添加一个`tests`模块和一个测试函数，就像我们在第11章中所做的那样。测试函数指定了我们希望`search`函数具备的行为：它将接收一个查询和要搜索的文本，并仅返回文本中包含该查询的行：
+
+此测试用于搜索字符串`"duct"`。我们要搜索的文本有三行，其中只有一行包含`"duct"`（注意，**开头双引号后的反斜杠告诉Rust不要在该字符串字面量的内容开头添加换行符**）。我们断言，`search`函数返回的值只包含我们预期的那一行。
+
+但是由于我们当前的`search`没有实现，使用的是`unimplemented!`作为占位符，所以程序会panic。为了避免这个问题，我们让我们的函数返回一个空的向量：
+
+Filename: src/lib.rs
+
+```Rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    vec![]
+}
+```
+
+现在我们来讨论为什么需要在`search`的签名中定义一个显式生命周期`'a`，**并将该生命周期用于`contents`参数和返回值**。生命周期**参数指定哪个参数的生命周期与返回值的生命周期相关联**。在这种情况下，**我们表明返回的向量应该包含引用参数`contents`（而非参数`query`）切片的字符串切片**。
+
+**换句话说，我们告诉Rust，`search`函数返回的数据的生命周期与通过`contents`参数传入`search`函数的数据的生命周期一样长**。这一点很重要！切片所引用的*by*数据必须有效，引用才能有效；如果编译器认为我们是在对`query`而不是`contents`进行字符串切片，那么它的安全性检查就会出错。
+
+如果我们不使用`'a`，我们编译会发现这样：
+
+![image-20250831011836554](./index.assets/image-20250831011836554.png)
+
+**这是由于编译器不知道两个入参哪个会被输出，我们需要显式告诉编译器**。请注意，帮助文本建议为所有参数和输出类型指定相同的生命周期参数，这是不正确的！因为`contents`是包含我们所有文本的参数，**而我们想要返回该文本中匹配的部分，所以我们知道`contents`是唯一应该使用生命周期语法与返回值相关联的参数**。
+
+----
+
+### 12.4.2 编写一个可以通过的测试
+
+目前，我们的测试失败了，因为我们总是返回一个空向量。要解决这个问题并实现`search`，我们的程序需要遵循以下步骤：
+
+1. **遍历内容中的每一行。**
+2. **检查该行是否包含我们的查询字符串。**
+3. **如果是这样，就把它添加到我们要返回的值列表中。**
+4. **如果没有，就什么也不做。**
+5. **返回匹配的结果列表。**
+
+接下来就按照这个步骤。
+
+----
+
+#### 遍历每一行
+
+**Rust有一个方法就是一行一行的遍历字符串，一般都叫做`lines`**。就像下面这样：
+
+Filename src/lib.rs
+
+```Rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    for lines in contents.lines(){
+        // sth
+    }
+}
+```
+
+`lines`方法会返回一个迭代器。对于迭代器，我们13章会详细讲，**现在只需要知道我们可以通过`for`来遍历这个迭代器**。
+
+---
+
+#### 逐行寻找我们要查询的字符串
+
+Rust中有一个已经实现了检查字符串是否包含的方法`contains`，所以我们可以像下面这样续写：
+
+```Rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    for lines in contents.lines(){
+        if lines.contains(query){
+            // sth
+        }
+    }
+}
+```
+
+这样我们就可以简单判断一句话中是否包含我们要查询的字符串。但是现在的函数依然不能通过编译。
+
+---
+
+#### 存储匹配的行
+
+要完成这个函数，我们需要一种方法来存储我们想要返回的匹配行。为此，我们可以在`for`循环之前创建一个可变向量，并调用`push`方法将`line`存储到该向量中。在`for`循环之后，我们返回这个向量：
+
+```Rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+
+    let mut results = Vec::new();
+
+    for lines in contents.lines(){
+        if lines.contains(query){
+            results.push(lines);
+        }
+    }
+    results
+}
+```
+
+现在，`search`功能应该只返回包含`query`的行，这样我们的测试应该就能通过了：
+
+![image-20250831013650836](./index.assets/image-20250831013650836.png)
+
+现在我们可以考虑一下重构`search`函数，同时保持原有的功能，确保其可以通过测试。十三章中我们会利用迭代器的一些特性来重构这个函数。
+
+现在整个程序应该可以运行了！让我们来试一下，首先用一个应该能从*poem.txt*的诗中返回恰好一行包含“楼”字的行：
+
+```Rust
+$ cargo run -- 楼 poem.txt
+```
+
+编译如下：
+
+![image-20250831014133178](./index.assets/image-20250831014133178.png)
+
+可以试试和多行匹配的字比如“风景”：
+
+![image-20250831014241838](./index.assets/image-20250831014241838.png)
+
+现在再试试我们输入一个不存在的字，比如“Rust”，应该是不会返回任何值的：
+
+![image-20250831014331386](./index.assets/image-20250831014331386.png)
+
+为了完善这个项目，我们将简要演示如何使用环境变量以及如何打印到标准错误流，这两者在编写命令行程序时都很有用。
 
 ---
 

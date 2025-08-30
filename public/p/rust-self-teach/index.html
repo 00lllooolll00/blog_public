@@ -10,7 +10,7 @@
 <meta property='og:description' content="根据官网学习Rust时做的笔记">
 <meta property='og:url' content='https://example.com/p/rust-self-teach/'>
 <meta property='og:site_name' content='N1ntyNine99'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-08-30T15:11:19&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-08-31T01:45:20&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
 <meta name="twitter:title" content="Rust自学笔记">
 <meta name="twitter:description" content="根据官网学习Rust时做的笔记"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://example.com/p/rust-self-teach/rust-2.jpg' />
@@ -614,6 +614,22 @@
           <ol>
             <li><a href="#改进错误消息">改进错误消息</a></li>
             <li><a href="#返回一个result而不是简单的panic">返回一个<code>Result</code>而不是简单的<code>panic!</code>：</a></li>
+            <li><a href="#调用configbuild之后处理错误">调用<code>Config::build</code>之后处理错误</a></li>
+            <li><a href="#将逻辑层从main函数中提取出来">将逻辑层从<code>main</code>函数中提取出来</a></li>
+            <li><a href="#从run函数中返回错误">从<code>run</code>函数中返回错误</a></li>
+            <li><a href="#将代码放到库中">将代码放到库中</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#124-tddtest-driven-development-测试驱动">12.4 TDD（<em>Test-Driven Development</em> 测试驱动）</a>
+      <ol>
+        <li><a href="#1241-编写一个错误的测试">12.4.1 编写一个错误的测试</a></li>
+        <li><a href="#1242-编写一个可以通过的测试">12.4.2 编写一个可以通过的测试</a>
+          <ol>
+            <li><a href="#遍历每一行">遍历每一行</a></li>
+            <li><a href="#逐行寻找我们要查询的字符串">逐行寻找我们要查询的字符串</a></li>
+            <li><a href="#存储匹配的行">存储匹配的行</a></li>
           </ol>
         </li>
       </ol>
@@ -708,7 +724,7 @@
 
 
             <time class="article-time--reading">
-                阅读时长: 227 分钟
+                阅读时长: 237 分钟
             </time>
         </div>
         
@@ -720,8 +736,8 @@
 <path d="M15 6L18 9" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M13 20H21" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-            <time class="article-time--updated" datetime=" 2025-08-30T15:11:19.000Z">
-                2025年8月30日
+            <time class="article-time--updated" datetime=" 2025-08-31T01:45:20.000Z">
+                2025年8月31日
             </time>
         </div>
         
@@ -12209,6 +12225,7 @@
 <h3 id="1234-为config结构体创建一个构造函数">12.3.4 为<code>Config</code>结构体创建一个构造函数
 </h3><p>到目前为止，我们已经从<code>main</code>中提取出了负责解析命令行参数的逻辑，并将其放入了<code>parse_config</code>函数中。<strong>这样做有助于我们发现<code>query</code>和<code>file_path</code>的值是相关联的</strong>，而这种关联应该在我们的代码中体现出来。随后，我们添加了一个<code>Config</code>结构体，以明确<code>query</code>和<code>file_path</code>的相关用途，<strong>并能够从<code>parse_config</code>函数中以结构体字段名的形式返回这些值的名称</strong>。</p>
 <p>既然<code>parse_config</code>函数的作用是创建一个<code>Config</code>实例，<strong>我们可以将<code>parse_config</code>从一个普通函数改为一个名为<code>new</code>的函数，并将其与<code>Config</code>结构体相关联</strong>。这样的修改会让代码更符合惯例。我们可以通过调用<code>String::new</code>来创建标准库中类型的实例，比如<code>String</code>。同样，通过将<code>parse_config</code>改为与<code>Config</code>相关联的<code>new</code>函数，我们将能够通过调用<code>Config::new</code>来创建<code>Config</code>的实例：</p>
+<p>Filename: src/main.rs</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -12364,6 +12381,546 @@
 </div><p>我们的<code>build</code>函数返回一个<code>Result</code>，<strong>在成功的情况下包含一个<code>Config</code>实例，在错误的情况下包含一个字符串字面量</strong>。我们的错误值将始终是具有<code>'static</code>生命周期的字符串字面量。</p>
 <p>我们对函数体做了两处修改：当用户没有传递足够的参数时，<strong>不再调用<code>panic!</code>，而是返回一个<code>Err</code>值</strong>；同时，我们将<code>Config</code>返回值包装在了<code>Ok</code>中。这些修改使该函数符合其新的类型签名。</p>
 <p>从<code>Config::build</code>返回<code>Err</code>值，能让<code>main</code>函数处理从<code>build</code>函数返回的<code>Result</code>值，并在出现错误时更干净地退出进程。</p>
+<hr>
+<h4 id="调用configbuild之后处理错误">调用<code>Config::build</code>之后处理错误
+</h4><p>现在我们的构建函数会返回一个<code>Result</code>类型，所以我们的错误处理逻辑就轮到了我们调用函数来，更新我们的<em>src/main.rs</em>，像下面的例子一样：</p>
+<p>Filename: src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="p">{</span><span class="n">env</span><span class="p">,</span><span class="w"> </span><span class="n">fs</span><span class="p">,</span><span class="w"> </span><span class="n">process</span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">args</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">args</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">config_value</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Config</span>::<span class="n">build</span><span class="p">(</span><span class="o">&amp;</span><span class="n">args</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">// 有值就解析这个值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="n">config_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">// 无值就退出
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Searching for </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">config_value</span><span class="p">.</span><span class="n">query</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;In file </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">config_value</span><span class="p">.</span><span class="n">file_path</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">contents</span><span class="w"> </span><span class="o">=</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">fs</span>::<span class="n">read_to_string</span><span class="p">(</span><span class="n">config_value</span><span class="p">.</span><span class="n">file_path</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&#34;Should have been able to read the file&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;With text:</span><span class="se">\n</span><span class="si">{contents}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这就是很常见的一种使用<code>if let ... else</code>的方式来处理<code>Result</code>，但是还有像下面这种：</p>
+<p>Filename: src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="p">{</span><span class="n">env</span><span class="p">,</span><span class="w"> </span><span class="n">fs</span><span class="p">,</span><span class="w"> </span><span class="n">process</span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">args</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">args</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">config_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Config</span>::<span class="n">build</span><span class="p">(</span><span class="o">&amp;</span><span class="n">args</span><span class="p">).</span><span class="n">unwrap_or_else</span><span class="p">(</span><span class="o">|</span><span class="n">err</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Problem parsing arguments: </span><span class="si">{err}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Searching for </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">config_value</span><span class="p">.</span><span class="n">query</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;In file </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">config_value</span><span class="p">.</span><span class="n">file_path</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">contents</span><span class="w"> </span><span class="o">=</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">fs</span>::<span class="n">read_to_string</span><span class="p">(</span><span class="n">config_value</span><span class="p">.</span><span class="n">file_path</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&#34;Should have been able to read the file&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;With text:</span><span class="se">\n</span><span class="si">{contents}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们使用了一种尚未详细介绍的方法：<code>unwrap_or_else</code>，它由标准库在<code>Result&lt;T, E&gt;</code>上定义。使用<code>unwrap_or_else</code>允许我们定义一些自定义的、非<code>panic!</code>的错误处理。<strong>如果<code>Result</code>是一个<code>Ok</code>值，该方法的行为与<code>unwrap</code>类似：它会返回<code>Ok</code>所包裹的内部值。然而，如果该值是一个<code>Err</code>值，此方法会调用闭包（<em>closure</em>）中的代码，闭包是我们定义并作为参数传递给<code>unwrap_or_else</code>的匿名函数</strong>。我们将在第13章更详细地介绍闭包。目前，你只需要知道<code>unwrap_or_else</code>会将<code>Err</code>的内部值（在这种情况下，就是我们添加的静态字符串<code>&quot;not enough arguments&quot;</code>）<strong>传递给竖线之间的参数<code>err</code>所对应的闭包</strong>。闭包中的代码在运行时就可以使用这个<code>err</code>值了。</p>
+<p>我们添加了一个新的<code>use</code>行，将标准库中的<code>process</code>引入作用域。在错误情况下运行的闭包中的代码只有两行：我们打印<code>err</code>值，然后调用<code>process::exit</code>。<code>**process::exit</code>函数会立即停止程序，并返回作为退出状态码传递的数字**。这与我们之前的基于<code>panic!</code>的处理方式类似，但我们不会再得到所有额外的输出：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250830220709560.png">
+<img src="./index.assets/image-20250830220709560.png" alt="image-20250830220709560"  />
+</a>
+</div>
+
+</p>
+<p>现在这个输出界面就对用户来说更加友好了。</p>
+<hr>
+<h4 id="将逻辑层从main函数中提取出来">将逻辑层从<code>main</code>函数中提取出来
+</h4><p>现在，我们将有关命令行处理的逻辑单独封装成一个<code>run</code>函数，这个函数只负责接收解析好的命令行然后处理逻辑即可。这样的好处就是将获取命令行参数和命令行操作分开，更易于后期的维护，并且一定程度上解耦：</p>
+<p>Filename: src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">args</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">args</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">config_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Config</span>::<span class="n">build</span><span class="p">(</span><span class="o">&amp;</span><span class="n">args</span><span class="p">).</span><span class="n">unwrap_or_else</span><span class="p">(</span><span class="o">|</span><span class="n">err</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Problem parsing arguments: </span><span class="si">{err}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Searching for </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">config_value</span><span class="p">.</span><span class="n">query</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;In file </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">config_value</span><span class="p">.</span><span class="n">file_path</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">run</span><span class="p">(</span><span class="n">config_value</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">run</span><span class="p">(</span><span class="n">config</span>: <span class="nc">Config</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">contents</span><span class="w"> </span><span class="o">=</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">fs</span>::<span class="n">read_to_string</span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="n">file_path</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&#34;Should have been able to read the file&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;With text:</span><span class="se">\n</span><span class="si">{contents}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>run</code>函数现在包含了来自<code>main</code>的所有剩余逻辑，从读取文件开始。</p>
+<hr>
+<h4 id="从run函数中返回错误">从<code>run</code>函数中返回错误
+</h4><p>接下来，要对<code>run</code>函数返回一个状态来表示执行情况，因为涉及到打开文件、读取文件等操作。并不是每一次操作都是成功的，有的情况会失败；所以我们接下来要让<code>run</code>函数返回一个<code>Result&lt;T,E&gt;</code>类型的数据来指示当前的情况：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">error</span>::<span class="n">Error</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">run</span><span class="p">(</span><span class="n">config</span>: <span class="nc">Config</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">Error</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">contents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fs</span>::<span class="n">read_to_string</span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="n">file_path</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;With text:</span><span class="se">\n</span><span class="si">{contents}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们在这里做了三处重大修改。首先，我们将<code>run</code>函数的返回类型改为了<code>Result&lt;(), Box&lt;dyn Error&gt;&gt;</code>。该函数之前返回的是单元类型<code>()</code>，现在我们在<code>Ok</code>情况中仍然返回该值。</p>
+<p>对于错误类型，我们使用了特征对象（<em>trait object</em>）<code>Box&lt;dyn Error&gt;</code>（并且我们已经通过顶部的<code>use</code>语句将<code>std::error::Error</code>引入作用域）。我们将在第十八章具体介绍特征对象，目前，只需知道 <code>Box&lt;dyn Error&gt;</code> <strong>意味着该函数将返回一个实现了 <code>Error</code> trait 的类型，但我们不必指定返回值具体是什么类型。这使我们能够灵活地返回在不同错误情况下可能属于不同类型的错误值</strong>。<code>dyn</code> 关键字是 <em>dynamic</em> 的缩写。</p>
+<p>其次，我们使用了<code>?</code>操作符来替代<code>expect</code>；如同第九章中提到的，<strong><code>?</code>操作符在错误的时候会直接返回错误值，由调用者处理，而不是让程序panic</strong>。</p>
+<p>第三，<code>run</code>函数现在在成功的情况下会返回一个<code>Ok</code>值。<strong>我们在签名中已将<code>run</code>函数的成功类型声明为<code>()</code>，这意味着我们需要将单元类型值包装在<code>Ok</code>值中</strong>。这种<code>Ok(())</code>语法起初可能看起来有点奇怪，但像这样使用<code>()</code>是一种惯用方式，用于表明我们调用<code>run</code>只是为了其副作用，<strong>它不会返回我们需要的值</strong>。</p>
+<p>现在我们运行这个代码会看到一个警告：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250830222528405.png">
+<img src="./index.assets/image-20250830222528405.png" alt="image-20250830222528405"  />
+</a>
+</div>
+
+</p>
+<p><strong>Rust 告诉我们，我们的代码忽略了 <code>Result</code> 值，而 <code>Result</code> 值可能表明发生了错误</strong>。但我们没有检查是否存在错误，编译器提醒我们，这里或许本应有一些错误处理代码！现在让我们纠正这个问题。</p>
+<p>我们按照<code>Config::build</code>一样的逻辑来处理这个错误：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">args</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">args</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">config_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Config</span>::<span class="n">build</span><span class="p">(</span><span class="o">&amp;</span><span class="n">args</span><span class="p">).</span><span class="n">unwrap_or_else</span><span class="p">(</span><span class="o">|</span><span class="n">err</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Problem parsing arguments: </span><span class="si">{err}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Searching for </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">config_value</span><span class="p">.</span><span class="n">query</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;In file </span><span class="si">{}</span><span class="s">&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">config_value</span><span class="p">.</span><span class="n">file_path</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">run</span><span class="p">(</span><span class="n">config_value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Application error:</span><span class="si">{e}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样，如果<code>run</code>函数返回的是一个错误值，将会和<code>if let</code>匹配，打印相关信息之后退出程序；如果是<code>Ok</code>则无事发生。这里使用<code>if let</code>而不是使用闭包是因为，<strong>这里的<code>Ok</code>包含的值是一个单元值，并没有任何意义，我们不需要使用他</strong>。在这两种情况下，<code>if let</code>和<code>unwrap_or_else</code>函数的主体是相同的：我们打印错误并退出。</p>
+<hr>
+<h4 id="将代码放到库中">将代码放到库中
+</h4><p>目前为止我们的<code>minigrep</code>初具雏形。但是所有的代码都放到了<em>src/main.rs</em>中，现在我们将部分代码放到<em>src/lib.rs</em>中，这样方便我们测试。</p>
+<p>让我们在<em>src/lib.rs</em>中定义一个搜索文本的代码，这将使我们（或任何使用我们的<code>minigrep</code>库的人）能够从比我们的<code>minigrep</code>二进制文件更多的场景中调用搜索函数。首先，让我们如代码下所示，在<em>src/lib.rs</em>中定义<code>search</code>函数签名，其函数体调用<code>unimplemented!</code>宏，表示当前函数没有实现。我们将在填充实现时更详细地解释该签名：</p>
+<p>Filename: src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">search</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">query</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">contents</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">unimplemented!</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们在函数定义上使用了<code>pub</code>关键字，将<code>search</code>指定为我们库 crate 的公共 API 的一部分。现在我们有了一个库 crate，可以从二进制 crate 中使用它，也可以对其进行测试！</p>
+<p>现在我们需要将<em>src/lib.rs</em>中定义的代码引入到<em>src/main.rs</em>中二进制 crate 的作用域内并调用它：</p>
+<p>Filename: src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">error</span>::<span class="n">Error</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="p">{</span><span class="n">env</span><span class="p">,</span><span class="w"> </span><span class="n">fs</span><span class="p">,</span><span class="w"> </span><span class="n">process</span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">minigrep</span>::<span class="n">search</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">args</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">args</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">config_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Config</span>::<span class="n">build</span><span class="p">(</span><span class="o">&amp;</span><span class="n">args</span><span class="p">).</span><span class="n">unwrap_or_else</span><span class="p">(</span><span class="o">|</span><span class="n">err</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Problem parsing arguments: </span><span class="si">{err}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">run</span><span class="p">(</span><span class="n">config_value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Application error:</span><span class="si">{e}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">run</span><span class="p">(</span><span class="n">config</span>: <span class="nc">Config</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">Error</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">contents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fs</span>::<span class="n">read_to_string</span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="n">file_path</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">//将文件中搜索到的关键字打印出来
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">search</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">.</span><span class="n">query</span><span class="p">,</span><span class="o">&amp;</span><span class="n">contents</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;</span><span class="si">{line}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">struct</span> <span class="nc">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">query</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">file_path</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="w"> </span><span class="n">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">build</span><span class="p">(</span><span class="n">args</span>: <span class="kp">&amp;</span><span class="p">[</span><span class="nb">String</span><span class="p">])</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="n">Config</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nb">&#39;static</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="s">&#34;not enough arguments&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">query</span>: <span class="nc">args</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">clone</span><span class="p">(),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">file_path</span>: <span class="nc">args</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">clone</span><span class="p">(),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们添加了一行<code>use minigrep::search</code>，<strong>将库 crate 中的<code>search</code>函数引入到二进制 crate 的作用域中</strong>。然后，在<code>run</code>函数里，我们不再打印文件内容，而是调用<code>search</code>函数，<strong>并将<code>config.query</code>的值和<code>contents</code>的引用作为参数传入</strong>。接着，<code>run</code>会使用一个<code>for</code>循环来打印从<code>search</code>返回的与查询匹配的每一行。此时，也应该移除<code>main</code>函数中用于显示查询内容和文件路径的<code>println!</code>调用，这样我们的程序就只会打印搜索结果（如果没有发生错误的话）。</p>
+<p>**请注意，搜索功能会在进行任何打印操作之前，将所有结果收集到一个向量中。**在搜索大型文件时，这种实现方式可能会导致结果显示缓慢，因为结果不会在找到时立即打印出来；我们将在第13章讨论一种使用迭代器来解决这个问题的可能方法。</p>
+<p>现在处理错误变得容易多了，而且我们让代码更模块化了。从现在开始，我们几乎所有的工作都将在<em>src/lib.rs</em>中完成。让我们利用这种新发现的模块化特性来做一件事，这件事在旧代码中很难实现，但在新代码中却很容易：<strong>我们要编写一些测试</strong>！</p>
+<hr>
+<h2 id="124-tddtest-driven-development-测试驱动">12.4 TDD（<em>Test-Driven Development</em> 测试驱动）
+</h2><p>既然我们已经将搜索逻辑放在了<em>src/lib.rs</em>中，与<code>main</code>函数分离，那么为代码的核心功能编写测试就容易多了。<strong>我们可以直接用各种参数调用函数并检查返回值，而不必从命令行调用我们的二进制文件</strong>。</p>
+<p>在本节中，我们将使用测试驱动开发（TDD）流程，通过以下步骤向<code>minigrep</code>程序添加搜索逻辑：</p>
+<ol>
+<li><strong>编写一个会失败的测试，然后运行它，以确保它是因为你预期的原因而失败</strong>。</li>
+<li><strong>编写或修改足够的代码，使新测试通过</strong>。</li>
+<li><strong>重构你刚刚添加或修改的代码，并确保测试继续通过</strong>。</li>
+<li><strong>从步骤1开始重复</strong>。</li>
+</ol>
+<p>虽然测试驱动开发只是众多编写软件的方法之一，<strong>但它有助于推动代码设计</strong>。在编写能让测试通过的代码之前先编写测试，有助于在整个过程中保持较高的测试覆盖率。</p>
+<p>我们将试运行这一功能的实现，该功能会实际在文件内容中搜索查询字符串，并生成与查询匹配的行列表。我们会将此功能添加到一个名为<code>search</code>的函数中。</p>
+<hr>
+<h3 id="1241-编写一个错误的测试">12.4.1 编写一个错误的测试
+</h3><p>在<em>src/lib.rs</em>中，我们将添加一个<code>tests</code>模块和一个测试函数，就像我们在第11章中所做的那样。测试函数指定了我们希望<code>search</code>函数具备的行为：它将接收一个查询和要搜索的文本，并仅返回文本中包含该查询的行：</p>
+<p>此测试用于搜索字符串<code>&quot;duct&quot;</code>。我们要搜索的文本有三行，其中只有一行包含<code>&quot;duct&quot;</code>（注意，<strong>开头双引号后的反斜杠告诉Rust不要在该字符串字面量的内容开头添加换行符</strong>）。我们断言，<code>search</code>函数返回的值只包含我们预期的那一行。</p>
+<p>但是由于我们当前的<code>search</code>没有实现，使用的是<code>unimplemented!</code>作为占位符，所以程序会panic。为了避免这个问题，我们让我们的函数返回一个空的向量：</p>
+<p>Filename: src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">search</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">query</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">contents</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">vec!</span><span class="p">[]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>现在我们来讨论为什么需要在<code>search</code>的签名中定义一个显式生命周期<code>'a</code>，<strong>并将该生命周期用于<code>contents</code>参数和返回值</strong>。生命周期<strong>参数指定哪个参数的生命周期与返回值的生命周期相关联</strong>。在这种情况下，<strong>我们表明返回的向量应该包含引用参数<code>contents</code>（而非参数<code>query</code>）切片的字符串切片</strong>。</p>
+<p><strong>换句话说，我们告诉Rust，<code>search</code>函数返回的数据的生命周期与通过<code>contents</code>参数传入<code>search</code>函数的数据的生命周期一样长</strong>。这一点很重要！切片所引用的<em>by</em>数据必须有效，引用才能有效；如果编译器认为我们是在对<code>query</code>而不是<code>contents</code>进行字符串切片，那么它的安全性检查就会出错。</p>
+<p>如果我们不使用<code>'a</code>，我们编译会发现这样：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250831011836554.png">
+<img src="./index.assets/image-20250831011836554.png" alt="image-20250831011836554"  />
+</a>
+</div>
+
+</p>
+<p><strong>这是由于编译器不知道两个入参哪个会被输出，我们需要显式告诉编译器</strong>。请注意，帮助文本建议为所有参数和输出类型指定相同的生命周期参数，这是不正确的！因为<code>contents</code>是包含我们所有文本的参数，<strong>而我们想要返回该文本中匹配的部分，所以我们知道<code>contents</code>是唯一应该使用生命周期语法与返回值相关联的参数</strong>。</p>
+<hr>
+<h3 id="1242-编写一个可以通过的测试">12.4.2 编写一个可以通过的测试
+</h3><p>目前，我们的测试失败了，因为我们总是返回一个空向量。要解决这个问题并实现<code>search</code>，我们的程序需要遵循以下步骤：</p>
+<ol>
+<li><strong>遍历内容中的每一行。</strong></li>
+<li><strong>检查该行是否包含我们的查询字符串。</strong></li>
+<li><strong>如果是这样，就把它添加到我们要返回的值列表中。</strong></li>
+<li><strong>如果没有，就什么也不做。</strong></li>
+<li><strong>返回匹配的结果列表。</strong></li>
+</ol>
+<p>接下来就按照这个步骤。</p>
+<hr>
+<h4 id="遍历每一行">遍历每一行
+</h4><p><strong>Rust有一个方法就是一行一行的遍历字符串，一般都叫做<code>lines</code></strong>。就像下面这样：</p>
+<p>Filename src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">search</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">query</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">contents</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">lines</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">contents</span><span class="p">.</span><span class="n">lines</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">// sth
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>lines</code>方法会返回一个迭代器。对于迭代器，我们13章会详细讲，<strong>现在只需要知道我们可以通过<code>for</code>来遍历这个迭代器</strong>。</p>
+<hr>
+<h4 id="逐行寻找我们要查询的字符串">逐行寻找我们要查询的字符串
+</h4><p>Rust中有一个已经实现了检查字符串是否包含的方法<code>contains</code>，所以我们可以像下面这样续写：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">search</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">query</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">contents</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">lines</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">contents</span><span class="p">.</span><span class="n">lines</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">lines</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">query</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// sth
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样我们就可以简单判断一句话中是否包含我们要查询的字符串。但是现在的函数依然不能通过编译。</p>
+<hr>
+<h4 id="存储匹配的行">存储匹配的行
+</h4><p>要完成这个函数，我们需要一种方法来存储我们想要返回的匹配行。为此，我们可以在<code>for</code>循环之前创建一个可变向量，并调用<code>push</code>方法将<code>line</code>存储到该向量中。在<code>for</code>循环之后，我们返回这个向量：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">search</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">query</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">contents</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Vec</span>::<span class="n">new</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">lines</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">contents</span><span class="p">.</span><span class="n">lines</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">lines</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">query</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">results</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">lines</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">results</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>现在，<code>search</code>功能应该只返回包含<code>query</code>的行，这样我们的测试应该就能通过了：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250831013650836.png">
+<img src="./index.assets/image-20250831013650836.png" alt="image-20250831013650836"  />
+</a>
+</div>
+
+</p>
+<p>现在我们可以考虑一下重构<code>search</code>函数，同时保持原有的功能，确保其可以通过测试。十三章中我们会利用迭代器的一些特性来重构这个函数。</p>
+<p>现在整个程序应该可以运行了！让我们来试一下，首先用一个应该能从<em>poem.txt</em>的诗中返回恰好一行包含“楼”字的行：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="cp">$</span><span class="w"> </span><span class="n">cargo</span><span class="w"> </span><span class="n">run</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="err">楼</span><span class="w"> </span><span class="n">poem</span><span class="p">.</span><span class="n">txt</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>编译如下：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250831014133178.png">
+<img src="./index.assets/image-20250831014133178.png" alt="image-20250831014133178"  />
+</a>
+</div>
+
+</p>
+<p>可以试试和多行匹配的字比如“风景”：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250831014241838.png">
+<img src="./index.assets/image-20250831014241838.png" alt="image-20250831014241838"  />
+</a>
+</div>
+
+</p>
+<p>现在再试试我们输入一个不存在的字，比如“Rust”，应该是不会返回任何值的：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250831014331386.png">
+<img src="./index.assets/image-20250831014331386.png" alt="image-20250831014331386"  />
+</a>
+</div>
+
+</p>
+<p>为了完善这个项目，我们将简要演示如何使用环境变量以及如何打印到标准错误流，这两者在编写命令行程序时都很有用。</p>
 <hr>
 
 </section>
@@ -12524,13 +13081,13 @@
         
         
         
-        共发表 9 篇文章 · 总计 126.92 k 字
+        共发表 9 篇文章 · 总计 132.03 k 字
     </div>
     <div>
         
         
 
-        最近一次更新时间：<span id="last-commit-time">2025-08-30 21:45</span>
+        最近一次更新时间：<span id="last-commit-time">2025-08-31 01:45</span>
     </div>
 </section>
 
