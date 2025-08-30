@@ -7897,3 +7897,227 @@ fn main() {
 
 ---
 
+## 12.3 使用模块化重构、错误处理
+
+为了改进我们的程序，我们在这一节将要修复四个问题：第一个问题，我们当前所有的逻辑都放在`main`函数中；在代码量特别小的时候不成问题，但是代码量过多就不易读。**为了解决这个问题，我们将不同功能的部分分成不同模块来实现**。
+
+这个问题还与第二个问题相关：尽管`query`和`file_path`是我们程序的配置变量，但像`contents`这样的变量是用于执行程序逻辑的。**`main`函数变得越长，我们需要纳入作用域的变量就越多；作用域中的变量越多，就越难记住每个变量的用途**。最好将配置变量分组到一个结构中，以明确它们的用途。
+
+第三个问题是关于错误处理，我们当前只是简单粗暴的使用`expect`在无法打开文件的时候终止程序然后在终端中打印一条消息。但是打不开文件的原因有很多种，比如说可能是因为文件不存在、没有权限打开等，**但是不同错误应该分开处理**，所以我们还需要强化我们的错误处理部分。	
+
+第四，我们使用`expect`来处理错误，**如果用户运行我们的程序时没有指定足够的参数，他们会收到Rust给出的`index out of bounds`错误**，但这个错误并没有清晰地解释问题所在。最好将所有错误处理代码放在一个地方，这样如果将来需要修改错误处理逻辑，维护人员只需查看这一处代码即可。将所有错误处理代码集中在一处还能确保我们输出的信息对最终用户来说是有意义的。
+
+接下来就着手于解决这些问题。
+
+---
+
+### 12.3.1 如何模块化
+
+我们按照下列的步骤把项目模块化：
+
+- **将我们的项目分为*main.rs*和*lib.rs*，将所有的逻辑层都放到*lib.rs*中。**
+- **如果我们的命令行解析的逻辑足够简单，那么就可以留在*main.rs*中。**
+- **当命令行解析逻辑开始变得复杂时，将其从`main`函数中提取到其他函数或类型中。**
+
+模块化之后*main.rs*中的主要职责应该限于以下内容：
+
+- **调用命令行解析的函数，将命令行的参数传入。**
+- **设置其他功能的配置。**
+- **调用一个来自*lib.rs*的`run`函数。**
+- **如果`run`返回一个错误结果，处理`run`函数的错误。**
+
+这种模式的核心是关注点分离：***main.rs* 负责程序的运行，*lib.rs* 负责处理当前任务的所有逻辑**。由于无法直接测试 `main` 函数，这种结构通过将程序的所有逻辑从 `main` 函数中移出，使你能够对其进行测试。留在 `main` 函数中的代码会足够简短，通过阅读就能验证其正确性。让我们按照这个流程重新编写程序。
+
+---
+
+### 12.3.2 分离命令行解析函数
+
+我们将通过把命令行解析的功能单独封装成一个函数，然后在主函数中接收命令行的参数，再调用它即可：
+
+Filename: src/main.rs
+
+```Rust
+use std::{env, fs};
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let (query, file_path) = parse_config(&args);
+
+    let contents = fs::read_to_string(file_path).expect("Should have been able to read the file");
+
+    println!("With text:\n{contents}");
+}
+
+fn parse_config(args: &[String]) -> (&str, &str) {
+    let query = &args[1];
+    let file_path = &args[2];
+
+    (query, file_path)
+}
+
+```
+
+我们仍然在将命令行参数收集到一个向量中，但不再在`main`函数内将索引1处的参数值赋给变量`query`、将索引2处的参数值赋给变量`file_path`，而是将整个向量传递给`parse_config`函数。随后，`parse_config`函数负责处理确定哪个参数对应哪个变量的逻辑，并将值传回`main`。我们仍会在`main`中创建`query`和`file_path`变量，但`main`不再负责确定命令行参数与变量之间的对应关系。
+
+对于我们这个小程序来说，这种修改可能显得有些多余，但我们正在以小而渐进的步骤进行重构。**完成这一更改后，再次运行程序，验证参数解析是否仍然有效**。经常检查进展情况是个好办法，这样在出现问题时有助于找出原因。
+
+---
+
+### 12.3.3 配置值分组
+
+我们可以再迈出一小步，进一步改进`parse_config`函数。目前，我们返回的是一个元组，**但随后又立即将这个元组拆分成各个部分**。这表明我们可能还没有找到合适的抽象方式。
+
+另一个表明还有改进空间的指标是`config`部分，即`parse_config`，**这意味着我们返回的两个值是相关的，并且都是一个配置值的组成部分**。目前，除了将这两个值组合成一个元组外，我们在数据结构中并没有传达这一含义；相反，**我们会将这两个值放入一个结构体中，并为每个结构体字段赋予一个有意义的名称**。这样做将使未来维护这段代码的人更容易理解不同值之间的关系以及它们的用途。
+
+Filename: src/main.rs
+
+```Rust
+use std::{env, fs};
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let config_value = parse_config(&args);
+
+    println!("Searching for {}", config_value.query);
+    println!("In file {}", config_value.file_path);
+
+    let contents =
+        fs::read_to_string(config_value.file_path).expect("Should have been able to read the file");
+}
+
+struct Config {
+    query: String,
+    file_path: String,
+}
+
+fn parse_config(args: &[String]) -> Config {
+    Config {
+        query: args[1].clone(),
+        file_path: args[2].clone(),
+    }
+}
+
+```
+
+我们添加了一个名为`Config`的结构体，它定义了名为`query`和`file_path`的字段。`parse_config`的签名现在表明它返回一个`Config`值**。在`parse_config`的主体中，我们曾经返回引用`args`中`String`值的字符串切片，现在我们定义`Config`来包含有所有权的`String`值**。`main`中的`args`变量是参数值的所有者，**它只允许`parse_config`函数借用这些值**，这意味着如果`Config`试图获取`args`中值的所有权，就会违反Rust的借用规则。
+
+我们有多种方法可以管理`String`数据；**最简单但效率稍低的方法是对这些值调用`clone`方法**。这将为`Config`实例创建数据的完整副本，使其拥有该数据，这比存储字符串数据的引用要花费更多时间和内存。**不过，克隆数据也让我们的代码变得非常简单，因为我们不必管理引用的生命周期**；在这种情况下，牺牲一点性能来换取简洁性是一个值得的权衡。
+
+> [!NOTE]
+>
+> 许多Rust开发者倾向于避免使用`clone`来解决所有权问题，**因为它存在运行时成本**。我们将在第十三章中学习更高效的方法，但就目前而言，复制几个字符串来继续推进是没问题的，因为你只会进行这些复制一次，而且你的文件路径和查询字符串都非常短。拥有一个能正常运行但效率稍低的程序，比在第一次尝试时就过度优化代码要好。随着你对Rust的经验越来越丰富，从最高效的解决方案入手会变得更容易，但现在，调用`clone`是完全可以接受的。
+
+我们已经更新了`main`，使其将`parse_config`返回的`Config`实例存入一个名为`config_Value`的变量中，并且我们更新了之前使用单独的`query`和`file_path`变量的代码，**现在该代码使用的是`Config`结构体上的字段**。
+
+现在我们的代码更清晰地传达了`query`和`file_path`是相关的，并且它们的用途是配置程序的运行方式。任何使用这些值的代码都知道要在`config`实例中按其用途命名的字段中找到它们。
+
+----
+
+### 12.3.4 为`Config`结构体创建一个构造函数
+
+到目前为止，我们已经从`main`中提取出了负责解析命令行参数的逻辑，并将其放入了`parse_config`函数中。**这样做有助于我们发现`query`和`file_path`的值是相关联的**，而这种关联应该在我们的代码中体现出来。随后，我们添加了一个`Config`结构体，以明确`query`和`file_path`的相关用途，**并能够从`parse_config`函数中以结构体字段名的形式返回这些值的名称**。
+
+既然`parse_config`函数的作用是创建一个`Config`实例，**我们可以将`parse_config`从一个普通函数改为一个名为`new`的函数，并将其与`Config`结构体相关联**。这样的修改会让代码更符合惯例。我们可以通过调用`String::new`来创建标准库中类型的实例，比如`String`。同样，通过将`parse_config`改为与`Config`相关联的`new`函数，我们将能够通过调用`Config::new`来创建`Config`的实例：
+
+```Rust
+use std::{env, fs};
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let config_value = Config::new(&args);
+
+    println!("Searching for {}", config_value.query);
+    println!("In file {}", config_value.file_path);
+
+    let contents =
+        fs::read_to_string(config_value.file_path).expect("Should have been able to read the file");
+}
+
+struct Config {
+    query: String,
+    file_path: String,
+}
+
+impl Config {
+    fn new(args: &[String]) -> Config {
+        Config {
+            query: args[1].clone(),
+            file_path: args[2].clone(),
+        }
+    }
+}
+```
+
+我们已经更新了`main`函数，将其中对`parse_config`的调用替换为对`Config::new`的调用。我们将`parse_config`的名称改为new</b4，并将其移入一个`impl`块中，**这样就把`new`函数与`Config`关联起来了**。请尝试再次编译这段代码，确保它能正常运行。
+
+---
+
+### 12.3.5 错误处理
+
+现在我们来修复错误处理。回想一下，如果尝试访问`args`向量中索引1或索引2处的值，**而该向量包含的元素少于3个，程序就会崩溃**。试着不带任何参数运行程序，结果会是这样的：
+
+![image-20250830144851883](./index.assets/image-20250830144851883.png)
+
+“`index out of bounds: the len is 1 but the index is 1`”这条信息是针对程序员的错误提示。它无法帮助我们的终端用户理解他们应该采取什么操作。我们现在就来解决这个问题。
+
+---
+
+#### 改进错误消息
+
+我们可以优化我们的`Config`的`new`方法，让其有一个判断向量参数个数的方法：
+
+```Rust
+impl Config {
+    fn new(args: &[String]) -> Config {
+        // 参数小于3个的时候直接报错说明
+        if args.len() < 3 {
+            panic!("not enough arguments");
+        }
+
+        Config {
+            query: args[1].clone(),
+            file_path: args[2].clone(),
+        }
+    }
+}
+
+```
+
+现在我们再试试不带参数运行程序：
+
+![image-20250830145758147](./index.assets/image-20250830145758147.png)
+
+现在这个输出就明确了，明确的告知了我们当前的输入参数小于了3个。但是我们在第九章也提到过一个新的方法，不是简单的报错而是返回一个`Result`，处理错误的逻辑交给调用者。
+
+---
+
+#### 返回一个`Result`而不是简单的`panic!`：
+
+我们可以返回一个`Result`值，**该值在成功的情况下将包含一个`Config`实例，并在出错的情况下描述问题**。我们还将把函数名从`new`改为`build`，因为许多程序员认为`new`函数永远不会失败。当`Config::build`与`main`通信时，我们可以使用`Result`类型来表示出现了问题。然后，我们可以修改`main`，将`Err`变体转换为对用户来说更实用的错误，而不会像调用`panic!`那样出现关于`thread 'main'`和`RUST_BACKTRACE`的附加文本。
+
+我们按照下面的方式修改代码：
+
+```Rust
+impl Config {
+    fn build(args: &[String]) -> Result<Config,&'static str> {
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+
+        let result = Config {
+            query: args[1].clone(),
+            file_path: args[2].clone(),
+        };
+        Ok(result)
+    }
+}
+```
+
+我们的`build`函数返回一个`Result`，**在成功的情况下包含一个`Config`实例，在错误的情况下包含一个字符串字面量**。我们的错误值将始终是具有`'static`生命周期的字符串字面量。
+
+我们对函数体做了两处修改：当用户没有传递足够的参数时，**不再调用`panic!`，而是返回一个`Err`值**；同时，我们将`Config`返回值包装在了`Ok`中。这些修改使该函数符合其新的类型签名。	
+
+从`Config::build`返回`Err`值，能让`main`函数处理从`build`函数返回的`Result`值，并在出现错误时更干净地退出进程。
+
+---
+
