@@ -10,7 +10,7 @@
 <meta property='og:description' content="根据官网学习Rust时做的笔记">
 <meta property='og:url' content='https://example.com/p/rust-self-teach/'>
 <meta property='og:site_name' content='N1ntyNine99'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-09-01T21:36:15&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-09-02T21:20:34&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
 <meta name="twitter:title" content="Rust自学笔记">
 <meta name="twitter:description" content="根据官网学习Rust时做的笔记"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://example.com/p/rust-self-teach/rust-2.jpg' />
@@ -657,6 +657,57 @@
         <li><a href="#1314-将捕获到的值移出闭包以及fn-trait">13.1.4 将捕获到的值移出闭包以及<code>Fn</code> trait</a></li>
       </ol>
     </li>
+    <li><a href="#132-迭代器遍历一系列数据">13.2 迭代器——遍历一系列数据</a>
+      <ol>
+        <li><a href="#1321-iterator-trait和next方法">13.2.1 <code>Iterator Trait</code>和<code>next</code>方法</a></li>
+        <li><a href="#1322-消耗迭代器的方法">13.2.2 消耗迭代器的方法</a></li>
+        <li><a href="#1323-其他产生迭代器的方法">13.2.3 其他产生迭代器的方法</a></li>
+        <li><a href="#1324-使用捕获环境的闭包">13.2.4 使用捕获环境的闭包</a></li>
+      </ol>
+    </li>
+    <li><a href="#133-改进我们的io程序">13.3 改进我们的I/O程序</a>
+      <ol>
+        <li><a href="#1331-移除clone使用迭代器">13.3.1 移除<code>clone</code>，使用迭代器</a>
+          <ol>
+            <li><a href="#直接返回一个迭代器">直接返回一个迭代器</a></li>
+            <li><a href="#使用迭代器而不是索引">使用迭代器而不是索引</a></li>
+          </ol>
+        </li>
+        <li><a href="#1332-使用迭代适配器来让代码更易读">13.3.2 使用迭代适配器来让代码更易读</a></li>
+        <li><a href="#1333-在迭代器和循环中抉择">13.3.3 在迭代器和循环中抉择</a></li>
+      </ol>
+    </li>
+    <li><a href="#134-性能比较-迭代器-vs-循环">13.4 性能比较： 迭代器 vs. 循环</a></li>
+    <li><a href="#134-总结">13.4 总结</a></li>
+  </ol>
+
+  <ol>
+    <li><a href="#141-自定义构建配置">14.1 自定义构建配置</a></li>
+    <li><a href="#142-在crateio上发布自己的crate">14.2 在Crate.io上发布自己的crate</a>
+      <ol>
+        <li><a href="#1421-攥写有用的文档注释">14.2.1 攥写有用的文档注释</a></li>
+        <li><a href="#1421-常用的部分">14.2.1 常用的部分</a></li>
+        <li><a href="#1422-作为测试的文档">14.2.2 作为测试的文档</a></li>
+        <li><a href="#1423-为包含的项目添加注释">14.2.3 为包含的项目添加注释</a></li>
+        <li><a href="#1424-使用pub-use导出公用的api">14.2.4 使用<code>pub use</code>导出公用的API</a></li>
+        <li><a href="#1425-创建一个cratesio账号">14.2.5 创建一个Crates.io账号</a></li>
+        <li><a href="#1426-为新的crate添加元数据">14.2.6 为新的crate添加元数据</a></li>
+        <li><a href="#1427-发布到cratesio">14.2.7 发布到Crates.io</a></li>
+        <li><a href="#1428-为已存在的crate发布新版本">14.2.8 为已存在的crate发布新版本</a></li>
+        <li><a href="#1429-弃用版本">14.2.9 弃用版本</a></li>
+      </ol>
+    </li>
+    <li><a href="#143-cargo-工作区">14.3 Cargo 工作区</a>
+      <ol>
+        <li><a href="#1431-创建一个工作区">14.3.1 创建一个工作区</a></li>
+        <li><a href="#1432-创建第二个package">14.3.2 创建第二个Package</a></li>
+        <li><a href="#1433-在工作区中依赖外部包">14.3.3 在工作区中依赖外部包</a></li>
+        <li><a href="#1434-在工作区创建一个测试">14.3.4 在工作区创建一个测试</a></li>
+      </ol>
+    </li>
+    <li><a href="#144-使用cargo-install安装二进制包">14.4 使用<code>cargo install</code>安装二进制包</a></li>
+    <li><a href="#144-使用自定义命令拓展cargo">14.4 使用自定义命令拓展Cargo</a></li>
+    <li><a href="#145-总结">14.5 总结</a></li>
   </ol>
 </nav>
         </div>
@@ -747,7 +798,7 @@
 
 
             <time class="article-time--reading">
-                阅读时长: 253 分钟
+                阅读时长: 288 分钟
             </time>
         </div>
         
@@ -759,8 +810,8 @@
 <path d="M15 6L18 9" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M13 20H21" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-            <time class="article-time--updated" datetime=" 2025-09-01T21:36:15.000Z">
-                2025年9月1日
+            <time class="article-time--updated" datetime=" 2025-09-02T21:20:34.000Z">
+                2025年9月2日
             </time>
         </div>
         
@@ -13107,7 +13158,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p>之后我们在 <code>run</code> 函数中只需要判断 <code>igonre_case</code> 这个字段的值就可以判断调用哪个搜索函数了！我们的 <code>run</code> 函数现在应该是这样的：</p>
+</div><p>之后我们在 <code>run</code> 函数中只需要判断 <code>ignore_case</code> 这个字段的值就可以判断调用哪个搜索函数了！我们的 <code>run</code> 函数现在应该是这样的：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -13131,8 +13182,8 @@
 <pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">run</span><span class="p">(</span><span class="n">config</span>: <span class="nc">Config</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">Error</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">contents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fs</span>::<span class="n">read_to_string</span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="n">file_path</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// 根据 igonre_case 字段来调用不同的搜索函数
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">igonre_case</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// 根据 ignore_case 字段来调用不同的搜索函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="n">ignore_case</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">minigrep</span>::<span class="n">search_case_insensitive</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">.</span><span class="n">query</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">contents</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">minigrep</span>::<span class="n">search</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">.</span><span class="n">query</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">contents</span><span class="p">)</span><span class="w">
@@ -13146,7 +13197,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span></code></pre></td></tr></table>
 </div>
-</div><p>现在我们还要去修改 <code>Config</code> 结构体的构建函数，我们需要根据环境变量的不同来为 <code>Config</code> 的 <code>igonre_case</code> 赋值。读取环境变量的一些方法都在标准库的 <code>env</code> 模块中，我们已经引入到了我们的作用域中。<strong>我们调用 <code>var</code> 函数来查看某个环境变量有没有被设置</strong>，在这里我们给这个变量命名为 <code>IGNORE_CASE</code>：</p>
+</div><p>现在我们还要去修改 <code>Config</code> 结构体的构建函数，我们需要根据环境变量的不同来为 <code>Config</code> 的 <code>ignore_case</code> 赋值。读取环境变量的一些方法都在标准库的 <code>env</code> 模块中，我们已经引入到了我们的作用域中。<strong>我们调用 <code>var</code> 函数来查看某个环境变量有没有被设置</strong>，在这里我们给这个变量命名为 <code>IGNORE_CASE</code>：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -13176,7 +13227,7 @@
 <pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">query</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">file_path</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">igonre_case</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">ignore_case</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="w"> </span><span class="n">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -13190,7 +13241,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">query</span>: <span class="nc">args</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">clone</span><span class="p">(),</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">file_path</span>: <span class="nc">args</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">clone</span><span class="p">(),</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">igonre_case</span>: <span class="nc">ignore_case</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">ignore_case</span>: <span class="nc">ignore_case</span><span class="p">,</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
@@ -13234,7 +13285,7 @@
 </div>
 
 </p>
-<p>现在在该命令之前加上 <code>IGONRE_CASE=1</code>，就可以设置该环境变量了：</p>
+<p>现在在该命令之前加上 <code>IGNORE_CASE=1</code>，就可以设置该环境变量了：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -13901,6 +13952,1611 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>在定义或使用函数，或者使用闭包的类型时，<code>Fn</code>特征非常重要</strong>。下一节中，我们将讨论迭代器。许多迭代器方法会接受闭包作为参数，所以在我们继续学习时，请记住这些闭包的细节！</p>
+<hr>
+<h2 id="132-迭代器遍历一系列数据">13.2 迭代器——遍历一系列数据
+</h2><p>迭代器就是用于快速遍历一个集合。如果我们要对一系列的数据中的每一个都做相同的操作，那么使用迭代器就可以避免很多重复的代码。</p>
+<p><strong>Rust中的迭代器是懒惰的，意味着只有在你调用方法来消耗迭代器的时候，迭代器才会一步一步往下遍历</strong>。比如下面这个代码，我们对向量<code>v1</code>创建了一个迭代器，但是不使用任何方法消耗这个迭代器，那么他本身并没有任何含义：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v1_iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v1</span><span class="p">.</span><span class="n">iter</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个迭代器被存储在<code>v1_iter</code>变量中，只要我们创建了一个迭代器，我们可以用很多种方法去使用它。在之前讲循环的时候，我们使用了<code>for</code>循环来遍历一系列数据。<strong>其实这一过程的的底层中，隐式的创建了一个迭代器，然后逐步消耗他</strong>，只是我们之前并没有详细说明其工作原理。</p>
+<p>比如下面这个例子，我们将迭代器的创建和迭代分开来，迭代我们使用的是<code>for</code>循环。在<code>for</code>循环内部，会把每一个迭代的对象打印出来：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v1_iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v1</span><span class="p">.</span><span class="n">iter</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">v1_iter</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Got: </span><span class="si">{val}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在那些标准库未提供迭代器的语言中，你可能需要通过以下方式实现相同的功能：将一个变量初始化为索引0，使用该变量对向量进行索引以获取值，然后在循环中递增该变量的值，直到它达到向量中的项目总数。迭代器会为你处理所有这些逻辑，减少你可能会搞砸的重复代码。迭代器让你拥有更大的灵活性，可以将相同的逻辑用于多种不同类型的序列，而不仅仅是像向量这样可以索引的数据结构。让我们来看看迭代器是如何做到这一点的。</p>
+<hr>
+<h3 id="1321-iterator-trait和next方法">13.2.1 <code>Iterator Trait</code>和<code>next</code>方法
+</h3><p>所有的迭代器都实现了一个叫做<code>Iterator</code>的trait。它是由标准库定义的，其定义看上去是这样的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="nb">Iterator</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">type</span> <span class="nc">Item</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">next</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Option</span><span class="o">&lt;</span><span class="bp">Self</span>::<span class="n">Item</span><span class="o">&gt;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>这里有新语法叫做<code>type Item</code>和<code>Self::Item</code>，这是用于定义一个该trait的一个关联类型（<em>associated type</em>）</strong>。对于关联类型，我们将在20章具体讨论，现在我们只知道，这个<code>Iterator</code> trait要求我们定义一个<code>Item</code>类型，该类型会被用于后面的<code>next</code>方法的返回类型中。<strong>换句话说，<code>Item</code> 类型将是从迭代器返回的类型</strong>。</p>
+<p><strong><code>Iterator</code>  trait只要求实现一个<code>next</code>方法，该方法会返回迭代器中的下一个值，这个值会被<code>Some</code>包裹，如果迭代器遍历完了将会返回<code>None</code></strong>。</p>
+<p>我们也可以直接对一个迭代器使用<code>next</code>方法来获得下一个值，比如可以查看下面这个测试：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="cp">#[cfg(test)]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">mod</span> <span class="nn">tests</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="cp">#[test]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">iterator_demonstration</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">v1_iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v1</span><span class="p">.</span><span class="n">iter</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">v1_iter</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="o">&amp;</span><span class="mi">1</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">v1_iter</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="o">&amp;</span><span class="mi">2</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">v1_iter</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="o">&amp;</span><span class="mi">3</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">v1_iter</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">None</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>测试结果如下：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250902164337114.png">
+<img src="./index.assets/image-20250902164337114.png" alt="image-20250902164337114"  />
+</a>
+</div>
+
+</p>
+<p>需要注意的是，我们需要让<code>v1_iter</code>是可变的：<strong>在迭代器上调用<code>next</code>方法会改变迭代器用于跟踪自身在序列中位置的内部状态。换句话说，这段代码会<em>消耗</em>（或者说用完）迭代器</strong>。每次调用<code>next</code>都会从迭代器中取出一个元素。<strong>当我们使用<code>for</code>循环时，不需要让<code>v1_iter</code>是可变的，因为循环会获取<code>v1_iter</code>的所有权，并在后台使其变为可变的</strong>。</p>
+<p>还要注意，<strong>我们通过调用<code>next</code>所获得的值是指向向量中值的不可变引用。<code>iter</code>方法会生成一个基于不可变引用的迭代器</strong>。如果我们想要创建一个<strong>获取<code>v1</code>的所有权并返回自有值的迭代器，可以调用<code>into_iter</code>而非<code>iter</code></strong>。同样地，<strong>如果我们想要遍历可变引用，可以调用<code>iter_mut</code>而非<code>iter</code></strong>。</p>
+<hr>
+<h3 id="1322-消耗迭代器的方法">13.2.2 消耗迭代器的方法
+</h3><p><code>Iterator</code> trait 有许多不同的方法，标准库为这些方法提供了默认实现；你可以在标准库 API 文档中查找 <code>Iterator</code> trait 来了解这些方法。<strong>其中一些方法在其定义中会调用 <code>next</code> 方法，这也是为什么在实现 <code>Iterator</code> trait 时，你需要实现 <code>next</code> 方法</strong>。</p>
+<p>调用<code>next</code>的方法被称为<strong>消费型适配器（<em>consumer adapters</em>）</strong>，因为调用它们会耗尽迭代器。<code>sum</code>方法就是一个例子，它会获取迭代器的所有权，并通过反复调用<code>next</code>来遍历元素，从而耗尽迭代器。在遍历过程中，它会将每个元素加到一个累加的总和中，当迭代完成时返回这个总和：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="cp">#[cfg(test)]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">mod</span> <span class="nn">tests</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="cp">#[test]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">iterator_sum</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">v1_iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v1</span><span class="p">.</span><span class="n">iter</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">total</span>: <span class="kt">i32</span> <span class="o">=</span><span class="w"> </span><span class="n">v1_iter</span><span class="p">.</span><span class="n">sum</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">total</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>在调用<code>sum</code>之后，我们不允许使用<code>v1_iter</code>，因为<code>sum</code>会获取我们调用它所使用的迭代器的所有权</strong>。</p>
+<hr>
+<h3 id="1323-其他产生迭代器的方法">13.2.3 其他产生迭代器的方法
+</h3><p>**迭代器适配器（<em>Iterator adapters</em>）**是在<code>Iterator</code> trait上定义的方法，<strong>它们不会消耗迭代器，相反，它们通过改变原始迭代器的某些方面来生成不同的迭代器。</strong></p>
+<p>下面这个例子展示了一个调用了迭代适配器的一个方法叫做<code>map</code>，<code>map</code>接收一个闭包，之后对迭代器中的每一个对象都调用一次该闭包，<strong>然后会返回一个经过传入的闭包处理过后的一个新的迭代器</strong>，下面这个例子就是把迭代器中的每一个值都加上1，返回的迭代器就是原本的迭代器的所有对象的值都加上1：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">v1</span><span class="p">.</span><span class="n">iter</span><span class="p">().</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250902182312790.png">
+<img src="./index.assets/image-20250902182312790.png" alt="image-20250902182312790"  />
+</a>
+</div>
+
+</p>
+<p>可以看到有一个警告<code>iterators are lazy and do nothing unless consumed</code>，<strong>这很好符合我们之前说的迭代器都是惰性的</strong>。</p>
+<p>为了修复这个问题，<strong>我们可以使用<code>collect</code>方法，它会消耗尽所有的迭代器，然后把该迭代器变成一个集合，不过我们需要显式指定这个集合的数据类型</strong>。比如下面这个代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v2</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">_</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v1</span><span class="p">.</span><span class="n">iter</span><span class="p">().</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">).</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">]);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>因为<code>map</code>会接收一个闭包，<strong>所以我们可以指定想要对每个元素执行的任何操作</strong>。这是一个很好的例子，展示了闭包如何让你在复用<code>Iterator</code> trait提供的迭代行为的同时，自定义某些行为。你可以将多个迭代器适配器调用链接起来，以一种易读的方式执行复杂操作。但由于所有迭代器都是惰性的，<strong>你必须调用其中一个消费型适配器方法，才能从迭代器适配器的调用中获取结果</strong>。</p>
+<hr>
+<h3 id="1324-使用捕获环境的闭包">13.2.4 使用捕获环境的闭包
+</h3><p>许多迭代器适配器将闭包作为参数，<strong>通常我们指定为迭代器适配器参数的闭包是会捕获其环境的闭包</strong>。在这个示例中，我们将使用接受闭包的<code>filter</code>方法。该闭包从迭代器中获取一个元素并返回一个<code>bool</code>值。如果闭包返回<code>true</code>，则该值将被包含在<code>filter</code>生成的迭代中。如果闭包返回<code>false</code>，则该值不会被包含在内。</p>
+<p>我们使用<code>filter</code>接受一个捕获自己环境中的<code>shoe_size</code>的闭包作为入参，让<code>filter</code>作用于一个<code>Shoe</code>结构体的集合。他只会返回一个满足我们的条件的鞋子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="cp">#[derive(PartialEq, Debug)]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">struct</span> <span class="nc">Shoe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">size</span>: <span class="kt">u32</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">style</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">shoes_fit_size</span><span class="p">(</span><span class="n">shoes</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">Shoe</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">size</span>: <span class="kt">u32</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">Shoe</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">shoes</span><span class="p">.</span><span class="n">into_iter</span><span class="p">().</span><span class="n">filter</span><span class="p">(</span><span class="o">|</span><span class="n">s</span><span class="o">|</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">size</span><span class="p">).</span><span class="n">collect</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// 使用 into_iter 来让 shoes 直接变成一个迭代器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="c1">// 这样的迭代器是有所有权的，如果只是 iter 返回的是一个不可变引用的迭代器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="cp">#[cfg(test)]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">mod</span> <span class="nn">tests</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="k">super</span>::<span class="o">*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="cp">#[test]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">filters_by_size</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">shoes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Shoe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">size</span>: <span class="mi">10</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">style</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;sneaker&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">},</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Shoe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">size</span>: <span class="mi">13</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">style</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;sandal&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">},</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Shoe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">size</span>: <span class="mi">10</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">style</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;boot&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">},</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">in_my_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shoes_fit_size</span><span class="p">(</span><span class="n">shoes</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">in_my_size</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="fm">vec!</span><span class="p">[</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">Shoe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">size</span>: <span class="mi">10</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">style</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;sneaker&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">},</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">Shoe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">size</span>: <span class="mi">10</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">style</span>: <span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;boot&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">},</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>函数<code>shoes_fit_size</code>会直接获取所有权，它会返回一个存有匹配我们设定尺码的鞋子的向量。在函数内部，<strong>我们使用了<code>into_iter</code>方法去创建了自有所有权的迭代器，之后使用<code>filter</code>去把迭代器调整成一个只包含让<code>filter</code>入参中的闭包返回为<code>true</code>的新的迭代器</strong>。闭包从环境中捕获<code>shoe_size</code>参数，并将该值与每只鞋的尺寸进行比较，只保留指定尺寸的鞋。最后，调用<code>collect</code>会将经过适配的迭代器返回的值收集到一个向量中，该向量由函数返回。</p>
+<p>测试结果如下：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250902185419860.png">
+<img src="./index.assets/image-20250902185419860.png" alt="image-20250902185419860"  />
+</a>
+</div>
+
+</p>
+<p>测试表明，当我们调用<code>shoes_in_size</code>时，我们只会得到与我们指定的值尺寸相同的鞋子。</p>
+<hr>
+<h2 id="133-改进我们的io程序">13.3 改进我们的I/O程序
+</h2><p>现在我们系统性的学习了闭包和迭代器，我们可以对我们12章写的<code>minigrep</code>做一些优化。来看看如何用所学的新知识来改进我们对<code>Config::build</code>和<code>search</code>的实现吧！</p>
+<hr>
+<h3 id="1331-移除clone使用迭代器">13.3.1 移除<code>clone</code>，使用迭代器
+</h3><p>Filename: src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">query</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">file_path</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">ignore_case</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="w"> </span><span class="n">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">build</span><span class="p">(</span><span class="n">args</span>: <span class="kp">&amp;</span><span class="p">[</span><span class="nb">String</span><span class="p">])</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="n">Config</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nb">&#39;static</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="s">&#34;not enough arguments&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">ignore_case</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">var</span><span class="p">(</span><span class="s">&#34;IGNORE_CASE&#34;</span><span class="p">).</span><span class="n">is_ok</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">query</span>: <span class="nc">args</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">clone</span><span class="p">(),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">file_path</span>: <span class="nc">args</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">clone</span><span class="p">(),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">ignore_case</span>: <span class="nc">ignore_case</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们之前实现<code>Config</code>的构建函数的时候，我们说不必担心低效的<code>clone</code>调用，因为我们会在未来将其移除。好了，现在就是那个时候了。<strong>我们在这里需要<code>clone</code>，因为参数<code>args</code>中有一个包含<code>String</code>元素的切片，但<code>build</code>函数并不拥有<code>args</code></strong>。为了返回一个<code>Config</code>实例的所有权，我们必须从<code>Config</code>的<code>query</code>和<code>file_path</code>字段中克隆值，这样<code>Config</code>实例才能拥有它自己的值。</p>
+<p>有了关于迭代器的新知识，我们可以修改<code>build</code>函数，<strong>使其接收一个迭代器的所有权作为参数</strong>，而不是借用一个切片。我们将使用迭代器的功能，而不是检查切片长度并索引到特定位置的代码。这将使<code>Config::build</code>函数的作用更加清晰，因为迭代器会访问这些值。一旦<code>Config::build</code>获得迭代器的所有权，<strong>并且不再使用会进行借用的索引操作，我们就可以将<code>String</code>值从迭代器中移到<code>Config</code>中，而不必调用<code>clone</code>来进行新的内存分配。</strong></p>
+<hr>
+<h4 id="直接返回一个迭代器">直接返回一个迭代器
+</h4><p>我们的已有的代码的<em>src/main.rs</em>中的主函数应该是这样的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">minigrep</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">error</span>::<span class="n">Error</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="p">{</span><span class="n">env</span><span class="p">,</span><span class="w"> </span><span class="n">fs</span><span class="p">,</span><span class="w"> </span><span class="n">process</span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">args</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">args</span><span class="p">().</span><span class="n">collect</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">config_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Config</span>::<span class="n">build</span><span class="p">(</span><span class="o">&amp;</span><span class="n">args</span><span class="p">).</span><span class="n">unwrap_or_else</span><span class="p">(</span><span class="o">|</span><span class="n">err</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">eprintln!</span><span class="p">(</span><span class="s">&#34;Problem parsing arguments: </span><span class="si">{err}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">run</span><span class="p">(</span><span class="n">config_value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">eprintln!</span><span class="p">(</span><span class="s">&#34;Application error:</span><span class="si">{e}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们会从<code>main</code>函数开始改进，<strong>直到我们修改完成我们的<code>Config::build</code>函数之前，我们的代码都是不可以正常通过编译的</strong>。首先我们修改如下：</p>
+<p>Filename:src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">config_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Config</span>::<span class="n">build</span><span class="p">(</span><span class="n">env</span>::<span class="n">args</span><span class="p">()).</span><span class="n">unwrap_or_else</span><span class="p">(</span><span class="o">|</span><span class="n">err</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">eprintln!</span><span class="p">(</span><span class="s">&#34;Problem parsing arguments:</span><span class="si">{err}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">run</span><span class="p">(</span><span class="n">config_value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">eprintln!</span><span class="p">(</span><span class="s">&#34;Application error:</span><span class="si">{e}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">process</span>::<span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong><code>env::args</code> 函数会返回一个迭代器</strong>！我们没有将迭代器的值收集到向量中，然后再将切片传递给 <code>Config::build</code>，而是直接将从 <code>env::args</code> 返回的迭代器的所有权传递给了 <code>Config::build</code>。</p>
+<p>接下来，我们需要更新<code>Config::build</code>的定义。在你的I/O项目的<em>src/lib.rs</em>文件中，让我们将<code>Config::build</code>的签名修改为如代码所示的样子。<strong>由于我们还需要更新函数体，所以此时它仍然无法编译</strong>：</p>
+<p>Filename:src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">impl</span><span class="w"> </span><span class="n">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">build</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">args</span>: <span class="nc">impl</span><span class="w"> </span><span class="nb">Iterator</span><span class="o">&lt;</span><span class="n">Item</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="n">Config</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nb">&#39;static</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="c1">//...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>标准库文档中关于<code>env::args</code>函数的说明显示，<strong>它返回的迭代器类型是<code>std::env::Args</code>，该类型实现了<code>Iterator</code>特性并返回<code>String</code>值</strong>。</p>
+<p>我们更新了<code>Config::build</code>函数的签名，因此参数<code>args</code>具有带 trait 约束的泛型类型<code>impl Iterator&lt;Item = String&gt;</code>，而非<code>&amp;[String]</code>。这里对<code>impl Trait</code>语法的使用我们在第10章就提过了，它意味着<code>args</code>可以是任何实现了<code>Iterator</code> trait并且返回<code>String</code>的类型。</p>
+<p><strong>因为我们正在获取<code>args</code>的所有权，并且我们将通过迭代来修改<code>args</code>，所以我们可以在<code>args</code>参数的规范中添加<code>mut</code>关键字，使其变为可变的。</strong></p>
+<hr>
+<h4 id="使用迭代器而不是索引">使用迭代器而不是索引
+</h4><p>接下来我们可以修改函数体，由于我们的入参<code>args</code>是一个迭代器，所以我们可以使用<code>next</code>方法来挨个访问数据：</p>
+<p>Filename: src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">query</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">file_path</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">ignore_case</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">impl</span><span class="w"> </span><span class="n">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">build</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">args</span>: <span class="nc">impl</span><span class="w"> </span><span class="nb">Iterator</span><span class="o">&lt;</span><span class="n">Item</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="n">Config</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nb">&#39;static</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">args</span><span class="p">.</span><span class="n">next</span><span class="p">();</span><span class="c1">// 第一个参数是程序名 我们不需要 所以直接舍弃
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">next</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nb">Some</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">arg</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nb">None</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="s">&#34;Didn&#39;t get a query string&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">file_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">next</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nb">Some</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">arg</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nb">None</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="s">&#34;Didn&#39;t get a file_path string&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">ignore_case</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span>::<span class="n">var</span><span class="p">(</span><span class="s">&#34;IGNORE_CASE&#34;</span><span class="p">).</span><span class="n">is_ok</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">Config</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">query</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">file_path</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">ignore_case</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">})</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>请记住，<code>env::args</code>返回值中的第一个值是程序的名称。我们要忽略这个值，获取下一个值，所以首先调用<code>next</code>，并且不对返回值进行任何处理</strong>。然后我们调用<code>next</code>来获取要放入<code>Config</code>的<code>query</code>字段的值。如果<code>next</code>返回<code>Some</code>，我们就用<code>match</code>来提取该值。如果它返回<code>None</code>，那就意味着提供的参数不足，我们会提前返回一个<code>Err</code>值。对于<code>file_path</code>值，我们也会执行同样的操作。</p>
+<hr>
+<h3 id="1332-使用迭代适配器来让代码更易读">13.3.2 使用迭代适配器来让代码更易读
+</h3><p>我们可以利用迭代器配合上<code>filter</code>方法来让我们的<code>search</code>函数更加简洁。<strong>函数式编程风格倾向于尽可能减少可变状态的数量，以使代码更清晰。移除可变状态可能会为未来的改进创造条件，让搜索能够并行进行</strong>，因为我们不必管理对<code>results</code>向量的并发访问：</p>
+<p>Filename: src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">search</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">query</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">contents</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">contents</span><span class="p">.</span><span class="n">lines</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">.</span><span class="n">filter</span><span class="p">(</span><span class="o">|</span><span class="n">line</span><span class="o">|</span><span class="w"> </span><span class="n">line</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">query</span><span class="p">))</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">.</span><span class="n">collect</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>回想一下，<code>search</code>函数的作用是返回<code>contents</code>中所有包含<code>query</code>的行。<strong>这段代码使用<code>filter</code>适配器来仅保留那些<code>line.contains(query)</code>返回<code>true</code>的行</strong>。然后，我们用<code>collect</code>将匹配的行收集到另一个向量中。简单多了！你也可以对<code>search_case_insensitive</code>函数做同样的修改，以使用迭代器方法：</p>
+<p>Filename: src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">search_case_insensitive</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">query</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">,</span><span class="w"> </span><span class="n">contents</span>: <span class="kp">&amp;</span><span class="na">&#39;a</span> <span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">contents</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">lines</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">filter</span><span class="p">(</span><span class="o">|</span><span class="n">line</span><span class="o">|</span><span class="w"> </span><span class="n">line</span><span class="p">.</span><span class="n">to_lowercase</span><span class="p">().</span><span class="n">contains</span><span class="p">(</span><span class="n">query</span><span class="p">.</span><span class="n">to_lowercase</span><span class="p">()))</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">collect</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h3 id="1333-在迭代器和循环中抉择">13.3.3 在迭代器和循环中抉择
+</h3><p>接下来顺理成章的问题是，在你自己的代码中应该选择哪种风格以及为什么：是<code>for</code>循环的原始实现，还是使用迭代器的版本。大多数Rust程序员更倾向于使用迭代器风格。一开始可能有点难掌握，但一旦你对各种迭代器适配器及其作用有了感觉，<strong>迭代器就会更容易理解。代码不再需要处理各种循环细节和构建新向量，而是专注于循环的高层目标</strong>。这抽象掉了一些常见代码，因此更容易看到这段代码特有的概念，例如迭代器中的每个元素必须满足的过滤条件。</p>
+<p>但这两种实现真的等效吗？直观的假设可能是低级循环会更快。让我们来谈谈性能。</p>
+<hr>
+<h2 id="134-性能比较-迭代器-vs-循环">13.4 性能比较： 迭代器 vs. 循环
+</h2><p>要确定是使用循环还是迭代器，你需要知道哪种实现更快：是带有显式for循环的search函数版本，还是带有迭代器的版本。</p>
+<p>我们进行了一项基准测试，方法是将阿瑟·柯南·道尔爵士的《福尔摩斯探案集》全文加载到一个<code>String</code>中，并在内容中查找“the”这个词。以下是使用<code>for</code>循环的<code>search</code>版本和使用迭代器的<code>search</code>版本的基准测试结果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="n">test</span><span class="w"> </span><span class="n">bench_search_for</span><span class="w">  </span><span class="o">..</span><span class="p">.</span><span class="w"> </span><span class="n">bench</span>:  <span class="mi">19</span><span class="p">,</span><span class="mi">620</span><span class="p">,</span><span class="mi">300</span><span class="w"> </span><span class="n">ns</span><span class="o">/</span><span class="n">iter</span><span class="w"> </span><span class="p">(</span><span class="o">+/-</span><span class="w"> </span><span class="mi">915</span><span class="p">,</span><span class="mi">700</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">test</span><span class="w"> </span><span class="n">bench_search_iter</span><span class="w"> </span><span class="o">..</span><span class="p">.</span><span class="w"> </span><span class="n">bench</span>:  <span class="mi">19</span><span class="p">,</span><span class="mi">234</span><span class="p">,</span><span class="mi">900</span><span class="w"> </span><span class="n">ns</span><span class="o">/</span><span class="n">iter</span><span class="w"> </span><span class="p">(</span><span class="o">+/-</span><span class="w"> </span><span class="mi">657</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>这两种实现的性能相近</strong>！我们在此不解释基准测试代码，因为重点并非证明这两个版本是等效的，而是大致了解这两种实现在性能方面的对比情况。</p>
+<p>为了进行更全面的基准测试，你应该使用各种大小的不同文本作为<code>contents</code>，使用不同的单词以及不同长度的单词作为<code>query</code>，并尝试其他各种变体。关键在于：迭代器虽然是一种高级抽象，但编译后生成的代码与你自己编写的低级代码大致相同。迭代器是Rust的<strong>零成本抽象</strong>之一，<strong>这意味着使用这种抽象不会带来额外的运行时开销</strong>。这类似于C++的最初设计者和实现者比雅尼·斯特劳斯特鲁普在《C++基础》（2012年）中对零开销的定义：</p>
+<p><strong>一般来说，C++的实现遵循零开销原则：未使用的部分，无需付出代价。而且更进一步讲：所使用的部分，其效率无法通过手工编码得到更优的实现。</strong></p>
+<p>再举一个例子，以下代码取自一个音频解码器。该解码算法使用线性预测这一数学运算，基于先前样本的线性函数来估计未来值。这段代码使用迭代器链对作用域内的三个变量进行一些数学运算：一个数据切片<code>buffer</code>、一个包含12个元素的<code>coefficients</code>数组，以及用于在<code>qlp_shift</code>中移位数据的量。我们在这个示例中声明了这些变量，但没有给它们赋值；尽管这段代码脱离其上下文后没有太多意义，但它仍然是一个简洁的、真实世界中的例子，展示了Rust如何将高层概念转化为低层代码。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="kd">let</span><span class="w"> </span><span class="n">buffer</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">i32</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">let</span><span class="w"> </span><span class="n">coefficients</span>: <span class="p">[</span><span class="kt">i64</span><span class="p">;</span><span class="w"> </span><span class="mi">12</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">let</span><span class="w"> </span><span class="n">qlp_shift</span>: <span class="kt">i16</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">12</span><span class="o">..</span><span class="n">buffer</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">prediction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">coefficients</span><span class="p">.</span><span class="n">iter</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                 </span><span class="p">.</span><span class="n">zip</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buffer</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">12</span><span class="o">..</span><span class="n">i</span><span class="p">])</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                 </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">s</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">i64</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                 </span><span class="p">.</span><span class="n">sum</span>::<span class="o">&lt;</span><span class="kt">i64</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">qlp_shift</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">delta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">buffer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prediction</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">delta</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>为了计算<code>prediction</code>的值，这段代码会遍历<code>coefficients</code>中的12个值，并使用<code>zip</code>方法将系数值与<code>buffer</code>中前12个值进行配对。然后，对于每一对值，我们将它们相乘，将所有结果相加，并将总和中的位向右移动<code>qlp_shift</code>位。</p>
+<p>像音频解码器这类应用中的计算往往将性能放在首位。在这里，我们创建了一个迭代器，使用了两个适配器，然后消费该值。这段Rust代码会编译成什么样的汇编代码呢？嗯，在撰写本文时，它编译出的汇编代码与你手动编写的完全相同。根本没有与遍历<code>coefficients</code>中值相对应的循环：Rust知道会有12次迭代，因此它会“展开”循环。<em>循环展开</em>是一种优化手段，它去除了循环控制代码的开销，转而针对循环的每次迭代生成重复代码。</p>
+<p>所有系数都存储在寄存器中，这意味着访问这些值的速度非常快。在运行时，对数组访问没有边界检查。Rust能够应用的所有这些优化使得生成的代码极其高效。既然了解了这一点，你就可以放心使用迭代器和闭包了！它们让代码看起来更高级，但不会因此带来运行时的性能损耗。</p>
+<hr>
+<h2 id="134-总结">13.4 总结
+</h2><p>闭包和迭代器是受函数式编程语言思想启发的 Rust 特性。它们使 Rust 能够以底层性能清晰地表达高级思想。闭包和迭代器的实现不会影响运行时性能。这是 Rust 努力提供零成本抽象这一目标的一部分。既然我们已经提升了I/O项目的表现力，那就来看看<code>cargo</code>的更多功能吧，这些功能将帮助我们与世界分享这个项目。</p>
+<hr>
+<h1 id="chapter-14cargo-和-cratesio">Chapter 14：Cargo 和 Crates.io
+</h1><p>到目前为止，我们只使用了Cargo最基本的功能来构建、运行和测试代码，但它能做的还有很多。在本章中，我们将讨论它的一些其他更高级的功能，向你展示如何进行以下操作：</p>
+<ul>
+<li><strong>通过修改配置文件自定义您的构建</strong></li>
+<li><strong>在<a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a>上发布自己的库</strong></li>
+<li><strong>使用工作区组织大型项目</strong></li>
+<li><strong>从<a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a>安装二进制文件</strong></li>
+<li><strong>使用自定义命令扩展Cargo</strong></li>
+</ul>
+<p>Cargo 的功能远不止本章所介绍的这些，因此，若想全面了解其所有特性，请参阅 <a class="link" href="https://doc.rust-lang.org/cargo/"  target="_blank" rel="noopener"
+    >它的文档</a>。</p>
+<hr>
+<h2 id="141-自定义构建配置">14.1 自定义构建配置
+</h2><p>在Rust中，<em>release profile</em>是预定义并且可以自定义的配置文件，我们可以修改里面的一些配置来更好的控制代码的编译的各种选项。<strong>每个项目的配置文件都是独立于其他的配置文件</strong>。</p>
+<p>Cargo 有两个主要配置文件：运行 <code>cargo build</code> 时 Cargo 会使用的 <code>dev</code> 配置文件，以及运行 <code>cargo build --release</code> 时 Cargo 会使用的 <code>release</code> 配置文件。<strong><code>dev</code> 配置文件具有适合开发的良好默认设置，而 <code>release</code> 配置文件则具有适合发布构建的良好默认设置</strong>。</p>
+<p>这些配置文件名称可能在你的构建输出中见过：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250902200411491.png">
+<img src="./index.assets/image-20250902200411491.png" alt="image-20250902200411491"  />
+</a>
+</div>
+
+</p>
+<p><code>dev</code>和<code>release</code>是编译器使用的不同配置文件。</p>
+<p><strong>Cargo 对每个配置文件都有默认设置，当你未在项目的 <em>Cargo.toml</em> 文件中明确添加任何 <code>[profile.*]</code> 部分时，这些默认设置将生效</strong>。通过为你想要自定义的任何配置文件添加 <code>[profile.*]</code> 部分，你可以覆盖默认设置的任何子集。例如，以下是 <code>dev</code> 和 <code>release</code> 配置文件的 <code>opt-level</code> 设置的默认值：</p>
+<p>Filename: Cargo.toml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">profile</span><span class="p">.</span><span class="nx">dev</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">opt-level</span> <span class="p">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">profile</span><span class="p">.</span><span class="nx">release</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">opt-level</span> <span class="p">=</span> <span class="mi">3</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>opt-level</code> 设置控制着 Rust 对代码应用的优化数量，其范围为 0 到 3。<strong>应用的优化越多，编译时间就越长，因此如果你处于开发阶段且需要频繁编译代码，可能希望减少优化以加快编译速度，即便生成的代码运行速度会变慢</strong>。因此，<code>dev</code> 模式下的默认 <code>opt-level</code> 是 <code>0</code>。当你准备发布代码时，最好花更多时间进行编译。你只会在发布模式下编译一次，但会多次运行编译后的程序，所以发布模式以更长的编译时间换取运行更快的代码。这就是 <code>release</code> 配置文件的默认 <code>opt-level</code> 为 <code>3</code> 的原因。</p>
+<p>你可以通过在<em>Cargo.toml</em>中为默认设置添加不同的值来覆盖它。例如，如果我们想在开发配置文件中使用优化级别1，可以在项目的<em>Cargo.toml</em>文件中添加以下两行：</p>
+<p>Filename: Cargo.toml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">profile</span><span class="p">.</span><span class="nx">dev</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">opt-level</span> <span class="p">=</span> <span class="mi">1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>这段代码覆盖了<code>0</code>的默认设置</strong>。现在，当我们运行<code>cargo build</code>时，Cargo会使用<code>dev</code>配置文件的默认值，再加上我们对<code>opt-level</code>的自定义设置。由于我们将<code>opt-level</code>设置为<code>1</code>，Cargo将应用比默认情况更多的优化，但不会像发布版本构建那样进行过多优化。</p>
+<p>有关每个配置文件的完整配置选项和默认值列表，请参见<a class="link" href="https://doc.rust-lang.org/cargo/reference/profiles.html"  target="_blank" rel="noopener"
+    >Cargo 的文档</a>。</p>
+<hr>
+<h2 id="142-在crateio上发布自己的crate">14.2 在Crate.io上发布自己的crate
+</h2><p>我们使用了来自<a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a>的包作为我们项目的依赖项，但你也可以通过发布自己的包与其他人分享你的代码。<strong>位于<a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a>的 crate 注册表，它会分发你的包的源代码，因此它主要托管开源代码</strong>。</p>
+<hr>
+<h3 id="1421-攥写有用的文档注释">14.2.1 攥写有用的文档注释
+</h3><p><strong>准确地为你的包编写文档将帮助其他用户了解如何以及何时使用它们，因此花时间编写文档是值得的</strong>。在第3章中，我们讨论了如何使用双斜杠<code>//</code>来注释Rust代码。<strong>Rust还有一种特殊的注释用于文档，方便地称为文档注释，它可以生成HTML文档</strong>。HTML会显示公共API项的文档注释内容，这些内容是为那些有兴趣<strong>了解如何使用你的 crate 而不是你的 crate 是如何实现的程序员准备的</strong>。</p>
+<p><strong>文档注释使用三个斜杠 <code>///</code> 而非两个，并且支持使用Markdown符号来设置文本格式</strong>。请将文档注释放在它们所要说明的项的前面。下面展示了名为 <code>my_crate</code> 的 crate 中一个 <code>add_one</code> 函数的文档注释：</p>
+<p>Filename: src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="sd">/// Adds one to the number given.
+</span></span></span><span class="line"><span class="cl"><span class="sd">///
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// # Examples
+</span></span></span><span class="line"><span class="cl"><span class="sd">///
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// ```
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// let arg = 5;
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// let answer = my_crate::add_one(arg);
+</span></span></span><span class="line"><span class="cl"><span class="sd">///
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// assert_eq!(6, answer);
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// ```
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">add_one</span><span class="p">(</span><span class="n">x</span>: <span class="kt">i32</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">i32</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>在这里，我们对<code>add_one</code>函数的功能进行描述，以<code>Examples</code>为标题开始一个章节，然后提供演示如何使用<code>add_one</code>函数的代码</strong>。我们可以通过运行<code>cargo doc</code>从这个文档注释生成HTML文档。该命令会运行Rust附带的<code>rustdoc</code>工具，并将生成的HTML文档放在<em>target/doc</em>目录中。</p>
+<p>为方便起见，运行<code>cargo doc --open</code>会为当前 crate 的文档（以及该 crate 所有依赖项的文档）生成 HTML 文件，并在网页浏览器中打开结果。导航到<code>add_one</code>函数，你会看到文档注释中的文本是如何呈现的，如图：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250902201904222.png">
+<img src="./index.assets/image-20250902201904222.png" alt="image-20250902201904222"  />
+</a>
+</div>
+
+</p>
+<hr>
+<h3 id="1421-常用的部分">14.2.1 常用的部分
+</h3><p>我们使用了<code># Examples</code>这个Markdown标题，在HTML中创建了一个标题为“示例”的部分。以下是 crate 作者在其文档中常用的其他部分：</p>
+<ul>
+<li><strong>Panics</strong>：所记录函数可能发生panic的场景。不希望程序发生panic的函数调用者应确保不在这些情况下调用该函数。</li>
+<li><strong>Errors</strong>：如果函数返回一个<code>Result</code>，那么描述可能出现的错误类型以及导致这些错误返回的条件，会对调用者有所帮助，这样他们就能编写代码以不同方式处理不同类型的错误。</li>
+<li><strong>Safety</strong>：如果调用该函数是<code>unsafe</code>（我们将在第20章讨论不安全性），则应有一个章节解释该函数为何不安全，并涵盖该函数期望调用者遵守的不变式。</li>
+</ul>
+<p>大多数文档注释并不需要包含所有这些部分，但这是一个很好的清单，能提醒你代码用户可能会关心的方面。</p>
+<hr>
+<h3 id="1422-作为测试的文档">14.2.2 作为测试的文档
+</h3><p>在文档注释中添加示例代码块有助于展示如何使用你的库，而且这样做还有一个额外好处：<strong>运行<code>cargo test</code>会将文档中的代码示例作为测试来运行</strong>！没有什么比带有示例的文档更好的了。但最糟糕的莫过于示例无法运行，因为自文档编写以来代码已经发生了变化。如果我们针对add_one<code>函数的文档运行</code>cargo test`，会在测试结果中看到一个类似这样的部分：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250902202843569.png">
+<img src="./index.assets/image-20250902202843569.png" alt="image-20250902202843569"  />
+</a>
+</div>
+
+</p>
+<p>现在，如果我们修改函数或示例，使得示例中的<code>assert_eq!</code>触发恐慌，然后再次运行<code>cargo test</code>，就会发现文档测试能检测到示例与代码不一致的问题！</p>
+<hr>
+<h3 id="1423-为包含的项目添加注释">14.2.3 为包含的项目添加注释
+</h3><p><strong>文档注释的格式<code>//!</code>会将文档添加到包含该注释的项中，而非添加到注释后面的项中</strong>。我们通常在 crate 根文件（按照惯例是<em>src/lib.rs</em>）中或模块内部使用这类文档注释，以对整个 crate 或模块进行文档说明。例如，要添加文档来描述包含<code>add_one</code>函数的<code>my_crate</code>包的用途，我们需要在<em>src/lib.rs</em>文件的开头添加以<code>//!</code>开头的文档注释，如代码：</p>
+<p>Filename: src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="sd">//! # My Crate
+</span></span></span><span class="line"><span class="cl"><span class="sd">//!
+</span></span></span><span class="line"><span class="cl"><span class="sd">//! `my_crate` is a collection of utilities to make performing certain
+</span></span></span><span class="line"><span class="cl"><span class="sd">//! calculations more convenient.
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="sd">/// Adds one to the number given.
+</span></span></span><span class="line"><span class="cl"><span class="sd">///
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// # Examples
+</span></span></span><span class="line"><span class="cl"><span class="sd">///
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// ```
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// let arg = 5;
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// let answer = my_crate::add_one(arg);
+</span></span></span><span class="line"><span class="cl"><span class="sd">///
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// assert_eq!(6, answer);
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// ```
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">add_one</span><span class="p">(</span><span class="n">x</span>: <span class="kt">i32</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">i32</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>注意，在最后一行以<code>//!</code>开头的代码后面没有任何代码。因为我们用<code>//!</code>而不是<code>///</code>来开始注释，所以我们是在为包含此注释的项编写文档，而不是为紧随此注释的项编写文档</strong>。在这种情况下，该项是<em>src/lib.rs</em>文件，也就是 crate 的根目录。这些注释描述了整个 crate。</p>
+<p>当我们运行<code>cargo doc --open</code>时，这些注释将显示在<code>my_crate</code>文档的首页上，位于 crate 中公共项列表的上方，如图：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250902203226401.png">
+<img src="./index.assets/image-20250902203226401.png" alt="image-20250902203226401"  />
+</a>
+</div>
+
+</p>
+<p><strong>项目中的文档注释对于描述 crate 和模块尤其有用。使用它们来解释容器的整体用途，以帮助用户理解 crate 的结构。</strong></p>
+<hr>
+<h3 id="1424-使用pub-use导出公用的api">14.2.4 使用<code>pub use</code>导出公用的API
+</h3><p>发布 crate 时，其公共 API 的结构是一个重要考量因素。<strong>使用你的 crate 的人对其结构的熟悉程度不如你，如果你的 crate 有庞大的模块层级，他们可能很难找到自己想要使用的部分</strong>。</p>
+<p>在第7章中，我们介绍了如何使用<code>pub</code>关键字使项目公开，以及如何使用<code>use</code>关键字将项目引入作用域。然而，在你开发一个 crate 时，对你来说合理的结构可能对用户并不那么方便。你可能希望将结构体组织在包含多个层级的层次结构中，但这样一来，那些想要使用你在层级结构深处定义的类型的人可能很难发现该类型的存在。他们也可能会对必须输入<code>use</code> <code>my_crate::some_module::another_module::UsefulType;</code> 而不是<code>use</code> <code>my_crate::UsefulType;</code>感到厌烦。</p>
+<p>好消息是，如果某个结构不方便其他库使用，你不必重新调整内部组织：<strong>相反，你可以通过使用<code>pub use</code>来重新导出条目，从而创建一个与私有结构不同的公共结构</strong>。重新导出会将一个位置的公共条目在另一个位置也设为公共，就好像该条目原本是在另一个位置定义的一样。</p>
+<p>例如，假设我们制作了一个名为<code>art</code>的库，用于建模艺术概念。这个库包含两个模块：一个是<code>kinds</code>模块，其中包含两个名为<code>PrimaryColor</code>和<code>SecondaryColor</code>的枚举；另一个是<code>utils</code>模块，其中包含一个名为<code>mix</code>的函数，如代码：</p>
+<p>Filename: src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="sd">//! # Art
+</span></span></span><span class="line"><span class="cl"><span class="sd">//!
+</span></span></span><span class="line"><span class="cl"><span class="sd">//! A library for modeling artistic concepts.
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">mod</span> <span class="nn">kinds</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="sd">/// The primary colors according to the RYB color model.
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">enum</span> <span class="nc">PrimaryColor</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Red</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Yellow</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Blue</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="sd">/// The secondary colors according to the RYB color model.
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">enum</span> <span class="nc">SecondaryColor</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Orange</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Green</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Purple</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">mod</span> <span class="nn">utils</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="k">crate</span>::<span class="n">kinds</span>::<span class="o">*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="sd">/// Combines two primary colors in equal amounts to create
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">    </span><span class="sd">/// a secondary color.
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">mix</span><span class="p">(</span><span class="n">c1</span>: <span class="nc">PrimaryColor</span><span class="p">,</span><span class="w"> </span><span class="n">c2</span>: <span class="nc">PrimaryColor</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">SecondaryColor</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">// --snip--
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>cargo doc</code>生成的该 crate 文档的首页应该是这样的：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250902203852029.png">
+<img src="./index.assets/image-20250902203852029.png" alt="image-20250902203852029"  />
+</a>
+</div>
+
+</p>
+<p><strong>请注意，<code>PrimaryColor</code>和<code>SecondaryColor</code>类型未在首页列出，<code>mix</code>函数也未列出。我们必须点击<code>kinds</code>和<code>utils</code>才能看到它们</strong>。另一个依赖于该库的包需要使用<code>use</code>语句将<code>art</code>中的项引入作用域，并指定当前定义的模块结构。下面展示了一个使用<code>art</code>包中的<code>PrimaryColor</code>和<code>mix</code>项的包的示例：</p>
+<p>Filename: src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">art</span>::<span class="n">kinds</span>::<span class="n">PrimaryColor</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">art</span>::<span class="n">utils</span>::<span class="n">mix</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">red</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrimaryColor</span>::<span class="n">Red</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">yellow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrimaryColor</span>::<span class="n">Yellow</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">mix</span><span class="p">(</span><span class="n">red</span><span class="p">,</span><span class="w"> </span><span class="n">yellow</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>代码的作者使用了<code>art</code> crate，他必须弄清楚<code>PrimaryColor</code>位于<code>kinds</code>模块中，而<code>mix</code>位于<code>utils</code>模块中。<code>art</code> crate的模块结构对开发<code>art</code> crate的开发者来说更为相关，而对使用它的人来说则不然。内部结构对于试图理解如何使用<code>art</code> crate的人来说没有任何有用信息，反而会造成困惑，因为使用它的开发者必须弄清楚该去哪里查找，还必须在<code>use</code>语句中指定模块名称。</p>
+<p><strong>为了从公共API中移除内部组织，我们可以修改代码，添加<code>pub use</code>语句以在顶层重新导出这些项</strong>，如下所示：</p>
+<p>Filename: src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Rust" data-lang="Rust"><span class="line"><span class="cl"><span class="sd">//! # Art
+</span></span></span><span class="line"><span class="cl"><span class="sd">//!
+</span></span></span><span class="line"><span class="cl"><span class="sd">//! A library for modeling artistic concepts.
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="bp">self</span>::<span class="n">kinds</span>::<span class="n">PrimaryColor</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="bp">self</span>::<span class="n">kinds</span>::<span class="n">SecondaryColor</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="bp">self</span>::<span class="n">utils</span>::<span class="n">mix</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">mod</span> <span class="nn">kinds</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="sd">/// The primary colors according to the RYB color model.
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">enum</span> <span class="nc">PrimaryColor</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Red</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Yellow</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Blue</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="sd">/// The secondary colors according to the RYB color model.
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">enum</span> <span class="nc">SecondaryColor</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Orange</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Green</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Purple</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">pub</span><span class="w"> </span><span class="k">mod</span> <span class="nn">utils</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="k">crate</span>::<span class="n">kinds</span>::<span class="o">*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="sd">/// Combines two primary colors in equal amounts to create
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">    </span><span class="sd">/// a secondary color.
+</span></span></span><span class="line"><span class="cl"><span class="sd"></span><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">mix</span><span class="p">(</span><span class="n">c1</span>: <span class="nc">PrimaryColor</span><span class="p">,</span><span class="w"> </span><span class="n">c2</span>: <span class="nc">PrimaryColor</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">SecondaryColor</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">SecondaryColor</span>::<span class="n">Orange</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>现在，<code>cargo doc</code> 为这个 crate 生成的 API 文档会在首页列出并链接重导出的内容，如图所示，这使得 <code>PrimaryColor</code> 和 <code>SecondaryColor</code> 类型以及 <code>mix</code> 函数更容易被找到：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250902204206401.png">
+<img src="./index.assets/image-20250902204206401.png" alt="image-20250902204206401"  />
+</a>
+</div>
+
+</p>
+<p>在存在许多嵌套模块的情况下，<strong>使用<code>pub use</code>在顶层重新导出类型，会极大改善使用该 crate 的用户体验</strong>。<code>pub use</code>的另一个常见用途是在当前 crate 中重新导出某个依赖项的定义，使该 crate 的定义成为你自己 crate 公共 API 的一部分。</p>
+<p>创建一个有用的公共API结构更像是一门艺术而非科学，你可以通过迭代来找到最适合用户的API。<strong>选择<code>pub use</code>能让你在内部 crate 结构的组织上拥有灵活性，并将这种内部结构与呈现给用户的内容解耦</strong>。查看一些你已安装的 crate 的代码，看看它们的内部结构是否与公共API有所不同。</p>
+<hr>
+<h3 id="1425-创建一个cratesio账号">14.2.5 创建一个Crates.io账号
+</h3><p>**在你发布任何 crate 之前，你需要在crates.io上创建一个账户并获取一个 API 令牌。**具体操作是，访问crates.io的主页，通过 GitHub 账户登录。（目前 GitHub 账户是必需的，但该网站未来可能会支持其他创建账户的方式。）登录后，访问位于https://crates.io/me/的账户设置，获取你的 API 密钥。然后运行<code>cargo login</code>命令，并在提示时粘贴你的 API 密钥，如下所示：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo login
+</span></span><span class="line"><span class="cl">abcdefghijklmnopqrstuvwxyz012345
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此命令会将你的API令牌告知Cargo，并将其本地存储在~/.cargo/credentials中。请<strong>注意，该令牌是一个秘密：不要与其他任何人分享</strong>。如果你因任何原因将其分享给了他人，你应当在crates.io上撤销该令牌并生成一个新的令牌。</p>
+<hr>
+<h3 id="1426-为新的crate添加元数据">14.2.6 为新的crate添加元数据
+</h3><p>假设你有一个想要发布的 crate。发布前，<strong>你需要在该 crate 的 <em>Cargo.toml</em> 文件的 <code>[package]</code> 部分添加一些元数据</strong>。</p>
+<p>你的 crate 需要一个独特的名称。当你在本地处理 crate 时，你可以给它取任何你喜欢的名字。<strong>不过，<a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a> 上的 crate 名称采用先到先得的原则进行分配</strong>。一旦某个 crate 名称被占用，其他人就不能再使用该名称发布 crate 了**。在尝试发布 crate 之前，请搜索你想要使用的名称。如果该名称已被使用，你需要另找一个名称**，并编辑 <code>[package]</code> 部分下 <em>Cargo.toml</em> 文件中的 <code>name</code> 字段，使用新名称进行发布，如下所示：</p>
+<p>Filename: Cargo.toml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">package</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">name</span> <span class="p">=</span> <span class="s2">&#34;guessing_game&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>即使你已经选择了一个独特的名称，此时当你运行<code>cargo publish</code>来发布这个 crate 时，你会先收到一个警告，然后是一个错误：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo publish
+</span></span><span class="line"><span class="cl">    Updating crates.io index
+</span></span><span class="line"><span class="cl">warning: manifest has no description, license, license-file, documentation, homepage or repository.
+</span></span><span class="line"><span class="cl">See https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata <span class="k">for</span> more info.
+</span></span><span class="line"><span class="cl">--snip--
+</span></span><span class="line"><span class="cl">error: failed to publish to registry at https://crates.io
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Caused by:
+</span></span><span class="line"><span class="cl">  the remote server responded with an error <span class="o">(</span>status <span class="m">400</span> Bad Request<span class="o">)</span>: missing or empty metadata fields: description, license. Please see https://doc.rust-lang.org/cargo/reference/manifest.html <span class="k">for</span> more information on configuring these fields
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这会导致错误，因为你缺少一些关键信息：<strong>需要提供描述和许可证，这样人们才能知道你的 crate 是做什么的，以及他们可以在什么条款下使用它</strong>。在 <em>Cargo.toml</em> 中，添加一两句话的描述，因为它会和你的 crate 一起出现在搜索结果中。对于 <code>license</code> 字段，你需要提供一个 <em>许可证标识符值</em>。<a class="link" href="http://spdx.org/licenses/"  target="_blank" rel="noopener"
+    >Linux 基金会的软件包数据交换（SPDX）</a> 列出了可用于该值的标识符。例如，要指定你的 crate 使用 MIT 许可证，添加 <code>MIT</code> 标识符即可：</p>
+<p>Filename: Cargo.toml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">package</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">name</span> <span class="p">=</span> <span class="s2">&#34;guessing_game&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">license</span> <span class="p">=</span> <span class="s2">&#34;MIT&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果你想使用SPDX中未列出的许可证，<strong>需要将该许可证的文本放入一个文件中，将该文件包含在你的项目里，然后使用<code>license-file</code>来指定该文件的名称，而非使用<code>license</code>键</strong>。关于哪种许可证适合您的项目，超出了本书的范围。<strong>Rust社区中的许多人通过使用<code>MIT OR Apache-2.0</code>的双重许可，以与Rust相同的方式为他们的项目授权</strong>。这种做法表明，您也可以指定多个许可证标识符，并使用<code>OR</code>分隔，为您的项目设置多个许可证。</p>
+<p>添加了独特的名称、版本、描述和许可证后，一个准备发布的项目的<em>Cargo.toml</em>文件可能如下所示：</p>
+<p>Filename: Cargo.toml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">package</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">name</span> <span class="p">=</span> <span class="s2">&#34;guessing_game&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">version</span> <span class="p">=</span> <span class="s2">&#34;0.1.0&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">edition</span> <span class="p">=</span> <span class="s2">&#34;2024&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">description</span> <span class="p">=</span> <span class="s2">&#34;A fun game where you guess what number the computer has chosen.&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">license</span> <span class="p">=</span> <span class="s2">&#34;MIT OR Apache-2.0&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">dependencies</span><span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="link" href="https://doc.rust-lang.org/cargo/"  target="_blank" rel="noopener"
+    >Cargo 的文档</a> 描述了其他元数据，你可以通过指定这些元数据，让其他人能更轻松地发现和使用你的 crate。</p>
+<hr>
+<h3 id="1427-发布到cratesio">14.2.7 发布到Crates.io
+</h3><p>既然你已经创建了账户、保存了API令牌、为你的包选择了名称并指定了所需的元数据，现在就可以发布了！发布包会将特定版本上传到<a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a>供他人使用。</p>
+<p><strong>请注意，发布是永久性的。该版本永远无法被覆盖</strong>，代码也不能被删除。<a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a>的一个主要目标是作为代码的永久存档，以便所有依赖于<a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a>上的 crate 的项目都能进行构建都可以正常使用。允许删除版本会导致无法实现该目标。不过，您可以发布的 crate 版本数量没有限制。</p>
+<p>再次运行<code>cargo publish</code>命令。现在它应该会成功：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo publish
+</span></span><span class="line"><span class="cl">    Updating crates.io index
+</span></span><span class="line"><span class="cl">   Packaging guessing_game v0.1.0 <span class="o">(</span>file:///projects/guessing_game<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   Verifying guessing_game v0.1.0 <span class="o">(</span>file:///projects/guessing_game<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   Compiling guessing_game v0.1.0
+</span></span><span class="line"><span class="cl"><span class="o">(</span>file:///projects/guessing_game/target/package/guessing_game-0.1.0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">    Finished <span class="sb">`</span>dev<span class="sb">`</span> profile <span class="o">[</span>unoptimized + debuginfo<span class="o">]</span> target<span class="o">(</span>s<span class="o">)</span> in 0.19s
+</span></span><span class="line"><span class="cl">   Uploading guessing_game v0.1.0 <span class="o">(</span>file:///projects/guessing_game<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>您现在已经与Rust社区分享了您的代码，任何人都可以轻松地将您的 crate 作为其项目的依赖项。</p>
+<hr>
+<h3 id="1428-为已存在的crate发布新版本">14.2.8 为已存在的crate发布新版本
+</h3><p>当你对自己的 crate 做了修改并准备发布新版本时，需要更改 <code>version</code> 在 <em>Cargo.toml</em> 文件中指定的值，然后重新发布。根据你所做的更改类型，使用 <a class="link" href="http://semver.org/"  target="_blank" rel="noopener"
+    >语义化版本规则</a> 来确定合适的下一个版本号。之后运行 <code>cargo publish</code>上传新版本。</p>
+<hr>
+<h3 id="1429-弃用版本">14.2.9 弃用版本
+</h3><p>虽然你无法删除 crate 的旧版本，但可以阻止未来的项目将它们作为新依赖项添加。当某个 crate 版本因某种原因出现问题时，这一功能会很有用。在这种情况下，Cargo 支持撤销 crate 版本。撤回一个版本会阻止新项目依赖该版本，同时允许所有已依赖它的现有项目继续运行。本质上，<strong>撤回意味着所有带有<em>Cargo.lock</em>的项目都不会出现问题，且未来生成的任何<em>Cargo.lock</em>文件都不会使用被撤回的版本</strong>。</p>
+<p>使用<code>cargo yank</code>就可以弃用某个版本。例如，如果我们发布过一个名为 <code>guessing_game</code>的 1.0.1 版本 crate，并且想要撤回它，那么在 <code>guessing_game</code>的项目目录中，我们会运行：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo yank --vers 1.0.1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在命令中添加<code>--undo</code>，你还可以撤销一次弃用操作，并允许项目重新开始依赖某个版本。<strong><code>cargo yank</code>操作不会删除任何代码。例如，它无法删除意外上传的密钥。如果发生这种情况，你必须立即重置这些密钥。</strong></p>
+<hr>
+<h2 id="143-cargo-工作区">14.3 Cargo 工作区
+</h2><p>在第12章中，我们构建了一个包含二进制 crate 和库 crate 的包。随着项目的发展，你可能会发现库 crate 不断变大，这时你会希望将包进一步拆分为多个库 crate。Cargo 提供了一个名为 <strong>工作区（<em>workspace</em>）</strong> 的功能，它可以帮助管理多个协同开发的相关包。</p>
+<hr>
+<h3 id="1431-创建一个工作区">14.3.1 创建一个工作区
+</h3><p><strong>工作区是一组共享相同Cargo.lock和输出目录的包</strong>。让我们使用工作区创建一个项目——我们会使用简单的代码，这样就能专注于工作区的结构。构建工作区有多种方法，因此我们只展示一种常见方式。我们将创建一个包含一个二进制文件和两个库的工作区。这个二进制文件将提供主要功能，它会依赖这两个库。一个库将提供<code>add_one</code>函数，另一个库将提供<code>add_two</code>函数。这三个 crate 将属于同一个工作区。我们首先为工作区创建一个新目录：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ mkdir add
+</span></span><span class="line"><span class="cl">$ <span class="nb">cd</span> add
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>接下来，在<em>add</em>目录中，我们创建<em>Cargo.toml</em>文件，<strong>该文件将配置整个工作区</strong>。此文件不会包含<code>[package]</code>部分。相反，<strong>它将以<code>[workspace]</code>部分开头，这使我们能够向工作区添加成员</strong>。我们还特意通过将<code>resolver</code>设置为<code>&quot;3&quot;</code>，在工作区中使用Cargo解析器算法的最新版本：</p>
+<p>Filename: Cargo.toml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">workspace</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">resolver</span> <span class="p">=</span> <span class="s2">&#34;3&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>接下来，我们将通过在<em>add</em>目录中运行<code>cargo new</code>来创建<code>adder</code>二进制 crate：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo new adder
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>在工作区中运行<code>cargo new</code>还会自动将新创建的包添加到工作区<code>Cargo.toml</code>中<code>[workspace]</code>定义的<code>members</code>键中</strong>，如下所示：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">workspace</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">resolver</span> <span class="p">=</span> <span class="s2">&#34;3&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">members</span> <span class="p">=</span> <span class="p">[</span><span class="s2">&#34;adder&#34;</span><span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时，我们可以通过运行<code>cargo build</code>来构建工作区。你的<em>add</em>目录中的文件应该如下所示：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">├── Cargo.lock
+</span></span><span class="line"><span class="cl">├── Cargo.toml
+</span></span><span class="line"><span class="cl">├── adder
+</span></span><span class="line"><span class="cl">│   ├── Cargo.toml
+</span></span><span class="line"><span class="cl">│   └── src
+</span></span><span class="line"><span class="cl">│       └── main.rs
+</span></span><span class="line"><span class="cl">└── target
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>工作区的顶层有一个<em>target</em>目录，编译后的工件将被放置到该目录中；<code>adder</code>包没有自己的<em>target</em>目录。即使我们从<em>adder</em>目录内运行<code>cargo build</code>，编译后的工件最终仍会放在<em>add/target</em>中，而不是<em>add/adder/target</em>。<strong>Cargo在工作区中这样构建<em>target</em>目录结构，是因为工作区中的 crate 旨在相互依赖</strong>。如果每个 crate 都有自己的<em>target</em>目录，那么每个 crate 都必须重新编译工作区中的其他每个 crate，才能将工件放入自己的<em>target</em>目录。通过共享一个<em>target</em>目录，这些 crate 可以避免不必要的重新构建。</p>
+<hr>
+<h3 id="1432-创建第二个package">14.3.2 创建第二个Package
+</h3><p>接下来，让我们在工作区中创建另一个成员包，并将其命名为<code>add_one</code>。生成一个名为<code>add_one</code>的新库 crate：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo new add_one --lib
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>顶级的<em>Cargo.toml</em>现在将在<code>members</code>列表中包含<em>add_one</em>路径：</p>
+<p>Filename: Cargo.toml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">workspace</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">resolver</span> <span class="p">=</span> <span class="s2">&#34;3&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">members</span> <span class="p">=</span> <span class="p">[</span><span class="s2">&#34;adder&#34;</span><span class="p">,</span> <span class="s2">&#34;add_one&#34;</span><span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>你的 <em>add</em> 目录现在应该包含这些目录和文件：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="err">├──</span> <span class="nx">Cargo</span><span class="p">.</span><span class="nx">lock</span>
+</span></span><span class="line"><span class="cl"><span class="err">├──</span> <span class="nx">Cargo</span><span class="p">.</span><span class="nx">toml</span>
+</span></span><span class="line"><span class="cl"><span class="err">├──</span> <span class="nx">add_one</span>
+</span></span><span class="line"><span class="cl"><span class="err">│</span>   <span class="err">├──</span> <span class="nx">Cargo</span><span class="p">.</span><span class="nx">toml</span>
+</span></span><span class="line"><span class="cl"><span class="err">│</span>   <span class="err">└──</span> <span class="nx">src</span>
+</span></span><span class="line"><span class="cl"><span class="err">│</span>       <span class="err">└──</span> <span class="nx">lib</span><span class="p">.</span><span class="nx">rs</span>
+</span></span><span class="line"><span class="cl"><span class="err">├──</span> <span class="nx">adder</span>
+</span></span><span class="line"><span class="cl"><span class="err">│</span>   <span class="err">├──</span> <span class="nx">Cargo</span><span class="p">.</span><span class="nx">toml</span>
+</span></span><span class="line"><span class="cl"><span class="err">│</span>   <span class="err">└──</span> <span class="nx">src</span>
+</span></span><span class="line"><span class="cl"><span class="err">│</span>       <span class="err">└──</span> <span class="nx">main</span><span class="p">.</span><span class="nx">rs</span>
+</span></span><span class="line"><span class="cl"><span class="err">└──</span> <span class="nx">target</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在<em>add_one/src/lib.rs</em>文件中，我们来添加一个<code>add_one</code>函数：</p>
+<p>Filename: add_one/src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">add_one</span><span class="p">(</span><span class="n">x</span>: <span class="kt">i32</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">i32</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>现在，我们可以让包含二进制文件的<code>adder</code>包依赖于包含我们库的<code>add_one</code>包。首先，我们需要在<em>adder/Cargo.toml</em>中添加一个对<code>add_one</code>的路径依赖。</p>
+<p>Filename: adder/Cargo.toml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">dependencies</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">add_one</span> <span class="p">=</span> <span class="p">{</span> <span class="nx">path</span> <span class="p">=</span> <span class="s2">&#34;../add_one&#34;</span> <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>Cargo并不假设工作区中的 crate 会相互依赖，因此我们需要明确指定依赖关系</strong>：</p>
+<p>接下来，让我们在<code>adder</code> crate中使用<code>add_one</code>函数（来自<code>add_one</code> crate）。打开<em>adder/src/main.rs</em>文件，并修改<code>main</code>函数以调用<code>add_one</code>函数，如下所示：</p>
+<p>Filename: adder/src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Hello, world! </span><span class="si">{num}</span><span class="s"> plus one is </span><span class="si">{}</span><span class="s">!&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">add_one</span>::<span class="n">add_one</span><span class="p">(</span><span class="n">num</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>让我们在顶级 <em>add</em> 目录中运行<code>cargo build</code>来构建工作区：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo build
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>要从 <em>add</em> 目录运行二进制 crate，我们可以使用<code>-p</code>参数和包名称，通过<code>cargo run</code>来指定要运行工作区中的哪个包</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo run -p adder
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这会运行<em>adder/src/main.rs</em>中的代码，该代码依赖于<code>add_one</code> crate。</p>
+<hr>
+<h3 id="1433-在工作区中依赖外部包">14.3.3 在工作区中依赖外部包
+</h3><p><strong>请注意，工作区的顶层只有一个<em>Cargo.lock</em>文件，而不是在每个 crate 的目录中都有一个<em>Cargo.lock</em>文件</strong>。这确保了所有 crate 都使用相同版本的所有依赖项。如果我们将<code>rand</code>包添加到<em>adder/Cargo.toml</em>和<em>add_one/Cargo.toml</em>文件中，Cargo 会将这两个文件中的依赖项解析为同一个版本的<code>rand</code>，并将其记录在唯一的<em>Cargo.lock</em>中。<strong>让工作区中的所有 crate 使用相同的依赖项，意味着这些 crate 之间始终是兼容的</strong>。让我们将<code>rand</code> crate 添加到<em>add_one/Cargo.toml</em>文件的<code>[dependencies]</code>部分，这样我们就可以在<code>add_one</code> crate 中使用<code>rand</code> crate 了：</p>
+<p>Filename: add_one/Cargo.toml</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">dependencies</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">rand</span> <span class="p">=</span> <span class="s2">&#34;0.8.5&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>现在我们可以在<em>add_one/src/lib.rs</em>文件中添加<code>use rand;</code>，<strong>然后在<em>add</em>目录下运行<code>cargo build</code>来构建整个工作区，这样就会引入并编译<code>rand</code> crate</strong>。我们会收到一个警告，因为我们没有引用引入作用域的<code>rand</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo build
+</span></span><span class="line"><span class="cl">    Updating crates.io index
+</span></span><span class="line"><span class="cl">  Downloaded rand v0.8.5
+</span></span><span class="line"><span class="cl">   --snip--
+</span></span><span class="line"><span class="cl">   Compiling rand v0.8.5
+</span></span><span class="line"><span class="cl">   Compiling add_one v0.1.0 <span class="o">(</span>file:///projects/add/add_one<span class="o">)</span>
+</span></span><span class="line"><span class="cl">warning: unused import: <span class="sb">`</span>rand<span class="sb">`</span>
+</span></span><span class="line"><span class="cl"> --&gt; add_one/src/lib.rs:1:5
+</span></span><span class="line"><span class="cl">  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">1</span> <span class="p">|</span> use rand<span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">|</span>     ^^^^
+</span></span><span class="line"><span class="cl">  <span class="p">|</span>
+</span></span><span class="line"><span class="cl">  <span class="o">=</span> note: <span class="sb">`</span><span class="c1">#[warn(unused_imports)]` on by default</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">warning: <span class="sb">`</span>add_one<span class="sb">`</span> <span class="o">(</span>lib<span class="o">)</span> generated <span class="m">1</span> warning <span class="o">(</span>run <span class="sb">`</span>cargo fix --lib -p add_one<span class="sb">`</span> to apply <span class="m">1</span> suggestion<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   Compiling adder v0.1.0 <span class="o">(</span>file:///projects/add/adder<span class="o">)</span>
+</span></span><span class="line"><span class="cl">    Finished <span class="sb">`</span>dev<span class="sb">`</span> profile <span class="o">[</span>unoptimized + debuginfo<span class="o">]</span> target<span class="o">(</span>s<span class="o">)</span> in 0.95s
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>顶级的<em>Cargo.lock</em>现在包含了<code>add_one</code>对<code>rand</code>的依赖信息。<strong>不过，即便<code>rand</code>在工作区的某个地方被使用了，我们也不能在工作区的其他 crate 中使用它，除非我们也将<code>rand</code>添加到它们的<em>Cargo.toml</em>文件中</strong>。例如，如果我们在<code>adder</code>包的<em>adder/src/main.rs</em>文件中添加<code>use rand;</code>，就会出现错误：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo build
+</span></span><span class="line"><span class="cl">  --snip--
+</span></span><span class="line"><span class="cl">   Compiling adder v0.1.0 <span class="o">(</span>file:///projects/add/adder<span class="o">)</span>
+</span></span><span class="line"><span class="cl">error<span class="o">[</span>E0432<span class="o">]</span>: unresolved import <span class="sb">`</span>rand<span class="sb">`</span>
+</span></span><span class="line"><span class="cl"> --&gt; adder/src/main.rs:2:5
+</span></span><span class="line"><span class="cl">  <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">2</span> <span class="p">|</span> use rand<span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">|</span>     ^^^^ no external crate <span class="sb">`</span>rand<span class="sb">`</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>要解决此问题，请编辑<em>Cargo.toml</em>文件（针对<code>adder</code>包），并指明<code>rand</code>也是该包的一个依赖项</strong>。构建<code>adder</code>包时，会将<code>rand</code>添加到<em>Cargo.lock</em>中<code>adder</code>的依赖项列表，但不会额外下载<code>rand</code>的副本。Cargo会确保工作区中每个使用<code>rand</code>包的包中的每个 crate 都使用相同的版本，只要它们指定了兼容的<code>rand</code>版本，这样既节省了空间，又能确保工作区中的各个 crate 彼此兼容。</p>
+<p>如果工作区中的 crate 指定了同一依赖项的不兼容版本，<strong>Cargo 会解析每个版本，但仍会尽量减少解析的版本数量</strong>。</p>
+<hr>
+<h3 id="1434-在工作区创建一个测试">14.3.4 在工作区创建一个测试
+</h3><p>另一个增强功能是，我们在<code>add_one</code> crate中添加对<code>add_one::add_one</code>函数的测试：</p>
+<p>Filename: add_one/src/lib.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">add_one</span><span class="p">(</span><span class="n">x</span>: <span class="kt">i32</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">i32</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="cp">#[cfg(test)]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">mod</span> <span class="nn">tests</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="k">super</span>::<span class="o">*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="cp">#[test]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">fn</span> <span class="nf">it_works</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>现在在顶级的<em>add</em>目录中运行<code>cargo test</code>。在这样结构的工作区中运行<code>cargo test</code>将会执行工作区中所有包的测试。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo <span class="nb">test</span>
+</span></span><span class="line"><span class="cl">   Compiling add_one v0.1.0 <span class="o">(</span>file:///projects/add/add_one<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   Compiling adder v0.1.0 <span class="o">(</span>file:///projects/add/adder<span class="o">)</span>
+</span></span><span class="line"><span class="cl">    Finished <span class="sb">`</span><span class="nb">test</span><span class="sb">`</span> profile <span class="o">[</span>unoptimized + debuginfo<span class="o">]</span> target<span class="o">(</span>s<span class="o">)</span> in 0.20s
+</span></span><span class="line"><span class="cl">     Running unittests src/lib.rs <span class="o">(</span>target/debug/deps/add_one-93c49ee75dc46543<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">running <span class="m">1</span> <span class="nb">test</span>
+</span></span><span class="line"><span class="cl"><span class="nb">test</span> tests::it_works ... ok
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">test</span> result: ok. <span class="m">1</span> passed<span class="p">;</span> <span class="m">0</span> failed<span class="p">;</span> <span class="m">0</span> ignored<span class="p">;</span> <span class="m">0</span> measured<span class="p">;</span> <span class="m">0</span> filtered out<span class="p">;</span> finished in 0.00s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     Running unittests src/main.rs <span class="o">(</span>target/debug/deps/adder-3a47283c568d2b6a<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">running <span class="m">0</span> tests
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">test</span> result: ok. <span class="m">0</span> passed<span class="p">;</span> <span class="m">0</span> failed<span class="p">;</span> <span class="m">0</span> ignored<span class="p">;</span> <span class="m">0</span> measured<span class="p">;</span> <span class="m">0</span> filtered out<span class="p">;</span> finished in 0.00s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">   Doc-tests add_one
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">running <span class="m">0</span> tests
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">test</span> result: ok. <span class="m">0</span> passed<span class="p">;</span> <span class="m">0</span> failed<span class="p">;</span> <span class="m">0</span> ignored<span class="p">;</span> <span class="m">0</span> measured<span class="p">;</span> <span class="m">0</span> filtered out<span class="p">;</span> finished in 0.00s
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>输出的第一部分显示，<code>it_works</code>测试在<code>add_one</code> crate中通过。下一部分显示在<code>adder</code> crate中未找到任何测试，最后一部分则显示在<code>add_one</code> crate中未找到任何文档测试。我<strong>们也可以从顶级目录对工作区中的某个特定 crate 运行测试，方法是使用 <code>-p</code> 标志并指定我们要测试的 crate 的名称</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo <span class="nb">test</span> -p add_one
+</span></span><span class="line"><span class="cl">    Finished <span class="sb">`</span><span class="nb">test</span><span class="sb">`</span> profile <span class="o">[</span>unoptimized + debuginfo<span class="o">]</span> target<span class="o">(</span>s<span class="o">)</span> in 0.00s
+</span></span><span class="line"><span class="cl">     Running unittests src/lib.rs <span class="o">(</span>target/debug/deps/add_one-93c49ee75dc46543<span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">running <span class="m">1</span> <span class="nb">test</span>
+</span></span><span class="line"><span class="cl"><span class="nb">test</span> tests::it_works ... ok
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">test</span> result: ok. <span class="m">1</span> passed<span class="p">;</span> <span class="m">0</span> failed<span class="p">;</span> <span class="m">0</span> ignored<span class="p">;</span> <span class="m">0</span> measured<span class="p">;</span> <span class="m">0</span> filtered out<span class="p">;</span> finished in 0.00s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">   Doc-tests add_one
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">running <span class="m">0</span> tests
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">test</span> result: ok. <span class="m">0</span> passed<span class="p">;</span> <span class="m">0</span> failed<span class="p">;</span> <span class="m">0</span> ignored<span class="p">;</span> <span class="m">0</span> measured<span class="p">;</span> <span class="m">0</span> filtered out<span class="p">;</span> finished in 0.00s
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此输出显示<code>cargo test</code>只运行了<code>add_one</code> crate的测试，没有运行<code>adder</code> crate的测试。<strong>如果你要将工作区中的包发布到<a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a>，工作区中的每个包都需要单独发布</strong>。与<code>cargo test</code>类似，我们可以使用<code>-p</code>标志并指定想要发布的包的名称，来发布工作区中的某个特定包。</p>
+<p>随着项目的发展，可以考虑使用工作区：这能让你处理更小、更易于理解的组件，而非一大块杂乱的代码。此外，如果多个 crate 经常需要同时修改，将它们放在工作区中可以更方便 crate 之间的协作。</p>
+<hr>
+<h2 id="144-使用cargo-install安装二进制包">14.4 使用<code>cargo install</code>安装二进制包
+</h2><p><code>cargo install</code> 命令允许你在本地安装和使用二进制 crate。这并非旨在替代系统包，而是为 Rust 开发者提供一种便捷的方式，用于安装其他人在 <a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a> 上分享的工具。<strong>请注意，您只能安装具有二进制目标的包。<em>二进制目标</em>是指如果 crate 包含 <em>src/main.rs</em> 文件或其他指定为二进制的文件时所生成的可运行程序</strong>，与之相对的是库目标，<strong>库目标自身不可运行，但适合包含在其他程序</strong>中。通常，crates 会在 <em>README</em> 文件中说明该 crate 是库、具有二进制目标，还是两者兼具。</p>
+<p>使用<code>cargo install</code>安装的所有二进制文件都存储在安装根目录的<em>bin</em>文件夹中。如果您使用<em>rustup.rs</em>安装了Rust，且没有任何自定义配置，该目录将是*$HOME/.cargo/bin*。<strong>请确保该目录在您的<code>$PATH</code>中，以便能够运行通过<code>cargo install</code>安装的程序</strong>。</p>
+<p>例如，在第12章中我们提到，有一个用Rust实现的<code>grep</code>工具，名为<code>ripgrep</code>，用于搜索文件。要安装<code>ripgrep</code>，我们可以运行以下命令：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ cargo install ripgrep
+</span></span><span class="line"><span class="cl">    Updating crates.io index
+</span></span><span class="line"><span class="cl">  Downloaded ripgrep v14.1.1
+</span></span><span class="line"><span class="cl">  Downloaded <span class="m">1</span> crate <span class="o">(</span>213.6 KB<span class="o">)</span> in 0.40s
+</span></span><span class="line"><span class="cl">  Installing ripgrep v14.1.1
+</span></span><span class="line"><span class="cl">--snip--
+</span></span><span class="line"><span class="cl">   Compiling grep v0.3.2
+</span></span><span class="line"><span class="cl">    Finished <span class="sb">`</span>release<span class="sb">`</span> profile <span class="o">[</span>optimized + debuginfo<span class="o">]</span> target<span class="o">(</span>s<span class="o">)</span> in 6.73s
+</span></span><span class="line"><span class="cl">  Installing ~/.cargo/bin/rg
+</span></span><span class="line"><span class="cl">   Installed package <span class="sb">`</span>ripgrep v14.1.1<span class="sb">`</span> <span class="o">(</span>executable <span class="sb">`</span>rg<span class="sb">`</span><span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>输<strong>出的倒数第二行显示了已安装二进制文件的位置和名称，对于<code>ripgrep</code>来说，这个名称是<code>rg</code></strong>。如前所述，只要安装目录在你的<code>$PATH</code>中，你就可以运行<code>rg --help</code>，开始使用这个更快、更具Rust风格的文件搜索工具了!</p>
+<hr>
+<h2 id="144-使用自定义命令拓展cargo">14.4 使用自定义命令拓展Cargo
+</h2><p>Cargo 的设计允许你在不修改它的情况下通过新的子命令对其进行扩展。如果你的 <code>$PATH</code> 中有一个名为 <code>cargo-something</code> 的二进制文件，你可以通过运行 <code>cargo something</code> 来将其当作 Cargo 的子命令执行。像这样的自定义命令在你运行 <code>cargo --list</code> 时也会被列出。能够使用 <code>cargo install</code> 来安装扩展，然后像使用 Cargo 的内置工具一样运行它们，这是 Cargo 设计带来的一个极为便捷的优势！</p>
+<hr>
+<h2 id="145-总结">14.5 总结
+</h2><p>使用Cargo和<a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a>共享代码这是Rust生态系统适用于多种不同任务的部分原因。Rust的标准库小巧且稳定，但 crate 易于共享、使用和改进，其时间线与该语言不同。不要羞于在 <a class="link" href="https://crates.io/"  target="_blank" rel="noopener"
+    >crates.io</a> 上分享对你有用的代码；它很可能也会对其他人有用！</p>
+<hr>
 
 </section>
 
@@ -14060,13 +15716,13 @@
         
         
         
-        共发表 9 篇文章 · 总计 139.91 k 字
+        共发表 9 篇文章 · 总计 157.10 k 字
     </div>
     <div>
         
         
 
-        最近一次更新时间：<span id="last-commit-time">2025-09-01 21:36</span>
+        最近一次更新时间：<span id="last-commit-time">2025-09-02 21:20</span>
     </div>
 </section>
 

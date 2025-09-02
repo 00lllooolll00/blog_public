@@ -2,7 +2,7 @@
 title: Rust自学笔记
 description: 根据官网学习Rust时做的笔记
 date: 2025-08-21
-lastmod: 2025-09-01
+lastmod: 2025-09-02
 slug: rust-self-teach
 image: rust-2.jpg
 comments: true
@@ -8601,14 +8601,14 @@ pub struct Config {
 }
 ```
 
-之后我们在 `run` 函数中只需要判断 `igonre_case` 这个字段的值就可以判断调用哪个搜索函数了！我们的 `run` 函数现在应该是这样的：
+之后我们在 `run` 函数中只需要判断 `ignore_case` 这个字段的值就可以判断调用哪个搜索函数了！我们的 `run` 函数现在应该是这样的：
 
 ```Rust
 fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
-    // 根据 igonre_case 字段来调用不同的搜索函数
-    let results = if config.igonre_case {
+    // 根据 ignore_case 字段来调用不同的搜索函数
+    let results = if config.ignore_case {
         minigrep::search_case_insensitive(&config.query, &contents)
     } else {
         minigrep::search(&config.query, &contents)
@@ -8623,13 +8623,13 @@ fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
 ```
 
-现在我们还要去修改 `Config` 结构体的构建函数，我们需要根据环境变量的不同来为 `Config` 的 `igonre_case` 赋值。读取环境变量的一些方法都在标准库的 `env` 模块中，我们已经引入到了我们的作用域中。**我们调用 `var` 函数来查看某个环境变量有没有被设置**，在这里我们给这个变量命名为 `IGNORE_CASE`：
+现在我们还要去修改 `Config` 结构体的构建函数，我们需要根据环境变量的不同来为 `Config` 的 `ignore_case` 赋值。读取环境变量的一些方法都在标准库的 `env` 模块中，我们已经引入到了我们的作用域中。**我们调用 `var` 函数来查看某个环境变量有没有被设置**，在这里我们给这个变量命名为 `IGNORE_CASE`：
 
 ```Rust
 struct Config {
     pub query: String,
     pub file_path: String,
-    pub igonre_case: bool,
+    pub ignore_case: bool,
 }
 
 impl Config {
@@ -8643,7 +8643,7 @@ impl Config {
         let result = Config {
             query: args[1].clone(),
             file_path: args[2].clone(),
-            igonre_case: ignore_case,
+            ignore_case: ignore_case,
         };
         Ok(result)
     }
@@ -8674,7 +8674,7 @@ To an admiring bog!
 
 ![image-20250901171425139](./index.assets/image-20250901171425139.png)
 
-现在在该命令之前加上 `IGONRE_CASE=1`，就可以设置该环境变量了：
+现在在该命令之前加上 `IGNORE_CASE=1`，就可以设置该环境变量了：
 
 ```shell
 $ IGNORE_CASE=1 cargo run -- to poem.txt
@@ -9110,3 +9110,1136 @@ fn main() {
 ```
 
 **在定义或使用函数，或者使用闭包的类型时，`Fn`特征非常重要**。下一节中，我们将讨论迭代器。许多迭代器方法会接受闭包作为参数，所以在我们继续学习时，请记住这些闭包的细节！
+
+---
+
+## 13.2 迭代器——遍历一系列数据
+
+迭代器就是用于快速遍历一个集合。如果我们要对一系列的数据中的每一个都做相同的操作，那么使用迭代器就可以避免很多重复的代码。
+
+**Rust中的迭代器是懒惰的，意味着只有在你调用方法来消耗迭代器的时候，迭代器才会一步一步往下遍历**。比如下面这个代码，我们对向量`v1`创建了一个迭代器，但是不使用任何方法消耗这个迭代器，那么他本身并没有任何含义：
+
+```Rust
+fn main() {
+    let v1 = vec![1, 2, 3];
+
+    let v1_iter = v1.iter();
+}
+```
+
+这个迭代器被存储在`v1_iter`变量中，只要我们创建了一个迭代器，我们可以用很多种方法去使用它。在之前讲循环的时候，我们使用了`for`循环来遍历一系列数据。**其实这一过程的的底层中，隐式的创建了一个迭代器，然后逐步消耗他**，只是我们之前并没有详细说明其工作原理。
+
+比如下面这个例子，我们将迭代器的创建和迭代分开来，迭代我们使用的是`for`循环。在`for`循环内部，会把每一个迭代的对象打印出来：
+
+```Rust
+fn main() {
+    let v1 = vec![1, 2, 3];
+
+    let v1_iter = v1.iter();
+
+    for val in v1_iter {
+        println!("Got: {val}");
+    }
+}
+```
+
+在那些标准库未提供迭代器的语言中，你可能需要通过以下方式实现相同的功能：将一个变量初始化为索引0，使用该变量对向量进行索引以获取值，然后在循环中递增该变量的值，直到它达到向量中的项目总数。迭代器会为你处理所有这些逻辑，减少你可能会搞砸的重复代码。迭代器让你拥有更大的灵活性，可以将相同的逻辑用于多种不同类型的序列，而不仅仅是像向量这样可以索引的数据结构。让我们来看看迭代器是如何做到这一点的。
+
+---
+
+### 13.2.1 `Iterator Trait`和`next`方法
+
+所有的迭代器都实现了一个叫做`Iterator`的trait。它是由标准库定义的，其定义看上去是这样的：
+
+```Rust
+pub trait Iterator {
+    type Item;
+
+    fn next(&mut self) -> Option<Self::Item>;
+
+    // ...
+}
+```
+
+**这里有新语法叫做`type Item`和`Self::Item`，这是用于定义一个该trait的一个关联类型（*associated type*）**。对于关联类型，我们将在20章具体讨论，现在我们只知道，这个`Iterator` trait要求我们定义一个`Item`类型，该类型会被用于后面的`next`方法的返回类型中。**换句话说，`Item` 类型将是从迭代器返回的类型**。
+
+**`Iterator`  trait只要求实现一个`next`方法，该方法会返回迭代器中的下一个值，这个值会被`Some`包裹，如果迭代器遍历完了将会返回`None`**。
+
+我们也可以直接对一个迭代器使用`next`方法来获得下一个值，比如可以查看下面这个测试：
+
+```Rust
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn iterator_demonstration() {
+        let v1 = vec![1, 2, 3];
+
+        let mut v1_iter = v1.iter();
+
+        assert_eq!(v1_iter.next(), Some(&1));
+        assert_eq!(v1_iter.next(), Some(&2));
+        assert_eq!(v1_iter.next(), Some(&3));
+        assert_eq!(v1_iter.next(), None);
+    }
+}
+```
+
+测试结果如下：
+
+![image-20250902164337114](./index.assets/image-20250902164337114.png)
+
+需要注意的是，我们需要让`v1_iter`是可变的：**在迭代器上调用`next`方法会改变迭代器用于跟踪自身在序列中位置的内部状态。换句话说，这段代码会*消耗*（或者说用完）迭代器**。每次调用`next`都会从迭代器中取出一个元素。**当我们使用`for`循环时，不需要让`v1_iter`是可变的，因为循环会获取`v1_iter`的所有权，并在后台使其变为可变的**。
+
+还要注意，**我们通过调用`next`所获得的值是指向向量中值的不可变引用。`iter`方法会生成一个基于不可变引用的迭代器**。如果我们想要创建一个**获取`v1`的所有权并返回自有值的迭代器，可以调用`into_iter`而非`iter`**。同样地，**如果我们想要遍历可变引用，可以调用`iter_mut`而非`iter`**。
+
+---
+
+### 13.2.2 消耗迭代器的方法
+
+`Iterator` trait 有许多不同的方法，标准库为这些方法提供了默认实现；你可以在标准库 API 文档中查找 `Iterator` trait 来了解这些方法。**其中一些方法在其定义中会调用 `next` 方法，这也是为什么在实现 `Iterator` trait 时，你需要实现 `next` 方法**。
+
+调用`next`的方法被称为**消费型适配器（*consumer adapters*）**，因为调用它们会耗尽迭代器。`sum`方法就是一个例子，它会获取迭代器的所有权，并通过反复调用`next`来遍历元素，从而耗尽迭代器。在遍历过程中，它会将每个元素加到一个累加的总和中，当迭代完成时返回这个总和：
+
+```Rust
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn iterator_sum() {
+        let v1 = vec![1, 2, 3];
+
+        let v1_iter = v1.iter();
+
+        let total: i32 = v1_iter.sum();
+
+        assert_eq!(total, 6);
+    }
+}
+```
+
+**在调用`sum`之后，我们不允许使用`v1_iter`，因为`sum`会获取我们调用它所使用的迭代器的所有权**。
+
+---
+
+### 13.2.3 其他产生迭代器的方法
+
+**迭代器适配器（*Iterator adapters*）**是在`Iterator` trait上定义的方法，**它们不会消耗迭代器，相反，它们通过改变原始迭代器的某些方面来生成不同的迭代器。**
+
+下面这个例子展示了一个调用了迭代适配器的一个方法叫做`map`，`map`接收一个闭包，之后对迭代器中的每一个对象都调用一次该闭包，**然后会返回一个经过传入的闭包处理过后的一个新的迭代器**，下面这个例子就是把迭代器中的每一个值都加上1，返回的迭代器就是原本的迭代器的所有对象的值都加上1：
+
+```Rust
+fn main(){
+    let v1 = vec![1,2,3,4];
+    v1.iter().map(|x| x + 1);
+}
+```
+
+![image-20250902182312790](./index.assets/image-20250902182312790.png)
+
+可以看到有一个警告`iterators are lazy and do nothing unless consumed`，**这很好符合我们之前说的迭代器都是惰性的**。
+
+为了修复这个问题，**我们可以使用`collect`方法，它会消耗尽所有的迭代器，然后把该迭代器变成一个集合，不过我们需要显式指定这个集合的数据类型**。比如下面这个代码：
+
+```Rust
+fn main() {
+    let v1 = vec![1, 2, 3, 4];
+    let v2: Vec<_> = v1.iter().map(|x| x + 1).collect();
+
+    assert_eq!(v2, vec![2, 3, 4, 5]);
+}
+```
+
+因为`map`会接收一个闭包，**所以我们可以指定想要对每个元素执行的任何操作**。这是一个很好的例子，展示了闭包如何让你在复用`Iterator` trait提供的迭代行为的同时，自定义某些行为。你可以将多个迭代器适配器调用链接起来，以一种易读的方式执行复杂操作。但由于所有迭代器都是惰性的，**你必须调用其中一个消费型适配器方法，才能从迭代器适配器的调用中获取结果**。
+
+----
+
+### 13.2.4 使用捕获环境的闭包
+
+许多迭代器适配器将闭包作为参数，**通常我们指定为迭代器适配器参数的闭包是会捕获其环境的闭包**。在这个示例中，我们将使用接受闭包的`filter`方法。该闭包从迭代器中获取一个元素并返回一个`bool`值。如果闭包返回`true`，则该值将被包含在`filter`生成的迭代中。如果闭包返回`false`，则该值不会被包含在内。
+
+我们使用`filter`接受一个捕获自己环境中的`shoe_size`的闭包作为入参，让`filter`作用于一个`Shoe`结构体的集合。他只会返回一个满足我们的条件的鞋子：
+
+```Rust
+#[derive(PartialEq, Debug)]
+struct Shoe {
+    size: u32,
+    style: String,
+}
+
+fn shoes_fit_size(shoes: Vec<Shoe>, size: u32) -> Vec<Shoe> {
+    shoes.into_iter().filter(|s| s.size == size).collect()
+    // 使用 into_iter 来让 shoes 直接变成一个迭代器
+    // 这样的迭代器是有所有权的，如果只是 iter 返回的是一个不可变引用的迭代器
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn filters_by_size() {
+        let shoes = vec![
+            Shoe {
+                size: 10,
+                style: String::from("sneaker"),
+            },
+            Shoe {
+                size: 13,
+                style: String::from("sandal"),
+            },
+            Shoe {
+                size: 10,
+                style: String::from("boot"),
+            },
+        ];
+
+        let in_my_size = shoes_fit_size(shoes, 10);
+
+        assert_eq!(
+            in_my_size,
+            vec![
+                Shoe {
+                    size: 10,
+                    style: String::from("sneaker")
+                },
+                Shoe {
+                    size: 10,
+                    style: String::from("boot")
+                },
+            ]
+        );
+    }
+}
+```
+
+函数`shoes_fit_size`会直接获取所有权，它会返回一个存有匹配我们设定尺码的鞋子的向量。在函数内部，**我们使用了`into_iter`方法去创建了自有所有权的迭代器，之后使用`filter`去把迭代器调整成一个只包含让`filter`入参中的闭包返回为`true`的新的迭代器**。闭包从环境中捕获`shoe_size`参数，并将该值与每只鞋的尺寸进行比较，只保留指定尺寸的鞋。最后，调用`collect`会将经过适配的迭代器返回的值收集到一个向量中，该向量由函数返回。
+
+测试结果如下：
+
+![image-20250902185419860](./index.assets/image-20250902185419860.png)
+
+测试表明，当我们调用`shoes_in_size`时，我们只会得到与我们指定的值尺寸相同的鞋子。
+
+---
+
+## 13.3 改进我们的I/O程序
+
+现在我们系统性的学习了闭包和迭代器，我们可以对我们12章写的`minigrep`做一些优化。来看看如何用所学的新知识来改进我们对`Config::build`和`search`的实现吧！
+
+---
+
+### 13.3.1 移除`clone`，使用迭代器
+
+Filename: src/lib.rs
+
+```Rust
+pub struct Config {
+    pub query: String,
+    pub file_path: String,
+    pub ignore_case: bool,
+}
+
+impl Config {
+    pub fn build(args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+
+        let ignore_case = env::var("IGNORE_CASE").is_ok();
+
+        let result = Config {
+            query: args[1].clone(),
+            file_path: args[2].clone(),
+            ignore_case: ignore_case,
+        };
+        Ok(result)
+    }
+}
+```
+
+我们之前实现`Config`的构建函数的时候，我们说不必担心低效的`clone`调用，因为我们会在未来将其移除。好了，现在就是那个时候了。**我们在这里需要`clone`，因为参数`args`中有一个包含`String`元素的切片，但`build`函数并不拥有`args`**。为了返回一个`Config`实例的所有权，我们必须从`Config`的`query`和`file_path`字段中克隆值，这样`Config`实例才能拥有它自己的值。
+
+有了关于迭代器的新知识，我们可以修改`build`函数，**使其接收一个迭代器的所有权作为参数**，而不是借用一个切片。我们将使用迭代器的功能，而不是检查切片长度并索引到特定位置的代码。这将使`Config::build`函数的作用更加清晰，因为迭代器会访问这些值。一旦`Config::build`获得迭代器的所有权，**并且不再使用会进行借用的索引操作，我们就可以将`String`值从迭代器中移到`Config`中，而不必调用`clone`来进行新的内存分配。**
+
+---
+
+#### 直接返回一个迭代器
+
+我们的已有的代码的*src/main.rs*中的主函数应该是这样的：
+
+```Rust
+use minigrep;
+use std::error::Error;
+use std::{env, fs, process};
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config_value = Config::build(&args).unwrap_or_else(|err| {
+        eprintln!("Problem parsing arguments: {err}");
+        process::exit(1);
+    });
+
+    if let Err(e) = run(config_value) {
+        eprintln!("Application error:{e}");
+        process::exit(1);
+    }
+}
+
+```
+
+我们会从`main`函数开始改进，**直到我们修改完成我们的`Config::build`函数之前，我们的代码都是不可以正常通过编译的**。首先我们修改如下：
+
+Filename:src/main.rs
+
+```Rust
+fn main() {
+    let config_value = Config::build(env::args()).unwrap_or_else(|err| {
+        eprintln!("Problem parsing arguments:{err}");
+        process::exit(1);
+    });
+
+    if let Err(e) = run(config_value) {
+        eprintln!("Application error:{e}");
+        process::exit(1);
+    }
+}
+```
+
+**`env::args` 函数会返回一个迭代器**！我们没有将迭代器的值收集到向量中，然后再将切片传递给 `Config::build`，而是直接将从 `env::args` 返回的迭代器的所有权传递给了 `Config::build`。
+
+接下来，我们需要更新`Config::build`的定义。在你的I/O项目的*src/lib.rs*文件中，让我们将`Config::build`的签名修改为如代码所示的样子。**由于我们还需要更新函数体，所以此时它仍然无法编译**：
+
+Filename:src/lib.rs
+
+```Rust
+impl Config {
+    pub fn build(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
+	//...
+    }
+}
+```
+
+标准库文档中关于`env::args`函数的说明显示，**它返回的迭代器类型是`std::env::Args`，该类型实现了`Iterator`特性并返回`String`值**。
+
+我们更新了`Config::build`函数的签名，因此参数`args`具有带 trait 约束的泛型类型`impl Iterator<Item = String>`，而非`&[String]`。这里对`impl Trait`语法的使用我们在第10章就提过了，它意味着`args`可以是任何实现了`Iterator` trait并且返回`String`的类型。
+
+**因为我们正在获取`args`的所有权，并且我们将通过迭代来修改`args`，所以我们可以在`args`参数的规范中添加`mut`关键字，使其变为可变的。**
+
+---
+
+#### 使用迭代器而不是索引
+
+接下来我们可以修改函数体，由于我们的入参`args`是一个迭代器，所以我们可以使用`next`方法来挨个访问数据：
+
+Filename: src/lib.rs
+
+```Rust
+pub struct Config {
+    pub query: String,
+    pub file_path: String,
+    pub ignore_case: bool,
+}
+
+impl Config {
+    pub fn build(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
+        args.next();// 第一个参数是程序名 我们不需要 所以直接舍弃
+
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a query string"),
+        };
+
+        let file_path = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a file_path string"),
+        };
+
+        let ignore_case = env::var("IGNORE_CASE").is_ok();
+
+        Ok(Config {
+            query,
+            file_path,
+            ignore_case,
+        })
+    }
+}
+```
+
+**请记住，`env::args`返回值中的第一个值是程序的名称。我们要忽略这个值，获取下一个值，所以首先调用`next`，并且不对返回值进行任何处理**。然后我们调用`next`来获取要放入`Config`的`query`字段的值。如果`next`返回`Some`，我们就用`match`来提取该值。如果它返回`None`，那就意味着提供的参数不足，我们会提前返回一个`Err`值。对于`file_path`值，我们也会执行同样的操作。
+
+---
+
+### 13.3.2 使用迭代适配器来让代码更易读
+
+我们可以利用迭代器配合上`filter`方法来让我们的`search`函数更加简洁。**函数式编程风格倾向于尽可能减少可变状态的数量，以使代码更清晰。移除可变状态可能会为未来的改进创造条件，让搜索能够并行进行**，因为我们不必管理对`results`向量的并发访问：
+
+Filename: src/lib.rs
+
+```Rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    contents.lines()
+    .filter(|line| line.contains(query))
+    .collect()
+}
+```
+
+回想一下，`search`函数的作用是返回`contents`中所有包含`query`的行。**这段代码使用`filter`适配器来仅保留那些`line.contains(query)`返回`true`的行**。然后，我们用`collect`将匹配的行收集到另一个向量中。简单多了！你也可以对`search_case_insensitive`函数做同样的修改，以使用迭代器方法：
+
+Filename: src/lib.rs
+
+```Rust
+pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    contents
+        .lines()
+        .filter(|line| line.to_lowercase().contains(query.to_lowercase()))
+        .collect()
+}
+```
+
+---
+
+### 13.3.3 在迭代器和循环中抉择
+
+接下来顺理成章的问题是，在你自己的代码中应该选择哪种风格以及为什么：是`for`循环的原始实现，还是使用迭代器的版本。大多数Rust程序员更倾向于使用迭代器风格。一开始可能有点难掌握，但一旦你对各种迭代器适配器及其作用有了感觉，**迭代器就会更容易理解。代码不再需要处理各种循环细节和构建新向量，而是专注于循环的高层目标**。这抽象掉了一些常见代码，因此更容易看到这段代码特有的概念，例如迭代器中的每个元素必须满足的过滤条件。
+
+但这两种实现真的等效吗？直观的假设可能是低级循环会更快。让我们来谈谈性能。
+
+---
+
+## 13.4 性能比较： 迭代器 vs. 循环
+
+要确定是使用循环还是迭代器，你需要知道哪种实现更快：是带有显式for循环的search函数版本，还是带有迭代器的版本。
+
+我们进行了一项基准测试，方法是将阿瑟·柯南·道尔爵士的《福尔摩斯探案集》全文加载到一个`String`中，并在内容中查找“the”这个词。以下是使用`for`循环的`search`版本和使用迭代器的`search`版本的基准测试结果：
+
+```Rust
+test bench_search_for  ... bench:  19,620,300 ns/iter (+/- 915,700)
+test bench_search_iter ... bench:  19,234,900 ns/iter (+/- 657,200)
+```
+
+**这两种实现的性能相近**！我们在此不解释基准测试代码，因为重点并非证明这两个版本是等效的，而是大致了解这两种实现在性能方面的对比情况。
+
+为了进行更全面的基准测试，你应该使用各种大小的不同文本作为`contents`，使用不同的单词以及不同长度的单词作为`query`，并尝试其他各种变体。关键在于：迭代器虽然是一种高级抽象，但编译后生成的代码与你自己编写的低级代码大致相同。迭代器是Rust的**零成本抽象**之一，**这意味着使用这种抽象不会带来额外的运行时开销**。这类似于C++的最初设计者和实现者比雅尼·斯特劳斯特鲁普在《C++基础》（2012年）中对零开销的定义：
+
+**一般来说，C++的实现遵循零开销原则：未使用的部分，无需付出代价。而且更进一步讲：所使用的部分，其效率无法通过手工编码得到更优的实现。**
+
+再举一个例子，以下代码取自一个音频解码器。该解码算法使用线性预测这一数学运算，基于先前样本的线性函数来估计未来值。这段代码使用迭代器链对作用域内的三个变量进行一些数学运算：一个数据切片`buffer`、一个包含12个元素的`coefficients`数组，以及用于在`qlp_shift`中移位数据的量。我们在这个示例中声明了这些变量，但没有给它们赋值；尽管这段代码脱离其上下文后没有太多意义，但它仍然是一个简洁的、真实世界中的例子，展示了Rust如何将高层概念转化为低层代码。
+
+```Rust
+let buffer: &mut [i32];
+let coefficients: [i64; 12];
+let qlp_shift: i16;
+
+for i in 12..buffer.len() {
+    let prediction = coefficients.iter()
+                                 .zip(&buffer[i - 12..i])
+                                 .map(|(&c, &s)| c * s as i64)
+                                 .sum::<i64>() >> qlp_shift;
+    let delta = buffer[i];
+    buffer[i] = prediction as i32 + delta;
+}
+```
+
+为了计算`prediction`的值，这段代码会遍历`coefficients`中的12个值，并使用`zip`方法将系数值与`buffer`中前12个值进行配对。然后，对于每一对值，我们将它们相乘，将所有结果相加，并将总和中的位向右移动`qlp_shift`位。
+
+像音频解码器这类应用中的计算往往将性能放在首位。在这里，我们创建了一个迭代器，使用了两个适配器，然后消费该值。这段Rust代码会编译成什么样的汇编代码呢？嗯，在撰写本文时，它编译出的汇编代码与你手动编写的完全相同。根本没有与遍历`coefficients`中值相对应的循环：Rust知道会有12次迭代，因此它会“展开”循环。*循环展开*是一种优化手段，它去除了循环控制代码的开销，转而针对循环的每次迭代生成重复代码。
+
+所有系数都存储在寄存器中，这意味着访问这些值的速度非常快。在运行时，对数组访问没有边界检查。Rust能够应用的所有这些优化使得生成的代码极其高效。既然了解了这一点，你就可以放心使用迭代器和闭包了！它们让代码看起来更高级，但不会因此带来运行时的性能损耗。
+
+----
+
+## 13.4 总结
+
+闭包和迭代器是受函数式编程语言思想启发的 Rust 特性。它们使 Rust 能够以底层性能清晰地表达高级思想。闭包和迭代器的实现不会影响运行时性能。这是 Rust 努力提供零成本抽象这一目标的一部分。既然我们已经提升了I/O项目的表现力，那就来看看`cargo`的更多功能吧，这些功能将帮助我们与世界分享这个项目。
+
+---
+
+# Chapter 14：Cargo 和 Crates.io
+
+到目前为止，我们只使用了Cargo最基本的功能来构建、运行和测试代码，但它能做的还有很多。在本章中，我们将讨论它的一些其他更高级的功能，向你展示如何进行以下操作：
+
+- **通过修改配置文件自定义您的构建**
+- **在[crates.io](https://crates.io/)上发布自己的库**
+- **使用工作区组织大型项目**
+- **从[crates.io](https://crates.io/)安装二进制文件**
+- **使用自定义命令扩展Cargo**
+
+Cargo 的功能远不止本章所介绍的这些，因此，若想全面了解其所有特性，请参阅 [它的文档](https://doc.rust-lang.org/cargo/)。
+
+----
+
+## 14.1 自定义构建配置
+
+在Rust中，*release profile*是预定义并且可以自定义的配置文件，我们可以修改里面的一些配置来更好的控制代码的编译的各种选项。**每个项目的配置文件都是独立于其他的配置文件**。
+
+Cargo 有两个主要配置文件：运行 `cargo build` 时 Cargo 会使用的 `dev` 配置文件，以及运行 `cargo build --release` 时 Cargo 会使用的 `release` 配置文件。**`dev` 配置文件具有适合开发的良好默认设置，而 `release` 配置文件则具有适合发布构建的良好默认设置**。
+
+这些配置文件名称可能在你的构建输出中见过：
+
+![image-20250902200411491](./index.assets/image-20250902200411491.png)
+
+`dev`和`release`是编译器使用的不同配置文件。
+
+**Cargo 对每个配置文件都有默认设置，当你未在项目的 *Cargo.toml* 文件中明确添加任何 `[profile.*]` 部分时，这些默认设置将生效**。通过为你想要自定义的任何配置文件添加 `[profile.*]` 部分，你可以覆盖默认设置的任何子集。例如，以下是 `dev` 和 `release` 配置文件的 `opt-level` 设置的默认值：
+
+Filename: Cargo.toml
+
+```toml
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
+```
+
+`opt-level` 设置控制着 Rust 对代码应用的优化数量，其范围为 0 到 3。**应用的优化越多，编译时间就越长，因此如果你处于开发阶段且需要频繁编译代码，可能希望减少优化以加快编译速度，即便生成的代码运行速度会变慢**。因此，`dev` 模式下的默认 `opt-level` 是 `0`。当你准备发布代码时，最好花更多时间进行编译。你只会在发布模式下编译一次，但会多次运行编译后的程序，所以发布模式以更长的编译时间换取运行更快的代码。这就是 `release` 配置文件的默认 `opt-level` 为 `3` 的原因。
+
+你可以通过在*Cargo.toml*中为默认设置添加不同的值来覆盖它。例如，如果我们想在开发配置文件中使用优化级别1，可以在项目的*Cargo.toml*文件中添加以下两行：
+
+Filename: Cargo.toml
+
+```toml
+[profile.dev]
+opt-level = 1
+```
+
+**这段代码覆盖了`0`的默认设置**。现在，当我们运行`cargo build`时，Cargo会使用`dev`配置文件的默认值，再加上我们对`opt-level`的自定义设置。由于我们将`opt-level`设置为`1`，Cargo将应用比默认情况更多的优化，但不会像发布版本构建那样进行过多优化。
+
+有关每个配置文件的完整配置选项和默认值列表，请参见[Cargo 的文档](https://doc.rust-lang.org/cargo/reference/profiles.html)。
+
+---
+
+## 14.2 在Crate.io上发布自己的crate
+
+我们使用了来自[crates.io](https://crates.io/)的包作为我们项目的依赖项，但你也可以通过发布自己的包与其他人分享你的代码。**位于[crates.io](https://crates.io/)的 crate 注册表，它会分发你的包的源代码，因此它主要托管开源代码**。
+
+---
+
+### 14.2.1 攥写有用的文档注释
+
+**准确地为你的包编写文档将帮助其他用户了解如何以及何时使用它们，因此花时间编写文档是值得的**。在第3章中，我们讨论了如何使用双斜杠`//`来注释Rust代码。**Rust还有一种特殊的注释用于文档，方便地称为文档注释，它可以生成HTML文档**。HTML会显示公共API项的文档注释内容，这些内容是为那些有兴趣**了解如何使用你的 crate 而不是你的 crate 是如何实现的程序员准备的**。
+
+**文档注释使用三个斜杠 `///` 而非两个，并且支持使用Markdown符号来设置文本格式**。请将文档注释放在它们所要说明的项的前面。下面展示了名为 `my_crate` 的 crate 中一个 `add_one` 函数的文档注释：
+
+Filename: src/lib.rs
+
+```Rust
+/// Adds one to the number given.
+///
+/// # Examples
+///
+/// ```
+/// let arg = 5;
+/// let answer = my_crate::add_one(arg);
+///
+/// assert_eq!(6, answer);
+/// ```
+pub fn add_one(x: i32) -> i32 {
+    x + 1
+}
+```
+
+**在这里，我们对`add_one`函数的功能进行描述，以`Examples`为标题开始一个章节，然后提供演示如何使用`add_one`函数的代码**。我们可以通过运行`cargo doc`从这个文档注释生成HTML文档。该命令会运行Rust附带的`rustdoc`工具，并将生成的HTML文档放在*target/doc*目录中。	
+
+为方便起见，运行`cargo doc --open`会为当前 crate 的文档（以及该 crate 所有依赖项的文档）生成 HTML 文件，并在网页浏览器中打开结果。导航到`add_one`函数，你会看到文档注释中的文本是如何呈现的，如图：
+
+![image-20250902201904222](./index.assets/image-20250902201904222.png)
+
+----
+
+### 14.2.1 常用的部分
+
+我们使用了`# Examples`这个Markdown标题，在HTML中创建了一个标题为“示例”的部分。以下是 crate 作者在其文档中常用的其他部分：
+
+- **Panics**：所记录函数可能发生panic的场景。不希望程序发生panic的函数调用者应确保不在这些情况下调用该函数。
+- **Errors**：如果函数返回一个`Result`，那么描述可能出现的错误类型以及导致这些错误返回的条件，会对调用者有所帮助，这样他们就能编写代码以不同方式处理不同类型的错误。
+- **Safety**：如果调用该函数是`unsafe`（我们将在第20章讨论不安全性），则应有一个章节解释该函数为何不安全，并涵盖该函数期望调用者遵守的不变式。
+
+大多数文档注释并不需要包含所有这些部分，但这是一个很好的清单，能提醒你代码用户可能会关心的方面。
+
+---
+
+### 14.2.2 作为测试的文档
+
+在文档注释中添加示例代码块有助于展示如何使用你的库，而且这样做还有一个额外好处：**运行`cargo test`会将文档中的代码示例作为测试来运行**！没有什么比带有示例的文档更好的了。但最糟糕的莫过于示例无法运行，因为自文档编写以来代码已经发生了变化。如果我们针对add_one`函数的文档运行`cargo test`，会在测试结果中看到一个类似这样的部分：
+
+![image-20250902202843569](./index.assets/image-20250902202843569.png)
+
+现在，如果我们修改函数或示例，使得示例中的`assert_eq!`触发恐慌，然后再次运行`cargo test`，就会发现文档测试能检测到示例与代码不一致的问题！
+
+---
+
+### 14.2.3 为包含的项目添加注释
+
+**文档注释的格式`//!`会将文档添加到包含该注释的项中，而非添加到注释后面的项中**。我们通常在 crate 根文件（按照惯例是*src/lib.rs*）中或模块内部使用这类文档注释，以对整个 crate 或模块进行文档说明。例如，要添加文档来描述包含`add_one`函数的`my_crate`包的用途，我们需要在*src/lib.rs*文件的开头添加以`//!`开头的文档注释，如代码：
+
+Filename: src/lib.rs
+
+```Rust
+//! # My Crate
+//!
+//! `my_crate` is a collection of utilities to make performing certain
+//! calculations more convenient.
+
+/// Adds one to the number given.
+///
+/// # Examples
+///
+/// ```
+/// let arg = 5;
+/// let answer = my_crate::add_one(arg);
+///
+/// assert_eq!(6, answer);
+/// ```
+pub fn add_one(x: i32) -> i32 {
+    x + 1
+}
+```
+
+**注意，在最后一行以`//!`开头的代码后面没有任何代码。因为我们用`//!`而不是`///`来开始注释，所以我们是在为包含此注释的项编写文档，而不是为紧随此注释的项编写文档**。在这种情况下，该项是*src/lib.rs*文件，也就是 crate 的根目录。这些注释描述了整个 crate。
+
+当我们运行`cargo doc --open`时，这些注释将显示在`my_crate`文档的首页上，位于 crate 中公共项列表的上方，如图：
+
+![image-20250902203226401](./index.assets/image-20250902203226401.png)
+
+**项目中的文档注释对于描述 crate 和模块尤其有用。使用它们来解释容器的整体用途，以帮助用户理解 crate 的结构。**
+
+---
+
+### 14.2.4 使用`pub use`导出公用的API
+
+发布 crate 时，其公共 API 的结构是一个重要考量因素。**使用你的 crate 的人对其结构的熟悉程度不如你，如果你的 crate 有庞大的模块层级，他们可能很难找到自己想要使用的部分**。
+
+在第7章中，我们介绍了如何使用`pub`关键字使项目公开，以及如何使用`use`关键字将项目引入作用域。然而，在你开发一个 crate 时，对你来说合理的结构可能对用户并不那么方便。你可能希望将结构体组织在包含多个层级的层次结构中，但这样一来，那些想要使用你在层级结构深处定义的类型的人可能很难发现该类型的存在。他们也可能会对必须输入`use` `my_crate::some_module::another_module::UsefulType;` 而不是`use` `my_crate::UsefulType;`感到厌烦。
+
+好消息是，如果某个结构不方便其他库使用，你不必重新调整内部组织：**相反，你可以通过使用`pub use`来重新导出条目，从而创建一个与私有结构不同的公共结构**。重新导出会将一个位置的公共条目在另一个位置也设为公共，就好像该条目原本是在另一个位置定义的一样。
+
+例如，假设我们制作了一个名为`art`的库，用于建模艺术概念。这个库包含两个模块：一个是`kinds`模块，其中包含两个名为`PrimaryColor`和`SecondaryColor`的枚举；另一个是`utils`模块，其中包含一个名为`mix`的函数，如代码：
+
+Filename: src/lib.rs
+
+```Rust
+//! # Art
+//!
+//! A library for modeling artistic concepts.
+
+pub mod kinds {
+    /// The primary colors according to the RYB color model.
+    pub enum PrimaryColor {
+        Red,
+        Yellow,
+        Blue,
+    }
+
+    /// The secondary colors according to the RYB color model.
+    pub enum SecondaryColor {
+        Orange,
+        Green,
+        Purple,
+    }
+}
+
+pub mod utils {
+    use crate::kinds::*;
+
+    /// Combines two primary colors in equal amounts to create
+    /// a secondary color.
+    pub fn mix(c1: PrimaryColor, c2: PrimaryColor) -> SecondaryColor {
+        // --snip--
+    }
+}
+```
+
+`cargo doc`生成的该 crate 文档的首页应该是这样的：
+
+![image-20250902203852029](./index.assets/image-20250902203852029.png)
+
+**请注意，`PrimaryColor`和`SecondaryColor`类型未在首页列出，`mix`函数也未列出。我们必须点击`kinds`和`utils`才能看到它们**。另一个依赖于该库的包需要使用`use`语句将`art`中的项引入作用域，并指定当前定义的模块结构。下面展示了一个使用`art`包中的`PrimaryColor`和`mix`项的包的示例：
+
+Filename: src/main.rs
+
+```Rust
+use art::kinds::PrimaryColor;
+use art::utils::mix;
+
+fn main() {
+    let red = PrimaryColor::Red;
+    let yellow = PrimaryColor::Yellow;
+    mix(red, yellow);
+}
+```
+
+代码的作者使用了`art` crate，他必须弄清楚`PrimaryColor`位于`kinds`模块中，而`mix`位于`utils`模块中。`art` crate的模块结构对开发`art` crate的开发者来说更为相关，而对使用它的人来说则不然。内部结构对于试图理解如何使用`art` crate的人来说没有任何有用信息，反而会造成困惑，因为使用它的开发者必须弄清楚该去哪里查找，还必须在`use`语句中指定模块名称。
+
+**为了从公共API中移除内部组织，我们可以修改代码，添加`pub use`语句以在顶层重新导出这些项**，如下所示：
+
+Filename: src/lib.rs
+
+```Rust
+//! # Art
+//!
+//! A library for modeling artistic concepts.
+
+pub use self::kinds::PrimaryColor;
+pub use self::kinds::SecondaryColor;
+pub use self::utils::mix;
+
+pub mod kinds {
+    /// The primary colors according to the RYB color model.
+    pub enum PrimaryColor {
+        Red,
+        Yellow,
+        Blue,
+    }
+
+    /// The secondary colors according to the RYB color model.
+    pub enum SecondaryColor {
+        Orange,
+        Green,
+        Purple,
+    }
+}
+
+pub mod utils {
+    use crate::kinds::*;
+
+    /// Combines two primary colors in equal amounts to create
+    /// a secondary color.
+    pub fn mix(c1: PrimaryColor, c2: PrimaryColor) -> SecondaryColor {
+        SecondaryColor::Orange
+    }
+}
+```
+
+现在，`cargo doc` 为这个 crate 生成的 API 文档会在首页列出并链接重导出的内容，如图所示，这使得 `PrimaryColor` 和 `SecondaryColor` 类型以及 `mix` 函数更容易被找到：
+
+![image-20250902204206401](./index.assets/image-20250902204206401.png)
+
+在存在许多嵌套模块的情况下，**使用`pub use`在顶层重新导出类型，会极大改善使用该 crate 的用户体验**。`pub use`的另一个常见用途是在当前 crate 中重新导出某个依赖项的定义，使该 crate 的定义成为你自己 crate 公共 API 的一部分。
+
+创建一个有用的公共API结构更像是一门艺术而非科学，你可以通过迭代来找到最适合用户的API。**选择`pub use`能让你在内部 crate 结构的组织上拥有灵活性，并将这种内部结构与呈现给用户的内容解耦**。查看一些你已安装的 crate 的代码，看看它们的内部结构是否与公共API有所不同。
+
+---
+
+### 14.2.5 创建一个Crates.io账号
+
+**在你发布任何 crate 之前，你需要在crates.io上创建一个账户并获取一个 API 令牌。**具体操作是，访问crates.io的主页，通过 GitHub 账户登录。（目前 GitHub 账户是必需的，但该网站未来可能会支持其他创建账户的方式。）登录后，访问位于https://crates.io/me/的账户设置，获取你的 API 密钥。然后运行`cargo login`命令，并在提示时粘贴你的 API 密钥，如下所示：
+
+```shell
+$ cargo login
+abcdefghijklmnopqrstuvwxyz012345
+```
+
+此命令会将你的API令牌告知Cargo，并将其本地存储在~/.cargo/credentials中。请**注意，该令牌是一个秘密：不要与其他任何人分享**。如果你因任何原因将其分享给了他人，你应当在crates.io上撤销该令牌并生成一个新的令牌。
+
+----
+
+### 14.2.6 为新的crate添加元数据
+
+假设你有一个想要发布的 crate。发布前，**你需要在该 crate 的 *Cargo.toml* 文件的 `[package]` 部分添加一些元数据**。
+
+你的 crate 需要一个独特的名称。当你在本地处理 crate 时，你可以给它取任何你喜欢的名字。**不过，[crates.io](https://crates.io/) 上的 crate 名称采用先到先得的原则进行分配**。一旦某个 crate 名称被占用，其他人就不能再使用该名称发布 crate 了**。在尝试发布 crate 之前，请搜索你想要使用的名称。如果该名称已被使用，你需要另找一个名称**，并编辑 `[package]` 部分下 *Cargo.toml* 文件中的 `name` 字段，使用新名称进行发布，如下所示：
+
+Filename: Cargo.toml
+
+```toml
+[package]
+name = "guessing_game"
+```
+
+即使你已经选择了一个独特的名称，此时当你运行`cargo publish`来发布这个 crate 时，你会先收到一个警告，然后是一个错误：
+
+```shell
+$ cargo publish
+    Updating crates.io index
+warning: manifest has no description, license, license-file, documentation, homepage or repository.
+See https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info.
+--snip--
+error: failed to publish to registry at https://crates.io
+
+Caused by:
+  the remote server responded with an error (status 400 Bad Request): missing or empty metadata fields: description, license. Please see https://doc.rust-lang.org/cargo/reference/manifest.html for more information on configuring these fields
+
+```
+
+这会导致错误，因为你缺少一些关键信息：**需要提供描述和许可证，这样人们才能知道你的 crate 是做什么的，以及他们可以在什么条款下使用它**。在 *Cargo.toml* 中，添加一两句话的描述，因为它会和你的 crate 一起出现在搜索结果中。对于 `license` 字段，你需要提供一个 *许可证标识符值*。[Linux 基金会的软件包数据交换（SPDX）](http://spdx.org/licenses/) 列出了可用于该值的标识符。例如，要指定你的 crate 使用 MIT 许可证，添加 `MIT` 标识符即可：
+
+Filename: Cargo.toml
+
+```toml
+[package]
+name = "guessing_game"
+license = "MIT"
+```
+
+如果你想使用SPDX中未列出的许可证，**需要将该许可证的文本放入一个文件中，将该文件包含在你的项目里，然后使用`license-file`来指定该文件的名称，而非使用`license`键**。关于哪种许可证适合您的项目，超出了本书的范围。**Rust社区中的许多人通过使用`MIT OR Apache-2.0`的双重许可，以与Rust相同的方式为他们的项目授权**。这种做法表明，您也可以指定多个许可证标识符，并使用`OR`分隔，为您的项目设置多个许可证。
+
+添加了独特的名称、版本、描述和许可证后，一个准备发布的项目的*Cargo.toml*文件可能如下所示：
+
+Filename: Cargo.toml
+
+```toml
+[package]
+name = "guessing_game"
+version = "0.1.0"
+edition = "2024"
+description = "A fun game where you guess what number the computer has chosen."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+
+```
+
+[Cargo 的文档](https://doc.rust-lang.org/cargo/) 描述了其他元数据，你可以通过指定这些元数据，让其他人能更轻松地发现和使用你的 crate。
+
+---
+
+### 14.2.7 发布到Crates.io
+
+既然你已经创建了账户、保存了API令牌、为你的包选择了名称并指定了所需的元数据，现在就可以发布了！发布包会将特定版本上传到[crates.io](https://crates.io/)供他人使用。
+
+**请注意，发布是永久性的。该版本永远无法被覆盖**，代码也不能被删除。[crates.io](https://crates.io/)的一个主要目标是作为代码的永久存档，以便所有依赖于[crates.io](https://crates.io/)上的 crate 的项目都能进行构建都可以正常使用。允许删除版本会导致无法实现该目标。不过，您可以发布的 crate 版本数量没有限制。
+
+再次运行`cargo publish`命令。现在它应该会成功：
+
+```shell
+$ cargo publish
+    Updating crates.io index
+   Packaging guessing_game v0.1.0 (file:///projects/guessing_game)
+   Verifying guessing_game v0.1.0 (file:///projects/guessing_game)
+   Compiling guessing_game v0.1.0
+(file:///projects/guessing_game/target/package/guessing_game-0.1.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s
+   Uploading guessing_game v0.1.0 (file:///projects/guessing_game)
+
+```
+
+您现在已经与Rust社区分享了您的代码，任何人都可以轻松地将您的 crate 作为其项目的依赖项。
+
+---
+
+### 14.2.8 为已存在的crate发布新版本
+
+当你对自己的 crate 做了修改并准备发布新版本时，需要更改 `version` 在 *Cargo.toml* 文件中指定的值，然后重新发布。根据你所做的更改类型，使用 [语义化版本规则](http://semver.org/) 来确定合适的下一个版本号。之后运行 `cargo publish`上传新版本。
+
+---
+
+### 14.2.9 弃用版本
+
+虽然你无法删除 crate 的旧版本，但可以阻止未来的项目将它们作为新依赖项添加。当某个 crate 版本因某种原因出现问题时，这一功能会很有用。在这种情况下，Cargo 支持撤销 crate 版本。撤回一个版本会阻止新项目依赖该版本，同时允许所有已依赖它的现有项目继续运行。本质上，**撤回意味着所有带有*Cargo.lock*的项目都不会出现问题，且未来生成的任何*Cargo.lock*文件都不会使用被撤回的版本**。
+
+使用`cargo yank`就可以弃用某个版本。例如，如果我们发布过一个名为 `guessing_game`的 1.0.1 版本 crate，并且想要撤回它，那么在 `guessing_game`的项目目录中，我们会运行：
+
+```shell
+$ cargo yank --vers 1.0.1
+```
+
+在命令中添加`--undo`，你还可以撤销一次弃用操作，并允许项目重新开始依赖某个版本。**`cargo yank`操作不会删除任何代码。例如，它无法删除意外上传的密钥。如果发生这种情况，你必须立即重置这些密钥。**
+
+---
+
+## 14.3 Cargo 工作区
+
+在第12章中，我们构建了一个包含二进制 crate 和库 crate 的包。随着项目的发展，你可能会发现库 crate 不断变大，这时你会希望将包进一步拆分为多个库 crate。Cargo 提供了一个名为 **工作区（*workspace*）** 的功能，它可以帮助管理多个协同开发的相关包。
+
+----
+
+### 14.3.1 创建一个工作区
+
+**工作区是一组共享相同Cargo.lock和输出目录的包**。让我们使用工作区创建一个项目——我们会使用简单的代码，这样就能专注于工作区的结构。构建工作区有多种方法，因此我们只展示一种常见方式。我们将创建一个包含一个二进制文件和两个库的工作区。这个二进制文件将提供主要功能，它会依赖这两个库。一个库将提供`add_one`函数，另一个库将提供`add_two`函数。这三个 crate 将属于同一个工作区。我们首先为工作区创建一个新目录：
+
+```shell
+$ mkdir add
+$ cd add
+```
+
+接下来，在*add*目录中，我们创建*Cargo.toml*文件，**该文件将配置整个工作区**。此文件不会包含`[package]`部分。相反，**它将以`[workspace]`部分开头，这使我们能够向工作区添加成员**。我们还特意通过将`resolver`设置为`"3"`，在工作区中使用Cargo解析器算法的最新版本：
+
+Filename: Cargo.toml
+
+```toml
+[workspace]
+resolver = "3"
+```
+
+接下来，我们将通过在*add*目录中运行`cargo new`来创建`adder`二进制 crate：
+
+```shell
+$ cargo new adder
+```
+
+**在工作区中运行`cargo new`还会自动将新创建的包添加到工作区`Cargo.toml`中`[workspace]`定义的`members`键中**，如下所示：
+
+```toml
+[workspace]
+resolver = "3"
+members = ["adder"]
+```
+
+此时，我们可以通过运行`cargo build`来构建工作区。你的*add*目录中的文件应该如下所示：
+
+```
+├── Cargo.lock
+├── Cargo.toml
+├── adder
+│   ├── Cargo.toml
+│   └── src
+│       └── main.rs
+└── target
+```
+
+工作区的顶层有一个*target*目录，编译后的工件将被放置到该目录中；`adder`包没有自己的*target*目录。即使我们从*adder*目录内运行`cargo build`，编译后的工件最终仍会放在*add/target*中，而不是*add/adder/target*。**Cargo在工作区中这样构建*target*目录结构，是因为工作区中的 crate 旨在相互依赖**。如果每个 crate 都有自己的*target*目录，那么每个 crate 都必须重新编译工作区中的其他每个 crate，才能将工件放入自己的*target*目录。通过共享一个*target*目录，这些 crate 可以避免不必要的重新构建。
+
+---
+
+### 14.3.2 创建第二个Package
+
+接下来，让我们在工作区中创建另一个成员包，并将其命名为`add_one`。生成一个名为`add_one`的新库 crate：
+
+```shell
+$ cargo new add_one --lib
+```
+
+顶级的*Cargo.toml*现在将在`members`列表中包含*add_one*路径：
+
+Filename: Cargo.toml
+
+```toml
+[workspace]
+resolver = "3"
+members = ["adder", "add_one"]
+```
+
+你的 *add* 目录现在应该包含这些目录和文件：
+
+```toml
+├── Cargo.lock
+├── Cargo.toml
+├── add_one
+│   ├── Cargo.toml
+│   └── src
+│       └── lib.rs
+├── adder
+│   ├── Cargo.toml
+│   └── src
+│       └── main.rs
+└── target
+
+```
+
+在*add_one/src/lib.rs*文件中，我们来添加一个`add_one`函数：
+
+Filename: add_one/src/lib.rs
+
+```rust
+pub fn add_one(x: i32) -> i32 {
+    x + 1
+}
+```
+
+现在，我们可以让包含二进制文件的`adder`包依赖于包含我们库的`add_one`包。首先，我们需要在*adder/Cargo.toml*中添加一个对`add_one`的路径依赖。
+
+Filename: adder/Cargo.toml
+
+```toml
+[dependencies]
+add_one = { path = "../add_one" }
+```
+
+**Cargo并不假设工作区中的 crate 会相互依赖，因此我们需要明确指定依赖关系**：
+
+接下来，让我们在`adder` crate中使用`add_one`函数（来自`add_one` crate）。打开*adder/src/main.rs*文件，并修改`main`函数以调用`add_one`函数，如下所示：
+
+Filename: adder/src/main.rs
+
+```rust
+fn main() {
+    let num = 10;
+    println!("Hello, world! {num} plus one is {}!", add_one::add_one(num));
+}
+```
+
+让我们在顶级 *add* 目录中运行`cargo build`来构建工作区：
+
+```shell
+$ cargo build
+```
+
+**要从 *add* 目录运行二进制 crate，我们可以使用`-p`参数和包名称，通过`cargo run`来指定要运行工作区中的哪个包**：
+
+```shell
+$ cargo run -p adder
+```
+
+这会运行*adder/src/main.rs*中的代码，该代码依赖于`add_one` crate。
+
+---
+
+### 14.3.3 在工作区中依赖外部包
+
+**请注意，工作区的顶层只有一个*Cargo.lock*文件，而不是在每个 crate 的目录中都有一个*Cargo.lock*文件**。这确保了所有 crate 都使用相同版本的所有依赖项。如果我们将`rand`包添加到*adder/Cargo.toml*和*add_one/Cargo.toml*文件中，Cargo 会将这两个文件中的依赖项解析为同一个版本的`rand`，并将其记录在唯一的*Cargo.lock*中。**让工作区中的所有 crate 使用相同的依赖项，意味着这些 crate 之间始终是兼容的**。让我们将`rand` crate 添加到*add_one/Cargo.toml*文件的`[dependencies]`部分，这样我们就可以在`add_one` crate 中使用`rand` crate 了：
+
+Filename: add_one/Cargo.toml
+
+```toml
+[dependencies]
+rand = "0.8.5"
+```
+
+现在我们可以在*add_one/src/lib.rs*文件中添加`use rand;`，**然后在*add*目录下运行`cargo build`来构建整个工作区，这样就会引入并编译`rand` crate**。我们会收到一个警告，因为我们没有引用引入作用域的`rand`。
+
+```shell
+$ cargo build
+    Updating crates.io index
+  Downloaded rand v0.8.5
+   --snip--
+   Compiling rand v0.8.5
+   Compiling add_one v0.1.0 (file:///projects/add/add_one)
+warning: unused import: `rand`
+ --> add_one/src/lib.rs:1:5
+  |
+1 | use rand;
+  |     ^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: `add_one` (lib) generated 1 warning (run `cargo fix --lib -p add_one` to apply 1 suggestion)
+   Compiling adder v0.1.0 (file:///projects/add/adder)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.95s
+
+```
+
+顶级的*Cargo.lock*现在包含了`add_one`对`rand`的依赖信息。**不过，即便`rand`在工作区的某个地方被使用了，我们也不能在工作区的其他 crate 中使用它，除非我们也将`rand`添加到它们的*Cargo.toml*文件中**。例如，如果我们在`adder`包的*adder/src/main.rs*文件中添加`use rand;`，就会出现错误：
+
+```shell
+$ cargo build
+  --snip--
+   Compiling adder v0.1.0 (file:///projects/add/adder)
+error[E0432]: unresolved import `rand`
+ --> adder/src/main.rs:2:5
+  |
+2 | use rand;
+  |     ^^^^ no external crate `rand`
+
+```
+
+**要解决此问题，请编辑*Cargo.toml*文件（针对`adder`包），并指明`rand`也是该包的一个依赖项**。构建`adder`包时，会将`rand`添加到*Cargo.lock*中`adder`的依赖项列表，但不会额外下载`rand`的副本。Cargo会确保工作区中每个使用`rand`包的包中的每个 crate 都使用相同的版本，只要它们指定了兼容的`rand`版本，这样既节省了空间，又能确保工作区中的各个 crate 彼此兼容。
+
+如果工作区中的 crate 指定了同一依赖项的不兼容版本，**Cargo 会解析每个版本，但仍会尽量减少解析的版本数量**。
+
+---
+
+### 14.3.4 在工作区创建一个测试
+
+另一个增强功能是，我们在`add_one` crate中添加对`add_one::add_one`函数的测试：
+
+Filename: add_one/src/lib.rs
+
+```rust
+pub fn add_one(x: i32) -> i32 {
+    x + 1
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        assert_eq!(3, add_one(2));
+    }
+}
+```
+
+现在在顶级的*add*目录中运行`cargo test`。在这样结构的工作区中运行`cargo test`将会执行工作区中所有包的测试。
+
+```shell
+$ cargo test
+   Compiling add_one v0.1.0 (file:///projects/add/add_one)
+   Compiling adder v0.1.0 (file:///projects/add/adder)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.20s
+     Running unittests src/lib.rs (target/debug/deps/add_one-93c49ee75dc46543)
+
+running 1 test
+test tests::it_works ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/adder-3a47283c568d2b6a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests add_one
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+```
+
+输出的第一部分显示，`it_works`测试在`add_one` crate中通过。下一部分显示在`adder` crate中未找到任何测试，最后一部分则显示在`add_one` crate中未找到任何文档测试。我**们也可以从顶级目录对工作区中的某个特定 crate 运行测试，方法是使用 `-p` 标志并指定我们要测试的 crate 的名称**：
+
+```shell
+$ cargo test -p add_one
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.00s
+     Running unittests src/lib.rs (target/debug/deps/add_one-93c49ee75dc46543)
+
+running 1 test
+test tests::it_works ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests add_one
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+```
+
+此输出显示`cargo test`只运行了`add_one` crate的测试，没有运行`adder` crate的测试。**如果你要将工作区中的包发布到[crates.io](https://crates.io/)，工作区中的每个包都需要单独发布**。与`cargo test`类似，我们可以使用`-p`标志并指定想要发布的包的名称，来发布工作区中的某个特定包。
+
+随着项目的发展，可以考虑使用工作区：这能让你处理更小、更易于理解的组件，而非一大块杂乱的代码。此外，如果多个 crate 经常需要同时修改，将它们放在工作区中可以更方便 crate 之间的协作。
+
+---
+
+## 14.4 使用`cargo install`安装二进制包
+
+`cargo install` 命令允许你在本地安装和使用二进制 crate。这并非旨在替代系统包，而是为 Rust 开发者提供一种便捷的方式，用于安装其他人在 [crates.io](https://crates.io/) 上分享的工具。**请注意，您只能安装具有二进制目标的包。*二进制目标*是指如果 crate 包含 *src/main.rs* 文件或其他指定为二进制的文件时所生成的可运行程序**，与之相对的是库目标，**库目标自身不可运行，但适合包含在其他程序**中。通常，crates 会在 *README* 文件中说明该 crate 是库、具有二进制目标，还是两者兼具。
+
+使用`cargo install`安装的所有二进制文件都存储在安装根目录的*bin*文件夹中。如果您使用*rustup.rs*安装了Rust，且没有任何自定义配置，该目录将是*$HOME/.cargo/bin*。**请确保该目录在您的`$PATH`中，以便能够运行通过`cargo install`安装的程序**。
+
+例如，在第12章中我们提到，有一个用Rust实现的`grep`工具，名为`ripgrep`，用于搜索文件。要安装`ripgrep`，我们可以运行以下命令：
+
+```shell
+$ cargo install ripgrep
+    Updating crates.io index
+  Downloaded ripgrep v14.1.1
+  Downloaded 1 crate (213.6 KB) in 0.40s
+  Installing ripgrep v14.1.1
+--snip--
+   Compiling grep v0.3.2
+    Finished `release` profile [optimized + debuginfo] target(s) in 6.73s
+  Installing ~/.cargo/bin/rg
+   Installed package `ripgrep v14.1.1` (executable `rg`)
+
+```
+
+输**出的倒数第二行显示了已安装二进制文件的位置和名称，对于`ripgrep`来说，这个名称是`rg`**。如前所述，只要安装目录在你的`$PATH`中，你就可以运行`rg --help`，开始使用这个更快、更具Rust风格的文件搜索工具了!
+
+---
+
+## 14.4 使用自定义命令拓展Cargo
+
+Cargo 的设计允许你在不修改它的情况下通过新的子命令对其进行扩展。如果你的 `$PATH` 中有一个名为 `cargo-something` 的二进制文件，你可以通过运行 `cargo something` 来将其当作 Cargo 的子命令执行。像这样的自定义命令在你运行 `cargo --list` 时也会被列出。能够使用 `cargo install` 来安装扩展，然后像使用 Cargo 的内置工具一样运行它们，这是 Cargo 设计带来的一个极为便捷的优势！
+
+---
+
+## 14.5 总结
+
+使用Cargo和[crates.io](https://crates.io/)共享代码这是Rust生态系统适用于多种不同任务的部分原因。Rust的标准库小巧且稳定，但 crate 易于共享、使用和改进，其时间线与该语言不同。不要羞于在 [crates.io](https://crates.io/) 上分享对你有用的代码；它很可能也会对其他人有用！
+
+---
+

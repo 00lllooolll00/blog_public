@@ -7,7 +7,7 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>© 2025 N1ntyNine99. 保留所有权利。</copyright>
-        <lastBuildDate>Fri, 22 Aug 2025 00:00:00 +0800</lastBuildDate><atom:link href="https://example.com/tags/%E5%86%85%E5%AD%98%E6%B1%A0/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 02 Sep 2025 00:00:00 +0800</lastBuildDate><atom:link href="https://example.com/tags/%E5%86%85%E5%AD%98%E6%B1%A0/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>嵌入式系统内存池</title>
         <link>https://example.com/p/%E5%86%85%E5%AD%98%E6%B1%A0/</link>
         <pubDate>Thu, 21 Aug 2025 00:00:00 +0800</pubDate>
@@ -165,7 +165,7 @@
       &lt;/tr&gt;
       &lt;tr&gt;
           &lt;td&gt;&lt;code&gt;MemPool_Init_Default()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;使用默认参数初始化(64字节,1024块)&lt;/td&gt;
+          &lt;td&gt;使用默认参数初始化(64K字节,1024块)&lt;/td&gt;
           &lt;td&gt;无&lt;/td&gt;
           &lt;td&gt;同MemPool_Init()&lt;/td&gt;
       &lt;/tr&gt;
@@ -211,11 +211,13 @@
 &lt;li&gt;&lt;strong&gt;位域结构&lt;/strong&gt; - 使用位域优化内存块信息存储&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;自动清零&lt;/strong&gt; - 分配的内存块自动初始化为零&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h2 id=&#34;使用限制&#34;&gt;使用限制
-&lt;/h2&gt;&lt;p&gt;⚠️ 仅支持固定块大小分配&lt;br&gt;
-⚠️ 非线程安全，多线程环境需额外同步&lt;br&gt;
-⚠️ 初始化后无法动态扩展内存池大小&lt;br&gt;
-⚠️ 最大支持32767个连续块(受Blocks_Num字段限制)&lt;/p&gt;
+&lt;h2 id=&#34;使用限制&#34;&gt;使用限制⚠️
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;仅支持固定块大小分配&lt;/li&gt;
+&lt;li&gt;非线程安全，多线程环境需额外同步&lt;/li&gt;
+&lt;li&gt;初始化后无法动态扩展内存池大小&lt;/li&gt;
+&lt;li&gt;最大支持32767个连续块(受Blocks_Num字段限制)&lt;/li&gt;
+&lt;/ol&gt;
 &lt;h2 id=&#34;典型应用场景&#34;&gt;典型应用场景
 &lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;嵌入式系统内存管理&lt;/li&gt;
@@ -237,11 +239,12 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;h2 id=&#34;性能提示&#34;&gt;性能提示
-&lt;/h2&gt;&lt;p&gt;🔹 分配单个块比多个连续块更快，单块分配为O(1)复杂度&lt;br&gt;
-🔹 释放时会自动合并相邻空闲块，减少内存碎片&lt;br&gt;
-🔹 调试时可启用&lt;code&gt;DEBUG&lt;/code&gt;宏进行内存池完整性检查&lt;br&gt;
-🔹 内存分配前会自动清零，无需手动初始化&lt;br&gt;
-🔹 内存池放置在SRAM区域，提高访问速度&lt;/p&gt;
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;🔹 分配单个块比多个连续块更快，单块分配为O(1)复杂度  
+🔹 释放时会自动合并相邻空闲块，减少内存碎片  
+🔹 调试时可启用`DEBUG`宏进行内存池完整性检查  
+🔹 内存分配前会自动清零，无需手动初始化  
+🔹 内存池放置在SRAM区域，提高访问速度  
+&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id=&#34;实现细节&#34;&gt;实现细节
 &lt;/h2&gt;&lt;h3 id=&#34;内存布局&#34;&gt;内存布局
 &lt;/h3&gt;&lt;p&gt;内存池由两部分组成：&lt;/p&gt;

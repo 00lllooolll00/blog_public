@@ -10,7 +10,7 @@
 <meta property='og:description' content="内存池">
 <meta property='og:url' content='https://example.com/p/%E5%86%85%E5%AD%98%E6%B1%A0/'>
 <meta property='og:site_name' content='N1ntyNine99'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='内存池' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-08-22T00:00:00&#43;08:00'/><meta property='og:image' content='https://example.com/p/%E5%86%85%E5%AD%98%E6%B1%A0/pic6.png' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='内存池' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-09-02T00:00:00&#43;08:00'/><meta property='og:image' content='https://example.com/p/%E5%86%85%E5%AD%98%E6%B1%A0/pic6.png' />
 <meta name="twitter:title" content="嵌入式系统内存池">
 <meta name="twitter:description" content="内存池"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://example.com/p/%E5%86%85%E5%AD%98%E6%B1%A0/pic6.png' />
@@ -293,7 +293,7 @@
     </li>
     <li><a href="#设计优势">设计优势</a></li>
     <li><a href="#内部优化">内部优化</a></li>
-    <li><a href="#使用限制">使用限制</a></li>
+    <li><a href="#使用限制">使用限制⚠️</a></li>
     <li><a href="#典型应用场景">典型应用场景</a></li>
     <li><a href="#示例配置">示例配置</a></li>
     <li><a href="#性能提示">性能提示</a></li>
@@ -403,8 +403,8 @@
 <path d="M15 6L18 9" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M13 20H21" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-            <time class="article-time--updated" datetime=" 2025-08-22T00:00:00.000Z">
-                2025年8月22日
+            <time class="article-time--updated" datetime=" 2025-09-02T00:00:00.000Z">
+                2025年9月2日
             </time>
         </div>
         
@@ -570,7 +570,7 @@
       </tr>
       <tr>
           <td><code>MemPool_Init_Default()</code></td>
-          <td>使用默认参数初始化(64字节,1024块)</td>
+          <td>使用默认参数初始化(64K字节,1024块)</td>
           <td>无</td>
           <td>同MemPool_Init()</td>
       </tr>
@@ -616,11 +616,13 @@
 <li><strong>位域结构</strong> - 使用位域优化内存块信息存储</li>
 <li><strong>自动清零</strong> - 分配的内存块自动初始化为零</li>
 </ol>
-<h2 id="使用限制">使用限制
-</h2><p>⚠️ 仅支持固定块大小分配<br>
-⚠️ 非线程安全，多线程环境需额外同步<br>
-⚠️ 初始化后无法动态扩展内存池大小<br>
-⚠️ 最大支持32767个连续块(受Blocks_Num字段限制)</p>
+<h2 id="使用限制">使用限制⚠️
+</h2><ol>
+<li>仅支持固定块大小分配</li>
+<li>非线程安全，多线程环境需额外同步</li>
+<li>初始化后无法动态扩展内存池大小</li>
+<li>最大支持32767个连续块(受Blocks_Num字段限制)</li>
+</ol>
 <h2 id="典型应用场景">典型应用场景
 </h2><ul>
 <li>嵌入式系统内存管理</li>
@@ -642,11 +644,12 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="性能提示">性能提示
-</h2><p>🔹 分配单个块比多个连续块更快，单块分配为O(1)复杂度<br>
-🔹 释放时会自动合并相邻空闲块，减少内存碎片<br>
-🔹 调试时可启用<code>DEBUG</code>宏进行内存池完整性检查<br>
-🔹 内存分配前会自动清零，无需手动初始化<br>
-🔹 内存池放置在SRAM区域，提高访问速度</p>
+</h2><pre><code>🔹 分配单个块比多个连续块更快，单块分配为O(1)复杂度  
+🔹 释放时会自动合并相邻空闲块，减少内存碎片  
+🔹 调试时可启用`DEBUG`宏进行内存池完整性检查  
+🔹 内存分配前会自动清零，无需手动初始化  
+🔹 内存池放置在SRAM区域，提高访问速度  
+</code></pre>
 <h2 id="实现细节">实现细节
 </h2><h3 id="内存布局">内存布局
 </h3><p>内存池由两部分组成：</p>
@@ -962,13 +965,13 @@
         
         
         
-        共发表 9 篇文章 · 总计 139.91 k 字
+        共发表 9 篇文章 · 总计 157.10 k 字
     </div>
     <div>
         
         
 
-        最近一次更新时间：<span id="last-commit-time">2025-09-01 21:36</span>
+        最近一次更新时间：<span id="last-commit-time">2025-09-02 21:20</span>
     </div>
 </section>
 
