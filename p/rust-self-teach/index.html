@@ -10,7 +10,7 @@
 <meta property='og:description' content="根据官网学习Rust时做的笔记">
 <meta property='og:url' content='https://example.com/p/rust-self-teach/'>
 <meta property='og:site_name' content='N1ntyNine99'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-09-03T20:52:32&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-09-04T21:23:39&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
 <meta name="twitter:title" content="Rust自学笔记">
 <meta name="twitter:description" content="根据官网学习Rust时做的笔记"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://example.com/p/rust-self-teach/rust-2.jpg' />
@@ -730,6 +730,7 @@
       </ol>
     </li>
     <li><a href="#153-使用drop-trait在清理时运行代码">15.3 使用<code>Drop</code> trait在清理时运行代码</a></li>
+    <li><a href="#154-rct引用计数器智能指针">15.4 <code>Rc&lt;T&gt;</code>引用计数器智能指针</a></li>
   </ol>
 </nav>
         </div>
@@ -832,8 +833,8 @@
 <path d="M15 6L18 9" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M13 20H21" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-            <time class="article-time--updated" datetime=" 2025-09-03T20:52:32.000Z">
-                2025年9月3日
+            <time class="article-time--updated" datetime=" 2025-09-04T21:23:39.000Z">
+                2025年9月4日
             </time>
         </div>
         
@@ -16139,6 +16140,9 @@
 <p>你可以通过多种方式使用在<code>Drop</code> trait实现中指定的代码，来使清理工作既方便又安全：例如，你可以用它来创建自己的内存分配器！借助<code>Drop</code> trait和Rust的所有权系统，你不必记得去清理，因为Rust会自动完成。你也不必担心因意外清理仍在使用的值而导致的问题：<strong>确保引用始终有效的所有权系统，也能保证当值不再被使用时，<code>drop</code> 只会被调用一次</strong>。</p>
 <p>既然我们已经研究了<code>Box&lt;T&gt;</code>以及智能指针的一些特性，接下来让我们看看标准库中定义的其他一些智能指针。</p>
 <hr>
+<h2 id="154-rct引用计数器智能指针">15.4 <code>Rc&lt;T&gt;</code>引用计数器智能指针
+</h2><p>在大多数情况下，所有权的归属都很明确，我们清楚地知道哪个变量拥有这个值的所有权。<strong>但是有时候，一个值可能会被很多变量拥有</strong>。例如，在图数据结构中，多条边可能指向同一个节点，从概念上讲，该节点归所有指向它的边**。只有所有指向这个节点的边都被drop之后才能将节点给释放掉，而不是只有一个边被释放这个节点就被释放**。</p>
+<p><strong>你必须通过使用Rust类型<code>Rc&lt;T&gt;</code>来显式启用多重所有权，该类型是引用计数（<em>reference counting</em>）的缩写</strong>。<code>Rc&lt;T&gt;</code>类型会跟踪对一个值的引用数量，以确定该值是否仍在使用中。<strong>如果一个值的引用数量为零，那么这个值就可以被清理掉，且不会导致任何引用失效</strong>。</p>
 
 </section>
 
@@ -16298,13 +16302,13 @@
         
         
         
-        共发表 9 篇文章 · 总计 167.12 k 字
+        共发表 9 篇文章 · 总计 167.44 k 字
     </div>
     <div>
         
         
 
-        最近一次更新时间：<span id="last-commit-time">2025-09-03 20:53</span>
+        最近一次更新时间：<span id="last-commit-time">2025-09-04 21:24</span>
     </div>
 </section>
 

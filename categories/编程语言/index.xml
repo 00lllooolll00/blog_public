@@ -15304,6 +15304,9 @@
 &lt;p&gt;你可以通过多种方式使用在&lt;code&gt;Drop&lt;/code&gt; trait实现中指定的代码，来使清理工作既方便又安全：例如，你可以用它来创建自己的内存分配器！借助&lt;code&gt;Drop&lt;/code&gt; trait和Rust的所有权系统，你不必记得去清理，因为Rust会自动完成。你也不必担心因意外清理仍在使用的值而导致的问题：&lt;strong&gt;确保引用始终有效的所有权系统，也能保证当值不再被使用时，&lt;code&gt;drop&lt;/code&gt; 只会被调用一次&lt;/strong&gt;。&lt;/p&gt;
 &lt;p&gt;既然我们已经研究了&lt;code&gt;Box&amp;lt;T&amp;gt;&lt;/code&gt;以及智能指针的一些特性，接下来让我们看看标准库中定义的其他一些智能指针。&lt;/p&gt;
 &lt;hr&gt;
+&lt;h2 id=&#34;154-rct引用计数器智能指针&#34;&gt;15.4 &lt;code&gt;Rc&amp;lt;T&amp;gt;&lt;/code&gt;引用计数器智能指针
+&lt;/h2&gt;&lt;p&gt;在大多数情况下，所有权的归属都很明确，我们清楚地知道哪个变量拥有这个值的所有权。&lt;strong&gt;但是有时候，一个值可能会被很多变量拥有&lt;/strong&gt;。例如，在图数据结构中，多条边可能指向同一个节点，从概念上讲，该节点归所有指向它的边**。只有所有指向这个节点的边都被drop之后才能将节点给释放掉，而不是只有一个边被释放这个节点就被释放**。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;你必须通过使用Rust类型&lt;code&gt;Rc&amp;lt;T&amp;gt;&lt;/code&gt;来显式启用多重所有权，该类型是引用计数（&lt;em&gt;reference counting&lt;/em&gt;）的缩写&lt;/strong&gt;。&lt;code&gt;Rc&amp;lt;T&amp;gt;&lt;/code&gt;类型会跟踪对一个值的引用数量，以确定该值是否仍在使用中。&lt;strong&gt;如果一个值的引用数量为零，那么这个值就可以被清理掉，且不会导致任何引用失效&lt;/strong&gt;。&lt;/p&gt;
 </description>
         </item>
         
