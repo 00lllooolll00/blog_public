@@ -2,7 +2,7 @@
 title: 嵌入式系统内存池
 description: 内存池
 date: 2025-08-21
-lastmod: 2025-09-02
+lastmod: 2025-09-05
 slug: 内存池
 image: pic6.png
 categories:
@@ -13,7 +13,7 @@ tags:
 ---
 # 内存池管理库 (Pool.c/Pool.h)
 
-## 源码下载
+## 👇🏻源码下载
 
 - [Pool.c](/code/Pool/Pool.c)
 - [Pool.h](/code/Pool/Pool.h)
