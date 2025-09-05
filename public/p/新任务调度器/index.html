@@ -1,0 +1,2783 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="基于定时器、链表的任务调度器">
+<title>任务调度器新版</title>
+
+<link rel='canonical' href='https://example.com/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/'>
+
+<link rel="stylesheet" href="/scss/style.min.72046820872168f5d569663e9f50eda0279d97bcfdddc13167ba0bb0dd5c1376.css"><meta property='og:title' content="任务调度器新版">
+<meta property='og:description' content="基于定时器、链表的任务调度器">
+<meta property='og:url' content='https://example.com/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/'>
+<meta property='og:site_name' content='N1ntyNine99'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='任务调度器' /><meta property='article:published_time' content='2025-09-05T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-09-05T00:00:00&#43;08:00'/><meta property='og:image' content='https://example.com/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/unnamed.png' />
+<meta name="twitter:title" content="任务调度器新版">
+<meta name="twitter:description" content="基于定时器、链表的任务调度器"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://example.com/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/unnamed.png' />
+    <link rel="shortcut icon" href="/favicon.svg" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+
+        <div id="page-loading" class="page-loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner-container">
+                    <div class="loading-spinner"></div>
+                </div>
+                <div class="loading-text">加载中...</div>
+            </div>
+        </div>
+
+        <div class="container main-container flex on-phone--column extended" id="main-content"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/blog_avtatar_hu_2fcd01c874799bc3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">N1ntyNine99</a></h1>
+            <h2 class="site-description">一个电子、编程苦逼爱好者</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/97101368'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg height="2500" viewBox="51.2 51.2 921.6 921.6" width="2500" xmlns="http://www.w3.org/2000/svg"><g fill="#f16c8d"><path d="m729.329 373.95c-9.795-5.945-19.062-6.785-19.144-6.785l-1.065-.05c-57.2-3.866-121.165-5.832-190.126-5.832l-13.988.005c-68.956 0-132.925 1.96-190.12 5.831l-1.066.052c-.082 0-9.349.84-19.144 6.784-15.047 9.129-24.273 25.948-27.417 49.97-10.071 76.913-4.383 173.65.19 251.393 2.938 49.966 33.407 62.459 85.048 67.149 10.782.988 69.089 5.867 159.508 5.893v-.005c90.42-.02 148.726-4.905 159.514-5.888 51.64-4.69 82.11-17.183 85.043-67.15 4.577-77.741 10.26-174.479.19-251.391-3.15-24.028-12.376-40.848-27.423-49.977zm-390.99 172.718a23.65 23.65 0 0 1 -31.687-10.845 23.68 23.68 0 0 1 10.844-31.687c2.038-1.004 50.693-24.725 110.541-43.065a23.68 23.68 0 1 1 13.88 45.292c-56.294 17.25-103.111 40.074-103.577 40.305zm268.898 35.886c-.44 2.232-11.269 54.64-50.939 54.64-21.442 0-36.1-14.049-44.984-26.772-8.694 12.708-22.805 26.772-42.655 26.772-35.533 0-50.135-48.266-51.681-53.77a11.366 11.366 0 0 1 21.878-6.17c2.75 9.652 14.13 37.202 29.798 37.202 16.374 0 28.892-23.644 31.985-31.928a11.372 11.372 0 0 1 10.65-7.388h.06a11.376 11.376 0 0 1 10.63 7.506c.107.286 11.965 31.815 34.314 31.815 20.864 0 28.565-35.952 28.641-36.32a11.346 11.346 0 0 1 13.358-8.94 11.361 11.361 0 0 1 8.945 13.353zm110.116-46.736a23.68 23.68 0 0 1 -31.683 10.844c-.47-.23-47.472-23.116-103.572-40.31a23.69 23.69 0 0 1 -15.708-29.583 23.67 23.67 0 0 1 29.578-15.703c59.848 18.34 108.498 42.061 110.551 43.065a23.68 23.68 0 0 1 10.834 31.687z"/><path d="m849.92 51.2h-675.84c-67.866 0-122.88 55.014-122.88 122.88v675.84c0 67.87 55.014 122.88 122.88 122.88h675.84c67.87 0 122.88-55.01 122.88-122.88v-675.84c0-67.86-55.01-122.88-122.88-122.88zm-36.603 627.45c-2.626 44.58-21.821 78.634-55.516 98.49-25.682 15.134-54.175 19.486-81.137 21.938-32.455 2.95-92.718 6.098-164.664 6.119-71.941-.02-132.209-3.164-164.664-6.119-26.962-2.452-55.455-6.804-81.132-21.939-33.695-19.855-52.89-53.903-55.51-98.483-4.706-80.133-10.574-179.855.194-262.108 10.654-81.383 70.102-104.976 100.612-106.168a2482.642 2482.642 0 0 1 81.423-4.086c-7.536-8.535-19.88-23.322-28.815-38.114-13.737-22.737 8.53-41.687 8.53-41.687s23.68-20.367 44.528 5.213c15.698 19.266 38.38 55.997 48.62 72.954l53.207-.215c13.26 0 26.332.072 39.22.215 10.24-16.957 32.92-53.683 48.619-72.954 20.843-25.58 44.528-5.213 44.528-5.213s22.262 18.95 8.525 41.687c-8.934 14.792-21.279 29.579-28.815 38.114 28.36.978 55.562 2.34 81.423 4.08 30.515 1.198 89.958 24.791 100.613 106.174 10.778 82.248 4.915 181.97.21 262.103z"/></g></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/00lllooolll00'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg width="2500" height="2432" viewBox="0 0 256 249" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet"><g fill="#161614"><path d="M127.505 0C57.095 0 0 57.085 0 127.505c0 56.336 36.534 104.13 87.196 120.99 6.372 1.18 8.712-2.766 8.712-6.134 0-3.04-.119-13.085-.173-23.739-35.473 7.713-42.958-15.044-42.958-15.044-5.8-14.738-14.157-18.656-14.157-18.656-11.568-7.914.872-7.752.872-7.752 12.804.9 19.546 13.14 19.546 13.14 11.372 19.493 29.828 13.857 37.104 10.6 1.144-8.242 4.449-13.866 8.095-17.05-28.32-3.225-58.092-14.158-58.092-63.014 0-13.92 4.981-25.295 13.138-34.224-1.324-3.212-5.688-16.18 1.235-33.743 0 0 10.707-3.427 35.073 13.07 10.17-2.826 21.078-4.242 31.914-4.29 10.836.048 21.752 1.464 31.942 4.29 24.337-16.497 35.029-13.07 35.029-13.07 6.94 17.563 2.574 30.531 1.25 33.743 8.175 8.929 13.122 20.303 13.122 34.224 0 48.972-29.828 59.756-58.22 62.912 4.573 3.957 8.648 11.717 8.648 23.612 0 17.06-.148 30.791-.148 34.991 0 3.393 2.295 7.369 8.759 6.117 50.634-16.879 87.122-64.656 87.122-120.973C255.009 57.085 197.922 0 127.505 0"/><path d="M47.755 181.634c-.28.633-1.278.823-2.185.389-.925-.416-1.445-1.28-1.145-1.916.275-.652 1.273-.834 2.196-.396.927.415 1.455 1.287 1.134 1.923M54.027 187.23c-.608.564-1.797.302-2.604-.589-.834-.889-.99-2.077-.373-2.65.627-.563 1.78-.3 2.616.59.834.899.996 2.08.36 2.65M58.33 194.39c-.782.543-2.06.034-2.849-1.1-.781-1.133-.781-2.493.017-3.038.792-.545 2.05-.055 2.85 1.07.78 1.153.78 2.513-.019 3.069M65.606 202.683c-.699.77-2.187.564-3.277-.488-1.114-1.028-1.425-2.487-.724-3.258.707-.772 2.204-.555 3.302.488 1.107 1.026 1.445 2.496.7 3.258M75.01 205.483c-.307.998-1.741 1.452-3.185 1.028-1.442-.437-2.386-1.607-2.095-2.616.3-1.005 1.74-1.478 3.195-1.024 1.44.435 2.386 1.596 2.086 2.612M85.714 206.67c.036 1.052-1.189 1.924-2.705 1.943-1.525.033-2.758-.818-2.774-1.852 0-1.062 1.197-1.926 2.721-1.951 1.516-.03 2.758.815 2.758 1.86M96.228 206.267c.182 1.026-.872 2.08-2.377 2.36-1.48.27-2.85-.363-3.039-1.38-.184-1.052.89-2.105 2.367-2.378 1.508-.262 2.857.355 3.049 1.398"/></g></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#-项目简介">📖 项目简介</a></li>
+    <li><a href="#源码下载">👇🏻源码下载</a>
+      <ol>
+        <li><a href="#-核心特性">🌟 核心特性</a></li>
+      </ol>
+    </li>
+    <li><a href="#-函数命名规范">🎯 函数命名规范</a>
+      <ol>
+        <li><a href="#命名约定说明">命名约定说明</a></li>
+      </ol>
+    </li>
+    <li><a href="#-api-参考文档">📚 API 参考文档</a>
+      <ol>
+        <li><a href="#-系统初始化">🔧 系统初始化</a>
+          <ol>
+            <li><a href="#taskres_t-rtaskinitvoid"><code>TaskRes_t rTaskInit(void)</code></a></li>
+          </ol>
+        </li>
+        <li><a href="#-任务管理">📝 任务管理</a>
+          <ol>
+            <li><a href="#taskres_t-rtaskcreate_dynamicvoid-pfuncvoid-uint8_t-priority-ptaskhandler_t-task_handler"><code>TaskRes_t rTaskCreate_Dynamic(void (*pfunc)(void), uint8_t priority, pTaskHandler_t *task_handler)</code></a></li>
+            <li><a href="#ptaskhandler_t-ptaskcreate_statictasknode_t-node-ptaskhandler_t-task_handler"><code>pTaskHandler_t pTaskCreate_Static(TaskNode_t *node, pTaskHandler_t *task_handler)</code></a></li>
+            <li><a href="#taskres_t-rtaskdeleteptaskhandler_t-task_handler"><code>TaskRes_t rTaskDelete(pTaskHandler_t task_handler)</code></a></li>
+          </ol>
+        </li>
+        <li><a href="#-任务控制">⏸️ 任务控制</a>
+          <ol>
+            <li><a href="#taskres_t-rtasksuspendptaskhandler_t-task_handler"><code>TaskRes_t rTaskSuspend(pTaskHandler_t task_handler)</code></a></li>
+            <li><a href="#taskres_t-rtaskresumeptaskhandler_t-task_handler"><code>TaskRes_t rTaskResume(pTaskHandler_t task_handler)</code></a></li>
+            <li><a href="#taskres_t-rtaskdelayuint16_t-delay_ms"><code>TaskRes_t rTaskDelay(uint16_t delay_ms)</code></a></li>
+            <li><a href="#taskres_t-rtasksetpriorityptaskhandler_t-task_handler-uint8_t-priority"><code>TaskRes_t rTaskSetPriority(pTaskHandler_t task_handler, uint8_t priority)</code></a></li>
+            <li><a href="#taskres_t-rtaskgetinfoptaskhandler_t-task_handler-taskinfo_t-task_info"><code>TaskRes_t rTaskGetInfo(pTaskHandler_t task_handler, TaskInfo_t *task_info)</code></a></li>
+            <li><a href="#size_t-utaskgetfreememoryvoid"><code>size_t uTaskGetFreeMemory(void)</code></a></li>
+          </ol>
+        </li>
+        <li><a href="#-调度器启动">🚀 调度器启动</a>
+          <ol>
+            <li><a href="#void-vtaskstartuint32_t-tick_getvoid"><code>void vTaskStart(uint32_t (*tick_get)(void))</code></a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#-内存池管理系统">🧠 内存池管理系统</a>
+      <ol>
+        <li><a href="#-架构设计">🏗️ 架构设计</a></li>
+        <li><a href="#-数据结构">📊 数据结构</a></li>
+        <li><a href="#-核心算法">🔧 核心算法</a>
+          <ol>
+            <li><a href="#内存分配流程">内存分配流程</a></li>
+            <li><a href="#内存释放流程">内存释放流程</a></li>
+          </ol>
+        </li>
+        <li><a href="#-内存池api">📋 内存池API</a>
+          <ol>
+            <li><a href="#bool-mempool_initvoid"><code>bool MemPool_Init(void)</code></a></li>
+            <li><a href="#void-mempool_mallocsize_t-size"><code>void *MemPool_Malloc(size_t size)</code></a></li>
+            <li><a href="#bool-mempool_freevoid-ptr"><code>bool MemPool_Free(void *ptr)</code></a></li>
+            <li><a href="#size_t-mempool_getfreesizevoid"><code>size_t MemPool_GetFreeSize(void)</code></a></li>
+            <li><a href="#void-mempool_getstatspool_stats_t-stats"><code>void MemPool_GetStats(pool_stats_t *stats)</code></a></li>
+            <li><a href="#bool-mempool_checkintegrityvoid"><code>bool MemPool_CheckIntegrity(void)</code></a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#-核心设计特性">🎨 核心设计特性</a>
+      <ol>
+        <li><a href="#-智能时间管理">💡 智能时间管理</a></li>
+        <li><a href="#-双链表调度架构">🔄 双链表调度架构</a></li>
+        <li><a href="#-分类错误处理系统">🚨 分类错误处理系统</a></li>
+      </ol>
+    </li>
+    <li><a href="#-使用示例">📊 使用示例</a>
+      <ol>
+        <li><a href="#-完整示例程序">🚀 完整示例程序</a></li>
+        <li><a href="#-高级使用技巧">🔧 高级使用技巧</a>
+          <ol>
+            <li><a href="#任务自管理">任务自管理</a></li>
+            <li><a href="#动态优先级调整">动态优先级调整</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#-新旧版本对比">📈 新旧版本对比</a>
+      <ol>
+        <li><a href="#-老版本-v20-特性回顾">📋 老版本 v2.0 特性回顾</a>
+          <ol>
+            <li><a href="#-数据结构-1">🗂️ <strong>数据结构</strong></a></li>
+            <li><a href="#-调度机制">🔄 <strong>调度机制</strong></a></li>
+            <li><a href="#-任务控制-1">🎛️ <strong>任务控制</strong></a></li>
+            <li><a href="#-性能特性">⚡ <strong>性能特性</strong></a></li>
+          </ol>
+        </li>
+        <li><a href="#-架构对比">🆚 架构对比</a></li>
+        <li><a href="#-性能提升">🚀 性能提升</a>
+          <ol>
+            <li><a href="#内存使用优化">内存使用优化</a></li>
+            <li><a href="#时间管理优化">时间管理优化</a></li>
+            <li><a href="#调度效率提升">调度效率提升</a></li>
+            <li><a href="#任务查找优化">任务查找优化</a></li>
+            <li><a href="#api易用性对比">API易用性对比</a></li>
+          </ol>
+        </li>
+        <li><a href="#-安全性增强">🛡️ 安全性增强</a>
+          <ol>
+            <li><a href="#内存安全">内存安全</a></li>
+            <li><a href="#错误诊断">错误诊断</a></li>
+            <li><a href="#任务管理安全性">任务管理安全性</a></li>
+          </ol>
+        </li>
+        <li><a href="#-功能对比表">📊 功能对比表</a></li>
+      </ol>
+    </li>
+    <li><a href="#-系统配置与弱定义函数">⚙️ 系统配置与弱定义函数</a>
+      <ol>
+        <li><a href="#-弱定义机制说明">🔧 弱定义机制说明</a>
+          <ol>
+            <li><a href="#bool-taskcreationvoid---任务创建函数"><code>bool TaskCreation(void)</code> - 任务创建函数</a></li>
+            <li><a href="#void-taskidlevoid---空闲函数"><code>void TaskIdle(void)</code> - 空闲函数</a></li>
+          </ol>
+        </li>
+        <li><a href="#-使用流程">📝 使用流程</a></li>
+      </ol>
+    </li>
+    <li><a href="#-配置选项">⚙️ 配置选项</a>
+      <ol>
+        <li><a href="#内存池配置">内存池配置</a></li>
+        <li><a href="#编译器支持">编译器支持</a></li>
+        <li><a href="#平台兼容性">平台兼容性</a></li>
+      </ol>
+    </li>
+    <li><a href="#-调试指南">🐛 调试指南</a>
+      <ol>
+        <li><a href="#错误代码速查">错误代码速查</a></li>
+        <li><a href="#调试技巧">调试技巧</a></li>
+        <li><a href="#常见问题">常见问题</a></li>
+      </ol>
+    </li>
+    <li><a href="#-版本历史">📝 版本历史</a>
+      <ol>
+        <li><a href="#v30-2025-09-05">v3.0 (2025-09-05)</a></li>
+        <li><a href="#v20-2025-08-17---老版本">v2.0 (2025-08-17) - 老版本</a></li>
+        <li><a href="#v1x-历史版本">v1.x (历史版本)</a></li>
+      </ol>
+    </li>
+    <li><a href="#-许可证">📄 许可证</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+            
+                
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/">
+                <img src="/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/unnamed_hu_707458ca8411bb14.png"
+                        srcset="/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/unnamed_hu_707458ca8411bb14.png 800w, /p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/unnamed_hu_4da4bab8811c4719.png 1600w"
+                        width="800" 
+                        height="800" 
+                        loading="lazy"
+                        alt="Featured image of post 任务调度器新版" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+        <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="background-color: #2a9d8f; color: #fff;" >
+            嵌入式
+        </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/">任务调度器新版</a>
+        </h2>
+
+        
+        <h3 class="article-subtitle">
+            基于定时器、链表的任务调度器
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    
+    
+    <footer class="article-time">
+        
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+            <time class="article-time--published">2025年9月5日</time>
+        </div>
+        
+
+        
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+            <time class="article-time--reading">
+                阅读时长: 15 分钟
+            </time>
+        </div>
+        
+
+        
+        <div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M5 16L4 20L8 19L19.5858 7.41421C20.3668 6.63316 20.3668 5.36683 19.5858 4.58579L19.4142 4.41421C18.6332 3.63316 17.3668 3.63317 16.5858 4.41421L5 16Z" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M15 6L18 9" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13 20H21" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+            <time class="article-time--updated" datetime=" 2025-09-05T00:00:00.000Z">
+                2025年9月5日
+            </time>
+        </div>
+        
+    </footer>
+    
+
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="任务调度器系统-v30">任务调度器系统 v3.0
+</h1><h2 id="-项目简介">📖 项目简介
+</h2><p>本项目是一个轻量级的实时任务调度器系统，采用协作式多任务调度机制，支持优先级调度、动态内存管理和完善的错误处理。系统由任务调度器和内存池管理器两大核心模块组成。</p>
+<h2 id="源码下载">👇🏻源码下载
+</h2><ul>
+<li><a class="link" href="/code/Task_New/Task.c" >Task.c</a></li>
+<li><a class="link" href="/code/Task_New/Task.h" >Task.h</a></li>
+<li><a class="link" href="/code/Task_New/Pool.c" >Pool.c</a></li>
+<li><a class="link" href="/code/Task_New/Pool.h" >Pool.h</a></li>
+</ul>
+<h3 id="-核心特性">🌟 核心特性
+</h3><ul>
+<li><strong>协作式调度</strong>：任务主动让出CPU，避免抢占式调度的复杂性</li>
+<li><strong>优先级调度</strong>：支持256级优先级（0-255，数值越小优先级越高）</li>
+<li><strong>双链表架构</strong>：等待链表 + 运行链表，状态清晰分离</li>
+<li><strong>智能延时管理</strong>：32位高低16位存储设计，节省内存空间</li>
+<li><strong>动态内存管理</strong>：基于FreeRTOS heap4算法的内存池系统</li>
+<li><strong>完善错误处理</strong>：分类错误代码，便于调试和定位问题</li>
+<li><strong>静态/动态任务</strong>：支持两种任务创建方式</li>
+</ul>
+<hr>
+<h2 id="-函数命名规范">🎯 函数命名规范
+</h2><h3 id="命名约定说明">命名约定说明
+</h3><p>本系统采用统一的函数命名规范，<strong>函数名的第一个字母代表其返回值类型</strong>：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>首字母</th>
+          <th>返回值类型</th>
+          <th>示例</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>r</strong></td>
+          <td><code>TaskRes_t</code> (枚举类型)</td>
+          <td><code>rTaskInit()</code>, <code>rTaskCreate_Dynamic()</code></td>
+      </tr>
+      <tr>
+          <td><strong>p</strong></td>
+          <td>指针类型</td>
+          <td><code>pTaskCreate_Static()</code></td>
+      </tr>
+      <tr>
+          <td><strong>v</strong></td>
+          <td><code>void</code></td>
+          <td><code>vTaskStart()</code></td>
+      </tr>
+      <tr>
+          <td><strong>u</strong></td>
+          <td><code>size_t</code> (unsigned)</td>
+          <td><code>uTaskGetFreeMemory()</code></td>
+      </tr>
+  </tbody>
+</table></div>
+<blockquote>
+<p>[!WARNING]</p>
+<p>任务调度器函数严格遵循返回值类型首字母规范。内存池模块(<code>MemPool_</code>)采用模块前缀命名，不遵循首字母规范</p></blockquote>
+<hr>
+<h2 id="-api-参考文档">📚 API 参考文档
+</h2><h3 id="-系统初始化">🔧 系统初始化
+</h3><h4 id="taskres_t-rtaskinitvoid"><code>TaskRes_t rTaskInit(void)</code>
+</h4><p><strong>功能</strong>：初始化任务调度器系统<br>
+<strong>返回值</strong>：</p>
+<ul>
+<li><code>TASK_OK</code>：初始化成功</li>
+<li><code>TASK_ERROR_POOL_NOT_INIT</code>：内存池初始化失败</li>
+<li><code>TASK_ERROR_INIT_FAILED</code>：任务系统初始化失败</li>
+</ul>
+<p><strong>初始化流程</strong>：</p>
+<ol>
+<li>初始化内存池系统</li>
+<li>初始化双链表结构（等待链表、运行链表）</li>
+<li>调用用户重定义的<code>TaskCreation()</code>函数添加任务</li>
+</ol>
+<p><strong>使用示例</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 用户需要重定义TaskCreation函数来添加任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">TaskCreation</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">pTaskHandler_t</span> <span class="n">task1</span><span class="p">,</span> <span class="n">task2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 添加LED任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">led_blink_task</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">task1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 添加传感器任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">sensor_task</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">task2</span><span class="p">)</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>  <span class="c1">// 所有任务添加成功
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TaskRes_t</span> <span class="n">result</span> <span class="o">=</span> <span class="nf">rTaskInit</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 处理初始化错误
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;系统初始化失败，错误码：%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>重要说明</strong>：</p>
+<ul>
+<li>系统采用<strong>弱定义机制</strong>，用户必须在自己的代码中重新定义<code>TaskCreation()</code>函数</li>
+<li>所有任务的添加都应该放在<code>TaskCreation()</code>函数中完成</li>
+<li>如果不重定义此函数，系统初始化会返回<code>TASK_ERROR_INIT_FAILED</code></li>
+</ul>
+<hr>
+<h3 id="-任务管理">📝 任务管理
+</h3><h4 id="taskres_t-rtaskcreate_dynamicvoid-pfuncvoid-uint8_t-priority-ptaskhandler_t-task_handler"><code>TaskRes_t rTaskCreate_Dynamic(void (*pfunc)(void), uint8_t priority, pTaskHandler_t *task_handler)</code>
+</h4><p><strong>功能</strong>：动态添加一个任务（使用内存池分配节点）<br>
+<strong>参数</strong>：</p>
+<ul>
+<li><code>pfunc</code>：任务回调函数指针</li>
+<li><code>priority</code>：任务优先级（0-255，越小优先级越高）</li>
+<li><code>task_handler</code>：返回的任务句柄指针，可为NULL</li>
+</ul>
+<p><strong>返回值</strong>：</p>
+<ul>
+<li><code>TASK_OK</code>：添加成功</li>
+<li><code>TASK_ERROR_NULL_POINTER</code>：函数指针为空</li>
+<li><code>TASK_ERROR_MEMORY_ALLOC</code>：内存分配失败</li>
+</ul>
+<p><strong>使用示例</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">pTaskHandler_t</span> <span class="n">my_task</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">my_task_function</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;任务执行中...</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>  <span class="c1">// 延时1秒
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">TaskRes_t</span> <span class="n">result</span> <span class="o">=</span> <span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">my_task_function</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">my_task</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="ptaskhandler_t-ptaskcreate_statictasknode_t-node-ptaskhandler_t-task_handler"><code>pTaskHandler_t pTaskCreate_Static(TaskNode_t *node, pTaskHandler_t *task_handler)</code>
+</h4><p><strong>功能</strong>：静态添加一个任务（用户提供节点内存）<br>
+<strong>参数</strong>：</p>
+<ul>
+<li><code>node</code>：用户提供的任务节点内存</li>
+<li><code>task_handler</code>：任务句柄</li>
+</ul>
+<p><strong>适用场景</strong>：内存受限的嵌入式系统，避免动态内存分配</p>
+<h4 id="taskres_t-rtaskdeleteptaskhandler_t-task_handler"><code>TaskRes_t rTaskDelete(pTaskHandler_t task_handler)</code>
+</h4><p><strong>功能</strong>：删除一个任务并释放其内存<br>
+<strong>参数</strong>：</p>
+<ul>
+<li><code>task_handler</code>：要删除的任务句柄</li>
+</ul>
+<p><strong>返回值</strong>：</p>
+<ul>
+<li><code>TASK_OK</code>：移除成功</li>
+<li><code>TASK_ERROR_TASK_NOT_FOUND</code>：任务未找到</li>
+</ul>
+<hr>
+<h3 id="-任务控制">⏸️ 任务控制
+</h3><h4 id="taskres_t-rtasksuspendptaskhandler_t-task_handler"><code>TaskRes_t rTaskSuspend(pTaskHandler_t task_handler)</code>
+</h4><p><strong>功能</strong>：挂起任务<br>
+<strong>参数</strong>：</p>
+<ul>
+<li><code>task_handler</code>：任务句柄，<strong>如果为NULL则挂起当前任务</strong></li>
+</ul>
+<p><strong>特色功能</strong>：支持任务自我挂起</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">my_task</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 执行一些工作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">error_condition</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">rTaskSuspend</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>  <span class="c1">// 挂起自己
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="taskres_t-rtaskresumeptaskhandler_t-task_handler"><code>TaskRes_t rTaskResume(pTaskHandler_t task_handler)</code>
+</h4><p><strong>功能</strong>：恢复任务<br>
+<strong>参数</strong>：</p>
+<ul>
+<li><code>task_handler</code>：任务句柄，<strong>如果为NULL则恢复当前任务</strong></li>
+</ul>
+<h4 id="taskres_t-rtaskdelayuint16_t-delay_ms"><code>TaskRes_t rTaskDelay(uint16_t delay_ms)</code>
+</h4><p><strong>功能</strong>：设置当前任务的延时时间<br>
+<strong>参数</strong>：</p>
+<ul>
+<li><code>delay_ms</code>：延时时间（毫秒，最大65535ms）</li>
+</ul>
+<p><strong>设计特点</strong>：</p>
+<ul>
+<li>仅对当前正在执行的任务有效</li>
+<li>类似操作系统的sleep()函数</li>
+<li>任务主动让出CPU，实现协作式调度</li>
+</ul>
+<h4 id="taskres_t-rtasksetpriorityptaskhandler_t-task_handler-uint8_t-priority"><code>TaskRes_t rTaskSetPriority(pTaskHandler_t task_handler, uint8_t priority)</code>
+</h4><p><strong>功能</strong>：设置任务优先级<br>
+<strong>参数</strong>：</p>
+<ul>
+<li><code>task_handler</code>：任务句柄，<strong>如果为NULL则设置当前任务</strong></li>
+<li><code>priority</code>：新的优先级值</li>
+</ul>
+<h4 id="taskres_t-rtaskgetinfoptaskhandler_t-task_handler-taskinfo_t-task_info"><code>TaskRes_t rTaskGetInfo(pTaskHandler_t task_handler, TaskInfo_t *task_info)</code>
+</h4><p><strong>功能</strong>：获取任务详细信息<br>
+<strong>参数</strong>：</p>
+<ul>
+<li><code>task_handler</code>：任务句柄，<strong>如果为NULL则获取当前任务信息</strong></li>
+<li><code>task_info</code>：任务信息结构体指针</li>
+</ul>
+<p><strong>返回值</strong>：</p>
+<ul>
+<li><code>TASK_OK</code>：获取成功</li>
+<li><code>TASK_ERROR_NULL_POINTER</code>：参数为空</li>
+</ul>
+<h4 id="size_t-utaskgetfreememoryvoid"><code>size_t uTaskGetFreeMemory(void)</code>
+</h4><p><strong>功能</strong>：获取内存池剩余可用内存大小<br>
+<strong>返回值</strong>：剩余内存字节数</p>
+<hr>
+<h3 id="-调度器启动">🚀 调度器启动
+</h3><h4 id="void-vtaskstartuint32_t-tick_getvoid"><code>void vTaskStart(uint32_t (*tick_get)(void))</code>
+</h4><p><strong>功能</strong>：启动任务调度器主循环<br>
+<strong>参数</strong>：</p>
+<ul>
+<li><code>tick_get</code>：获取系统时钟tick的函数指针</li>
+</ul>
+<p><strong>调度流程</strong>：</p>
+<ol>
+<li>遍历等待链表，递减倒计时</li>
+<li>将倒计时为0的任务移至运行链表</li>
+<li>按优先级执行运行链表中的任务</li>
+<li>记录任务执行时间统计</li>
+<li>执行完成后重置倒计时并移回等待链表</li>
+</ol>
+<p><strong>使用示例</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// STM32 HAL示例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">vTaskStart</span><span class="p">(</span><span class="n">HAL_GetTick</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 裸机示例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">uint32_t</span> <span class="nf">get_system_tick</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">system_tick_counter</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nf">vTaskStart</span><span class="p">(</span><span class="n">get_system_tick</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="-内存池管理系统">🧠 内存池管理系统
+</h2><h3 id="-架构设计">🏗️ 架构设计
+</h3><p>内存池管理器采用<strong>FreeRTOS heap4算法</strong>的设计思路，具备以下特性：</p>
+<ul>
+<li><strong>首次适应算法</strong>：快速查找合适大小的空闲块</li>
+<li><strong>块分割与合并</strong>：自动处理内存碎片</li>
+<li><strong>地址排序链表</strong>：空闲块按地址顺序排列，便于合并</li>
+<li><strong>内存对齐</strong>：支持4/8字节对齐，提高访问效率</li>
+<li><strong>安全保护</strong>：完整的边界检查和重复释放检测</li>
+</ul>
+<h3 id="-数据结构">📊 数据结构
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">mem_block</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="n">mem_block</span> <span class="o">*</span><span class="n">next_free</span><span class="p">;</span>  <span class="c1">// 指向下一个空闲块
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">size_t</span> <span class="n">block_size</span><span class="p">;</span>           <span class="c1">// 块大小，最高位用作分配标记
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="kt">mem_block_t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">size_t</span> <span class="n">total_size</span><span class="p">;</span>      <span class="c1">// 内存池总大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">size_t</span> <span class="n">free_bytes</span><span class="p">;</span>      <span class="c1">// 当前可用字节数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">size_t</span> <span class="n">min_free_bytes</span><span class="p">;</span>  <span class="c1">// 历史最小可用字节数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">size_t</span> <span class="n">alloc_count</span><span class="p">;</span>     <span class="c1">// 分配次数统计
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">size_t</span> <span class="n">free_count</span><span class="p">;</span>      <span class="c1">// 释放次数统计
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="kt">pool_stats_t</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-核心算法">🔧 核心算法
+</h3><h4 id="内存分配流程">内存分配流程
+</h4><ol>
+<li><strong>参数验证</strong>：检查size是否有效</li>
+<li><strong>大小计算</strong>：添加头部信息并进行内存对齐</li>
+<li><strong>空闲块查找</strong>：使用首次适应算法遍历空闲链表</li>
+<li><strong>块分割</strong>：如果找到的块过大，分割成所需大小和剩余部分</li>
+<li><strong>标记分配</strong>：设置最高位标记块已分配</li>
+<li><strong>统计更新</strong>：更新内存使用统计信息</li>
+</ol>
+<h4 id="内存释放流程">内存释放流程
+</h4><ol>
+<li><strong>指针验证</strong>：检查指针是否在有效范围内</li>
+<li><strong>分配检查</strong>：验证块确实已分配，防止重复释放</li>
+<li><strong>邻块合并</strong>：检查前后相邻块并自动合并</li>
+<li><strong>插入链表</strong>：将合并后的空闲块按地址顺序插入链表</li>
+</ol>
+<h3 id="-内存池api">📋 内存池API
+</h3><h4 id="bool-mempool_initvoid"><code>bool MemPool_Init(void)</code>
+</h4><p><strong>功能</strong>：初始化内存池系统<br>
+<strong>返回值</strong>：true表示成功，false表示失败<br>
+<strong>说明</strong>：内存池函数采用模块前缀命名，不遵循首字母返回值类型规范</p>
+<h4 id="void-mempool_mallocsize_t-size"><code>void *MemPool_Malloc(size_t size)</code>
+</h4><p><strong>功能</strong>：分配指定大小的内存块<br>
+<strong>参数</strong>：size - 需要分配的字节数<br>
+<strong>返回值</strong>：成功返回内存指针，失败返回NULL</p>
+<h4 id="bool-mempool_freevoid-ptr"><code>bool MemPool_Free(void *ptr)</code>
+</h4><p><strong>功能</strong>：释放内存块<br>
+<strong>参数</strong>：ptr - 要释放的内存指针<br>
+<strong>返回值</strong>：true表示成功，false表示失败</p>
+<h4 id="size_t-mempool_getfreesizevoid"><code>size_t MemPool_GetFreeSize(void)</code>
+</h4><p><strong>功能</strong>：获取剩余可用内存大小<br>
+<strong>返回值</strong>：可用字节数</p>
+<h4 id="void-mempool_getstatspool_stats_t-stats"><code>void MemPool_GetStats(pool_stats_t *stats)</code>
+</h4><p><strong>功能</strong>：获取内存池统计信息<br>
+<strong>参数</strong>：stats - 统计信息结构体指针</p>
+<h4 id="bool-mempool_checkintegrityvoid"><code>bool MemPool_CheckIntegrity(void)</code>
+</h4><p><strong>功能</strong>：检查内存池完整性<br>
+<strong>返回值</strong>：true表示完整，false表示检测到损坏</p>
+<hr>
+<h2 id="-核心设计特性">🎨 核心设计特性
+</h2><h3 id="-智能时间管理">💡 智能时间管理
+</h3><p>采用<strong>32位高低16位分离存储</strong>设计：</p>
+<ul>
+<li><strong>高16位</strong>：存储设定的延时时间值</li>
+<li><strong>低16位</strong>：存储当前倒计时值</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 时间操作宏
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define TASK_SET_TRIG_TIME(set_val, cur_val)  (((uint32_t)(set_val) &lt;&lt; 16) | ((uint32_t)(cur_val) &amp; 0xFFFF))
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define TASK_GET_SET_TIME(trig_time)          ((uint16_t)((trig_time) &gt;&gt; 16))
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define TASK_GET_CUR_TIME(trig_time)          ((uint16_t)((trig_time) &amp; 0xFFFF))
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define TASK_RESET_TIME(trig_time)            (((trig_time) &amp; 0xFFFF0000) | (((trig_time) &gt;&gt; 16) &amp; 0xFFFF))
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>优势</strong>：</p>
+<ul>
+<li>节省内存空间（1个32位变量 vs 2个16位变量）</li>
+<li>原子操作，避免数据不一致</li>
+<li>支持最大65535ms的延时设置</li>
+</ul>
+<h3 id="-双链表调度架构">🔄 双链表调度架构
+</h3><ul>
+<li><strong>等待链表（Wait_Schedule）</strong>：存放等待执行的任务</li>
+<li><strong>运行链表（Run_Schedule）</strong>：存放就绪待执行的任务</li>
+</ul>
+<p><strong>调度流程</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[等待链表] --倒计时到0--&gt; [运行链表] --执行完成--&gt; [等待链表]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-分类错误处理系统">🚨 分类错误处理系统
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TASK_ERR_TICK_NULL</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>     <span class="c1">// tick获取函数为空
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">TASK_ERR_WAIT_TO_RUN</span><span class="p">,</span>       <span class="c1">// 等待链表到运行链表移动失败
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">TASK_ERR_RUN_TO_WAIT</span><span class="p">,</span>       <span class="c1">// 运行链表到等待链表移动失败
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">TASK_ERR_MEMORY_CORRUPT</span><span class="p">,</span>    <span class="c1">// 内存损坏
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">TASK_ERR_LIST_CORRUPT</span>       <span class="c1">// 链表结构损坏
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">TaskErrorCode_t</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>每种错误都有独特的死循环，便于调试时通过断点快速定位问题类型。</p>
+<hr>
+<h2 id="-使用示例">📊 使用示例
+</h2><h3 id="-完整示例程序">🚀 完整示例程序
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;Task.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 任务句柄
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">pTaskHandler_t</span> <span class="n">led_task</span><span class="p">,</span> <span class="n">sensor_task</span><span class="p">,</span> <span class="n">display_task</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 用户重定义TaskCreation函数 - 在这里添加所有任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">TaskCreation</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TaskRes_t</span> <span class="n">result</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 添加LED任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">result</span> <span class="o">=</span> <span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">led_blink_task</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">led_task</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;✗ LED任务添加失败</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;✓ LED任务添加成功</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 添加传感器任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">result</span> <span class="o">=</span> <span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">sensor_read_task</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">sensor_task</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;✗ 传感器任务添加失败</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;✓ 传感器任务添加成功</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 添加显示任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">result</span> <span class="o">=</span> <span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">display_task</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">display_task</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;✗ 显示任务添加失败</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;✓ 显示任务添加成功</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>  <span class="c1">// 所有任务添加成功
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// LED闪烁任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">led_blink_task</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">bool</span> <span class="n">led_state</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">led_state</span> <span class="o">=</span> <span class="o">!</span><span class="n">led_state</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;LED: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">led_state</span> <span class="o">?</span> <span class="s">&#34;ON&#34;</span> <span class="o">:</span> <span class="s">&#34;OFF&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 根据状态设置不同延时
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">led_state</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>   <span class="c1">// 亮100ms
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">900</span><span class="p">);</span>   <span class="c1">// 暗900ms
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 传感器读取任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">sensor_read_task</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">sensor_value</span> <span class="o">=</span> <span class="nf">rand</span><span class="p">()</span> <span class="o">%</span> <span class="mi">100</span><span class="p">;</span>  <span class="c1">// 模拟传感器读取
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;传感器读取: %d (第%d次)</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">sensor_value</span><span class="p">,</span> <span class="o">++</span><span class="n">count</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 根据读取值动态调整采样频率
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">sensor_value</span> <span class="o">&gt;</span> <span class="mi">80</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>    <span class="c1">// 高值时高频采样
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">sensor_value</span> <span class="o">&gt;</span> <span class="mi">40</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>   <span class="c1">// 中等值时中频采样
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span>   <span class="c1">// 低值时低频采样
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 显示任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">display_task</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">uint32_t</span> <span class="n">update_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;===== 系统状态更新 #%lu =====</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="o">++</span><span class="n">update_count</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取内存使用情况
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">pool_stats_t</span> <span class="n">stats</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MemPool_GetStats</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stats</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;内存使用: %zu/%zu 字节</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">           <span class="n">stats</span><span class="p">.</span><span class="n">total_size</span> <span class="o">-</span> <span class="n">stats</span><span class="p">.</span><span class="n">free_bytes</span><span class="p">,</span> <span class="n">stats</span><span class="p">.</span><span class="n">total_size</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 每10次更新后降低自己的优先级
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">update_count</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;降低显示任务优先级</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">rTaskSetPriority</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>  <span class="c1">// 对自己降低优先级
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">2000</span><span class="p">);</span>  <span class="c1">// 2秒更新一次
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 系统时钟函数（模拟）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">static</span> <span class="kt">uint32_t</span> <span class="n">system_tick</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">uint32_t</span> <span class="nf">get_system_tick</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">system_tick</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;=== 任务调度器系统 v3.0 示例 ===</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 1. 初始化系统（会自动调用TaskCreation函数添加任务）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">TaskRes_t</span> <span class="n">result</span> <span class="o">=</span> <span class="nf">rTaskInit</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;系统初始化失败！错误码: %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;✓ 系统初始化成功，所有任务已添加</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 2. 启动调度器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;启动任务调度器...</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">vTaskStart</span><span class="p">(</span><span class="n">get_system_tick</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>  <span class="c1">// 永远不会执行到这里
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-高级使用技巧">🔧 高级使用技巧
+</h3><h4 id="任务自管理">任务自管理
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">smart_task</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">int</span> <span class="n">error_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">do_some_work</span><span class="p">()</span> <span class="o">==</span> <span class="n">ERROR</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">error_count</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">error_count</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;错误过多，挂起自己</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">rTaskSuspend</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>  <span class="c1">// 挂起自己
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// 出错时降低执行频率
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">error_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  <span class="c1">// 重置错误计数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>   <span class="c1">// 正常执行频率
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="动态优先级调整">动态优先级调整
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">adaptive_task</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">int</span> <span class="n">workload</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">workload</span> <span class="o">=</span> <span class="nf">calculate_workload</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">workload</span> <span class="o">&gt;</span> <span class="mi">80</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">rTaskSetPriority</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>  <span class="c1">// 提升优先级
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>              <span class="c1">// 高频执行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">rTaskSetPriority</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>  <span class="c1">// 降低优先级
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>             <span class="c1">// 低频执行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="-新旧版本对比">📈 新旧版本对比
+</h2><h3 id="-老版本-v20-特性回顾">📋 老版本 v2.0 特性回顾
+</h3><p>老版本任务调度器采用了以下设计特点：</p>
+<h4 id="-数据结构-1">🗂️ <strong>数据结构</strong>
+</h4><ul>
+<li><strong>固定数组</strong>：<code>task_t Task_Schedule[MAXTASKS]</code> 静态分配</li>
+<li><strong>任务结构</strong>：包含任务名称、函数指针、参数、优先级、时间间隔等</li>
+<li><strong>时间管理</strong>：<code>LastWakeUp</code> + <code>Interval</code> 分离存储方式</li>
+</ul>
+<h4 id="-调度机制">🔄 <strong>调度机制</strong>
+</h4><ul>
+<li><strong>时间轮询</strong>：每次调度遍历整个任务数组</li>
+<li><strong>qsort排序</strong>：每次添加任务后重新排序</li>
+<li><strong>优先级+创建顺序</strong>：相同优先级按创建顺序执行</li>
+</ul>
+<h4 id="-任务控制-1">🎛️ <strong>任务控制</strong>
+</h4><ul>
+<li><strong>字符串查找</strong>：通过任务名称字符串查找和操作任务</li>
+<li><strong>状态管理</strong>：ACTIVE/SUSPEND/INACTIVE 三种状态</li>
+<li><strong>时间统计</strong>：记录每个任务的最大执行时间</li>
+</ul>
+<h4 id="-性能特性">⚡ <strong>性能特性</strong>
+</h4><ul>
+<li><strong>动态调整</strong>：支持根据任务执行时间动态调整调度间隔</li>
+<li><strong>低功耗</strong>：支持系统空闲时进入低功耗模式</li>
+<li><strong>空闲回调</strong>：提供空闲时执行的回调函数</li>
+</ul>
+<hr>
+<h3 id="-架构对比">🆚 架构对比
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>老版本 v2.0</th>
+          <th>新版本 v3.0</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>调度方式</strong></td>
+          <td>时间间隔轮询 + qsort排序</td>
+          <td>双链表优先级调度</td>
+      </tr>
+      <tr>
+          <td><strong>内存管理</strong></td>
+          <td>静态数组 <code>Task_Schedule[MAXTASKS]</code></td>
+          <td>动态内存池 + 静态选项</td>
+      </tr>
+      <tr>
+          <td><strong>时间管理</strong></td>
+          <td><code>LastWakeUp</code> + <code>Interval</code> 分离存储</td>
+          <td>32位高低位智能存储</td>
+      </tr>
+      <tr>
+          <td><strong>数据结构</strong></td>
+          <td>固定数组结构</td>
+          <td>双向链表结构</td>
+      </tr>
+      <tr>
+          <td><strong>任务限制</strong></td>
+          <td>最大任务数限制 <code>MAXTASKS</code></td>
+          <td>仅受内存限制</td>
+      </tr>
+      <tr>
+          <td><strong>错误处理</strong></td>
+          <td>简单bool返回值</td>
+          <td>分类错误代码 + 调试支持</td>
+      </tr>
+      <tr>
+          <td><strong>任务控制</strong></td>
+          <td>暂停/恢复/删除</td>
+          <td>挂起/恢复/删除 + 优先级调整</td>
+      </tr>
+      <tr>
+          <td><strong>API设计</strong></td>
+          <td>字符串任务名查找</td>
+          <td>句柄直接操作</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="-性能提升">🚀 性能提升
+</h3><h4 id="内存使用优化">内存使用优化
+</h4><ul>
+<li><strong>老版本</strong>：固定数组 <code>task_t Task_Schedule[MAXTASKS]</code>，每个任务包含完整结构体</li>
+<li><strong>新版本</strong>：链表节点动态分配，仅在需要时占用内存</li>
+</ul>
+<h4 id="时间管理优化">时间管理优化
+</h4><ul>
+<li><strong>老版本</strong>：<code>LastWakeUp</code> + <code>Interval</code> 两个32位变量（8字节）</li>
+<li><strong>新版本</strong>：一个32位变量高低16位存储（4字节），节省50%空间</li>
+</ul>
+<h4 id="调度效率提升">调度效率提升
+</h4><ul>
+<li><strong>老版本</strong>：每次调度都要遍历完整数组 + qsort排序，O(n log n)复杂度</li>
+<li><strong>新版本</strong>：双链表分离就绪/等待任务，避免重复排序，平均复杂度更低</li>
+</ul>
+<h4 id="任务查找优化">任务查找优化
+</h4><ul>
+<li><strong>老版本</strong>：字符串比较查找任务，O(n)时间复杂度</li>
+<li><strong>新版本</strong>：句柄直接访问，O(1)时间复杂度</li>
+</ul>
+<h4 id="api易用性对比">API易用性对比
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 老版本 - 添加任务需要多个参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">Task_Add</span><span class="p">(</span><span class="s">&#34;LED_Task&#34;</span><span class="p">,</span> <span class="n">led_function</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 新版本 - 更简洁的任务创建
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">led_function</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">led_task</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 老版本 - 字符串查找任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">Task_Suspend</span><span class="p">(</span><span class="s">&#34;LED_Task&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 新版本 - 句柄直接操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">rTaskSuspend</span><span class="p">(</span><span class="n">led_task</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 老版本 - 无内置延时功能，需要在任务内部实现
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">task_function</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">param</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 需要自己管理时间间隔
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">static</span> <span class="kt">uint32_t</span> <span class="n">last_time</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint32_t</span> <span class="n">now</span> <span class="o">=</span> <span class="nf">HAL_GetTick</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">last_time</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">last_time</span> <span class="o">=</span> <span class="n">now</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 执行任务逻辑...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 新版本 - 简洁的延时设置
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">task_function</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 执行任务逻辑...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>  <span class="c1">// 直接设置延时
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-安全性增强">🛡️ 安全性增强
+</h3><h4 id="内存安全">内存安全
+</h4><ul>
+<li><strong>老版本</strong>：固定数组边界，可能出现数组越界</li>
+<li><strong>新版本</strong>：动态内存管理，完整的内存边界检查，防止重复释放和野指针访问</li>
+</ul>
+<h4 id="错误诊断">错误诊断
+</h4><ul>
+<li><strong>老版本</strong>：简单的bool返回值，难以定位具体错误原因</li>
+<li><strong>新版本</strong>：详细的错误枚举类型，不同错误进入不同死循环，便于调试</li>
+</ul>
+<h4 id="任务管理安全性">任务管理安全性
+</h4><ul>
+<li><strong>老版本</strong>：任务删除仅标记为INACTIVE，内存无法回收</li>
+<li><strong>新版本</strong>：真正的任务删除，释放占用的内存资源</li>
+</ul>
+<h3 id="-功能对比表">📊 功能对比表
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>功能模块</th>
+          <th>老版本 v2.0</th>
+          <th>新版本 v3.0</th>
+          <th>提升说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>任务创建</strong></td>
+          <td>✅ <code>Task_Add()</code></td>
+          <td>✅ 静态+动态双模式</td>
+          <td>支持两种内存分配方式</td>
+      </tr>
+      <tr>
+          <td><strong>任务删除</strong></td>
+          <td>⚠️ 标记删除(INACTIVE)</td>
+          <td>✅ 真正删除+内存释放</td>
+          <td>可释放内存资源</td>
+      </tr>
+      <tr>
+          <td><strong>任务暂停</strong></td>
+          <td>✅ <code>Task_Suspend()</code></td>
+          <td>✅ <code>rTaskSuspend()</code></td>
+          <td>支持NULL参数(自操作)</td>
+      </tr>
+      <tr>
+          <td><strong>任务恢复</strong></td>
+          <td>✅ <code>Task_Resume()</code></td>
+          <td>✅ <code>rTaskResume()</code></td>
+          <td>支持NULL参数(自操作)</td>
+      </tr>
+      <tr>
+          <td><strong>优先级</strong></td>
+          <td>✅ 创建时设定</td>
+          <td>✅ 动态调整优先级</td>
+          <td>运行时可修改</td>
+      </tr>
+      <tr>
+          <td><strong>任务查找</strong></td>
+          <td>🔤 字符串名称查找</td>
+          <td>🎯 句柄直接访问</td>
+          <td>性能提升显著</td>
+      </tr>
+      <tr>
+          <td><strong>内存限制</strong></td>
+          <td>❌ 固定数组大小限制</td>
+          <td>✅ 仅受系统内存限制</td>
+          <td>灵活性大幅提升</td>
+      </tr>
+      <tr>
+          <td><strong>时间统计</strong></td>
+          <td>✅ <code>MaxUsed</code> 时间统计</td>
+          <td>✅ 增强的时间统计</td>
+          <td>更精确的性能监控</td>
+      </tr>
+      <tr>
+          <td><strong>空闲处理</strong></td>
+          <td>✅ <code>Task_IdleFunction()</code></td>
+          <td>❌ 移除空闲函数</td>
+          <td>简化调度逻辑</td>
+      </tr>
+      <tr>
+          <td><strong>低功耗</strong></td>
+          <td>✅ 支持低功耗模式</td>
+          <td>❌ 暂未实现</td>
+          <td>后续版本考虑</td>
+      </tr>
+      <tr>
+          <td><strong>动态调整</strong></td>
+          <td>✅ 任务间隔动态调整</td>
+          <td>❌ 采用固定调度</td>
+          <td>简化复杂度</td>
+      </tr>
+      <tr>
+          <td><strong>内存池</strong></td>
+          <td>❌ 无</td>
+          <td>✅ 完整内存池实现</td>
+          <td>动态内存管理</td>
+      </tr>
+      <tr>
+          <td><strong>错误处理</strong></td>
+          <td>⚠️ bool返回值</td>
+          <td>✅ 完善的错误分类</td>
+          <td>调试支持大幅增强</td>
+      </tr>
+  </tbody>
+</table></div>
+<hr>
+<h2 id="-系统配置与弱定义函数">⚙️ 系统配置与弱定义函数
+</h2><h3 id="-弱定义机制说明">🔧 弱定义机制说明
+</h3><p>新版本调度器采用**弱定义（Weak Definition）**机制，提供了两个用户可重定义的函数：</p>
+<h4 id="bool-taskcreationvoid---任务创建函数"><code>bool TaskCreation(void)</code> - 任务创建函数
+</h4><p><strong>功能</strong>：用户必须重定义此函数来添加系统所需的所有任务<br>
+<strong>调用时机</strong>：在<code>rTaskInit()</code>初始化过程中自动调用<br>
+<strong>返回值</strong>：</p>
+<ul>
+<li><code>true</code>：所有任务创建成功</li>
+<li><code>false</code>：任务创建失败，导致系统初始化失败</li>
+</ul>
+<p><strong>默认实现</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">__weak</span> <span class="kt">bool</span> <span class="nf">TaskCreation</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>  <span class="c1">// 默认返回失败，用户必须重定义
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>用户实现示例</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 用户在自己的代码中重新定义TaskCreation函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">TaskCreation</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">pTaskHandler_t</span> <span class="n">task1</span><span class="p">,</span> <span class="n">task2</span><span class="p">,</span> <span class="n">task3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 创建LED控制任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">led_control_task</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">task1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 创建数据采集任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">data_collect_task</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">task2</span><span class="p">)</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 创建通信任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">communication_task</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">task3</span><span class="p">)</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>  <span class="c1">// 所有任务创建成功
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="void-taskidlevoid---空闲函数"><code>void TaskIdle(void)</code> - 空闲函数
+</h4><p><strong>功能</strong>：系统空闲时执行的函数，用户可选择性重定义<br>
+<strong>调用时机</strong>：当没有就绪任务时调用<br>
+<strong>注意事项</strong>：不要在此函数中执行耗时操作！</p>
+<p><strong>默认实现</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">__weak</span> <span class="kt">void</span> <span class="nf">TaskIdle</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 默认为空函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>用户实现示例</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 用户可选择重新定义空闲函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">TaskIdle</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 进入低功耗模式
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">__WFI</span><span class="p">();</span>  <span class="c1">// ARM Cortex-M系列的等待中断指令
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 或者执行一些轻量级的后台任务
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// watchdog_feed();  // 喂狗操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-使用流程">📝 使用流程
+</h3><ol>
+<li><strong>编写任务函数</strong>：定义各个任务的具体实现</li>
+<li><strong>重定义TaskCreation</strong>：在此函数中添加所有需要的任务</li>
+<li><strong>调用rTaskInit</strong>：系统会自动调用您的TaskCreation函数</li>
+<li><strong>启动调度器</strong>：调用vTaskStart开始任务调度</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 步骤1: 编写任务函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">my_task1</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 任务逻辑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">my_task2</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 任务逻辑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">rTaskDelay</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 步骤2: 重定义TaskCreation
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">TaskCreation</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">pTaskHandler_t</span> <span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">my_task1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">h1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">rTaskCreate_Dynamic</span><span class="p">(</span><span class="n">my_task2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">h2</span><span class="p">)</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 步骤3&amp;4: 主函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">rTaskInit</span><span class="p">()</span> <span class="o">!=</span> <span class="n">TASK_OK</span><span class="p">)</span> <span class="p">{</span>  <span class="c1">// 自动调用TaskCreation
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;初始化失败</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">vTaskStart</span><span class="p">(</span><span class="n">HAL_GetTick</span><span class="p">);</span>  <span class="c1">// 启动调度器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="-配置选项">⚙️ 配置选项
+</h2><h3 id="内存池配置">内存池配置
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Pool.h 中的配置宏
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define MEMPOOL_SIZE (4096)        </span><span class="c1">// 内存池大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define MEMPOOL_ALIGNMENT (8)      </span><span class="c1">// 内存对齐字节数
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="编译器支持">编译器支持
+</h3><ul>
+<li><strong>GCC/Clang</strong>：完全支持</li>
+<li><strong>MSVC</strong>：支持</li>
+<li><strong>IAR</strong>：支持</li>
+<li><strong>Keil ARM</strong>：支持</li>
+</ul>
+<h3 id="平台兼容性">平台兼容性
+</h3><ul>
+<li><strong>STM32系列</strong>：完全兼容</li>
+<li><strong>Arduino</strong>：兼容</li>
+<li><strong>ESP32</strong>：兼容</li>
+<li><strong>X86仿真</strong>：兼容</li>
+</ul>
+<hr>
+<h2 id="-调试指南">🐛 调试指南
+</h2><h3 id="错误代码速查">错误代码速查
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>错误代码</th>
+          <th>含义</th>
+          <th>可能原因</th>
+          <th>解决方案</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>TASK_ERR_TICK_NULL</code></td>
+          <td>tick函数为空</td>
+          <td>未传入时钟函数</td>
+          <td>检查vTaskStart()参数</td>
+      </tr>
+      <tr>
+          <td><code>TASK_ERR_WAIT_TO_RUN</code></td>
+          <td>链表移动失败</td>
+          <td>链表结构损坏</td>
+          <td>检查内存完整性</td>
+      </tr>
+      <tr>
+          <td><code>TASK_ERR_RUN_TO_WAIT</code></td>
+          <td>链表移动失败</td>
+          <td>链表结构损坏</td>
+          <td>检查内存完整性</td>
+      </tr>
+      <tr>
+          <td><code>TASK_ERR_MEMORY_CORRUPT</code></td>
+          <td>内存损坏</td>
+          <td>越界访问</td>
+          <td>使用内存检测工具</td>
+      </tr>
+      <tr>
+          <td><code>TASK_ERR_LIST_CORRUPT</code></td>
+          <td>链表损坏</td>
+          <td>指针错误</td>
+          <td>检查任务节点操作</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="调试技巧">调试技巧
+</h3><ol>
+<li><strong>断点调试</strong>：在不同错误的死循环处设置断点</li>
+<li><strong>统计监控</strong>：定期调用<code>MemPool_GetStats()</code>监控内存使用</li>
+<li><strong>完整性检查</strong>：定期调用<code>MemPool_CheckIntegrity()</code>检查内存池</li>
+<li><strong>日志输出</strong>：在任务中添加状态输出</li>
+</ol>
+<h3 id="常见问题">常见问题
+</h3><p><strong>Q: 系统初始化失败，返回TASK_ERROR_INIT_FAILED？</strong>
+A: 检查是否重定义了<code>TaskCreation()</code>函数，且该函数返回true。如果没有重定义此函数，系统会调用默认的弱定义版本（返回false）。</p>
+<p><strong>Q: 任务不执行怎么办？</strong>
+A: 检查是否调用了<code>rTaskDelay()</code>设置延时，新添加的任务默认延时为0。</p>
+<p><strong>Q: 可以在TaskCreation之外添加任务吗？</strong>
+A: 不建议。虽然技术上可行，但为了保持代码结构清晰，建议所有任务都在<code>TaskCreation()</code>中添加。</p>
+<p><strong>Q: 内存分配失败？</strong>
+A: 检查内存池大小设置，或存在内存泄漏。</p>
+<p><strong>Q: 系统卡死？</strong>
+A: 可能进入了错误处理死循环，检查错误代码定位问题。</p>
+<hr>
+<h2 id="-版本历史">📝 版本历史
+</h2><h3 id="v30-2025-09-05">v3.0 (2025-09-05)
+</h3><ul>
+<li>✨ 全新双链表调度架构，替代数组+排序方案</li>
+<li>🚀 FreeRTOS heap4风格内存池系统</li>
+<li>💡 32位高低16位智能时间存储</li>
+<li>🛡️ 完善的错误处理系统，支持调试定位</li>
+<li>📊 详细的统计和诊断功能</li>
+<li>🎯 任务自操作支持（NULL参数）</li>
+<li>🔧 句柄式API设计，替代字符串查找</li>
+<li>⚡ 性能优化：O(1)任务访问，避免排序开销</li>
+</ul>
+<h3 id="v20-2025-08-17---老版本">v2.0 (2025-08-17) - 老版本
+</h3><ul>
+<li>✅ 基于固定数组的任务调度表</li>
+<li>✅ qsort优先级排序机制</li>
+<li>✅ 字符串任务名称系统</li>
+<li>✅ 任务暂停/恢复/删除功能</li>
+<li>✅ 任务最大用时统计</li>
+<li>✅ 低功耗模式支持</li>
+<li>✅ 动态时间间隔调整</li>
+<li>✅ 空闲函数回调机制</li>
+<li>⚠️ 固定最大任务数限制</li>
+<li>⚠️ 简单bool返回值错误处理</li>
+</ul>
+<h3 id="v1x-历史版本">v1.x (历史版本)
+</h3><ul>
+<li>基础的任务轮询机制</li>
+</ul>
+<hr>
+<h2 id="-许可证">📄 许可证
+</h2><p>本项目采用MIT许可证，详情请查看LICENSE文件。</p>
+<hr>
+<p><strong>享受使用任务调度器系统 v3.0！</strong> 🎉</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/">任务调度器</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    
+
+
+</footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+	const mainArticleElement = document.querySelector(".main-article");
+        renderMathInElement(mainArticleElement, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/pic8.4d23723f665971529d311c5ef7f00610_hu_766fb068a8ab14ac.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 任务调度器"
+                        data-key="任务调度器" 
+                        data-hash="md5-TSNyP2ZZcVKdMRxe9/AGEA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">任务调度器</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/gd25q40e/">
+        
+        
+            <div class="article-image">
+                <img src="/p/gd25q40e/pic2.0b31f81dea2fe410f95fea09ce0513ad_hu_15a6fe78f23e68c0.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post GD25Q40E驱动"
+                        data-key="gd25q40e" 
+                        data-hash="md5-CzH4Heov5BD5X&#43;oJzgUTrQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">GD25Q40E驱动</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/hwt101%E9%99%80%E8%9E%BA%E4%BB%AA/">
+        
+        
+            <div class="article-image">
+                <img src="/p/hwt101%E9%99%80%E8%9E%BA%E4%BB%AA/HWT101.6f528cd6ac6e962656f14c1d92f2712a_hu_21edc3bbce63fe98.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post HWT101 驱动"
+                        data-key="hwt101陀螺仪" 
+                        data-hash="md5-b1KM1qxuliZW8UwdkvJxKg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">HWT101 驱动</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/oled-dma%E6%96%B9%E6%A1%88/">
+        
+        
+            <div class="article-image">
+                <img src="/p/oled-dma%E6%96%B9%E6%A1%88/OLED.a7a945a68953a65c27e2ff4070c10fbf_hu_c32fb198071860fb.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post OLED DMA高刷驱动"
+                        data-key="oled dma方案" 
+                        data-hash="md5-p6lFpolTplwn4v9AcMEPvw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">OLED DMA高刷驱动</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E4%B8%B2%E5%8F%A3/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E4%B8%B2%E5%8F%A3/pic3.e123d956b72f67e4ee9f1e06e0516d44_hu_d38f7587d474ba18.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 串口格式化发送&#43;环形缓冲区"
+                        data-key="串口" 
+                        data-hash="md5-4SPZVrcvZ&#43;Tunx4G4FFtRA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">串口格式化发送&#43;环形缓冲区</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="00lllooolll00/blog_public"
+    data-repo-id="R_kgDOPhv8YA"
+    data-category="General"
+    data-category-id="DIC_kwDOPhv8YM4Cuegh"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="en"
+    data-loading=""
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <section class="count_info">
+    <div>
+        本博客已稳定运行
+        <span id="ds" class="running-days"></span>
+        天
+        <span id="hs" class="running-days"></span>
+        小时
+        <span id="ms" class="running-days"></span>
+        分钟
+    </div>
+    <div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        共发表 10 篇文章 · 总计 174.82 k 字
+    </div>
+    <div>
+        
+        
+
+        最近一次更新时间：<span id="last-commit-time">2025-09-05 19:17</span>
+    </div>
+</section>
+
+
+<script>
+    let s1 = '2025-8-21'; 
+    s1 = new Date(s1.replace(/-/g, "/"));
+    let s2 = new Date();
+    let timeDifference = s2.getTime() - s1.getTime();
+
+    let days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    let hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    let minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+    document.getElementById('ds').innerHTML = days;
+    document.getElementById('hs').innerHTML = hours;
+    document.getElementById('ms').innerHTML = minutes;
+
+</script>
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script><script type="text/javascript" src="/ts/custom.1ad88f4a81a60653bbc89a62cd05504b28b028154b3f3e0f3354d66a9464e625.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+         
+        position: fixed;
+         
+         
+        bottom: 30px;
+         
+        right: 400px;
+         
+         
+        z-index: 99;
+         
+        cursor: pointer;
+         
+         
+        width: 60px;
+         
+        height: 60px;
+         
+         
+        background-image: url(/icons/backTop.svg);
+     
+    background-size: contain;
+     
+    background-repeat: no-repeat;
+     
+    background-position: center;
+     
+    border-radius: 50%;
+     
+    background-color: rgba(255, 255, 255, 0.8);
+     
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+     
+     
+    will-change: transform;
+    transition: transform 0.3s ease-in-out,
+    opacity 0.3s ease-in-out;
+     
+    }
+
+     
+    @media screen and (max-width: 768px) {
+        #backTopBtn {
+            right: 20px;
+             
+            bottom: 20px;
+             
+            width: 50px;
+             
+            height: 50px;
+             
+        }
+    }
+
+     
+    #backTopBtn:hover {
+        transform: rotate(360deg);
+         
+        background-color: rgba(255, 255, 255, 1);
+         
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        
+        
+        let articleContent = document.querySelector(".main-article") ||
+            document.querySelector(".article-content") ||
+            document.querySelector(".post-content");
+        let isHomePage = document.querySelector(".article-list");
+
+        if (!articleContent || isHomePage) {
+            return; 
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";        
+        btn.onclick = backToTop;      
+        document.body.appendChild(btn); 
+
+        
+        window.onscroll = function () {
+            
+            let scrollTop = window.pageYOffset ||
+                document.documentElement.scrollTop ||
+                document.body.scrollTop || 0;
+
+             
+            
+            
+            if (scrollTop > 200) {
+                btn.style.display = "block";  
+            } else {
+                btn.style.display = "none";   
+            }
+             
+        };
+    }
+
+    
+
+    function backToTop() {
+        
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    
+    document.addEventListener('DOMContentLoaded', initScrollTop);
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+    $(document).ready(function () {
+        
+        $('.article-content img').each(function () {
+            var $img = $(this);
+            var src = $img.attr('src');
+
+            
+            $img.wrap('<a href="' + src + '" data-fancybox="gallery" data-caption="' + ($img.attr('alt') || '') + '"></a>');
+        });
+
+        
+        $('[data-fancybox]').fancybox({
+            buttons: [
+                'zoom',
+                'slideShow',
+                'fullScreen',
+                'download',
+                'close'
+            ],
+            loop: true,
+            protect: true
+        });
+    });
+</script>
+
+
+
+
+<style>
+     
+    #live2d-widget {
+        position: fixed;
+        bottom: 80px;
+         
+        left: 20px;
+         
+        z-index: 999;
+         
+        font-size: 0;
+        transition: all 0.5s ease-in-out;
+        opacity: 0;
+         
+        transform: translateY(20px) scale(0.8);
+         
+        pointer-events: none;
+         
+    }
+
+     
+    #live2d-widget.loaded {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+     
+    @media screen and (min-width: 1920px) {
+        #live2d-widget {
+            transform: scale(0.8);
+            transform-origin: bottom left;
+            left: 25px;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.8);
+        }
+    }
+
+    @media screen and (max-width: 1440px) {
+        #live2d-widget {
+            transform: scale(0.9);
+            transform-origin: bottom left;
+            left: 18px;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.9);
+        }
+    }
+
+    @media screen and (max-width: 1200px) {
+        #live2d-widget {
+            transform: scale(0.8);
+            transform-origin: bottom left;
+            left: 15px;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.8);
+        }
+    }
+
+    @media screen and (max-width: 1024px) {
+        #live2d-widget {
+            transform: scale(0.7);
+            left: 12px;
+            bottom: 70px;
+            transform-origin: bottom left;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.7);
+        }
+    }
+
+     
+    @media screen and (max-width: 768px) {
+        #live2d-widget {
+            display: none !important;
+        }
+    }
+
+     
+    @media screen and (min-width: 3000px) {
+        #live2d-widget {
+            display: none !important;
+        }
+    }
+
+     
+    #waifu {
+        position: fixed;
+        bottom: 80px;
+        left: 20px;
+        z-index: 999;
+        font-size: 0;
+        transition: all 0.5s ease-in-out;
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+        pointer-events: none;
+    }
+
+    #waifu.loaded {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+     
+    #live2d-message {
+        position: fixed;
+        bottom: 250px;
+        left: 20px;
+        background: linear-gradient(135deg, #ff69b4, #ff1493);
+        border: 2px solid #fff;
+        border-radius: 15px;
+        padding: 10px 15px;
+        font-size: 14px;
+        color: white;
+        max-width: 200px;
+        z-index: 9999;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+    }
+
+     
+    #live2d canvas {
+        cursor: pointer !important;
+    }
+
+    canvas[id*="live2d"] {
+        cursor: pointer !important;
+    }
+
+     
+    #live2d-message::after {
+        content: '';
+        position: absolute;
+        right: -10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-left: 10px solid #ff1493;
+    }
+
+    #live2d-message.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+
+
+<script>
+    
+    window.live2d_settings = {
+        
+        modelId: 0,                    
+        modelTexturesId: 0,            
+
+        
+        showToolMenu: true,            
+        canCloseLive2d: true,          
+        canSwitchModel: true,          
+        canSwitchTextures: true,       
+
+        
+        showWelcomeMessage: true,      
+
+        
+        waifuSize: '280x250',          
+        waifuMinWidth: '768px',        
+        waifuDraggable: 'axis-x',      
+
+        
+        welcomeMessage: '欢迎来到N1ntyNine99的博客！',
+        clickMessages: [
+            '你好呀！欢迎访问博客~',
+            '今天过得怎么样呢？',
+            '要不要看看最新的文章？',
+            '记得多喝水哦！',
+            '学习使人快乐！',
+            '代码改变世界！',
+            '写代码要注意休息眼睛哦~',
+            '有什么问题可以在评论区留言~',
+            '技术分享让世界更美好！',
+            '保持好奇心，持续学习！',
+            '每一行代码都是艺术品~',
+            '调试是程序员的必修课！',
+            '开源精神值得敬佩！',
+            '算法优化永无止境~',
+            '团队协作很重要哦！',
+            '文档写得好，维护没烦恼~',
+            '测试驱动开发很棒！',
+            '重构让代码更优雅~',
+            '安全编程不能忽视！',
+            '持续集成提高效率！'
+        ]
+    };
+</script>
+
+
+<script src="https://fastly.jsdelivr.net/npm/live2d-widget@3.x/lib/L2Dwidget.min.js"></script>
+<script>
+    
+    L2Dwidget.init({
+        "model": {
+            
+            "jsonPath": "https://unpkg.com/live2d-widget-model-hijiki@1.0.5/assets/hijiki.model.json",
+            "scale": 1.3
+        },
+        "display": {
+            "position": "left",
+            "width": 150,
+            "height": 300,
+            "hOffset": 150,
+            "vOffset": 20
+        },
+        "mobile": {
+            "show": false,              
+            "scale": 0.8
+        },
+        "react": {
+            "opacityDefault": 0.8,
+            "opacityOnHover": 1.0
+        },
+        "log": false,
+        "pluginJsPath": "lib/",
+        "pluginModelPath": "assets/",
+        "tagMode": false,
+        "debug": false
+    });
+</script>
+
+
+<div id="live2d-message"></div>
+
+
+<script>
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Live2D Widget loaded without interaction features');
+
+        
+        function waitForLive2DAndShow() {
+            const widget = document.getElementById('live2d-widget') || document.querySelector('#live2d-widget');
+            const canvas = document.querySelector('canvas');
+
+            if (canvas && canvas.parentElement) {
+                
+                const container = canvas.parentElement;
+                if (!container.id) {
+                    container.id = 'live2d-widget';
+                }
+
+                
+                setTimeout(() => {
+                    container.classList.add('loaded');
+                    console.log('Live2D widget fade-in animation started');
+                }, 1000); 
+
+            } else {
+                
+                setTimeout(waitForLive2DAndShow, 500);
+            }
+        }
+
+        
+        setTimeout(waitForLive2DAndShow, 2000);
+
+        
+        let resizeTimer;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                const widget = document.getElementById('live2d-widget') || document.querySelector('canvas')?.parentElement;
+                if (widget) {
+                    
+                    const viewportWidth = window.innerWidth;
+
+                    
+                    if (viewportWidth > 768 && viewportWidth < 3000) {
+                        widget.classList.add('loaded');
+                    }
+
+                    console.log('Live2D widget responsive adjustment applied, viewport width:', viewportWidth);
+                }
+            }, 250);
+        });
+
+        
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                
+                setTimeout(() => {
+                    const widget = document.getElementById('live2d-widget') || document.querySelector('canvas')?.parentElement;
+                    if (widget && window.innerWidth > 768 && window.innerWidth < 3000) {
+                        widget.classList.add('loaded');
+                    }
+                }, 500);
+            }
+        });
+    });
+</script>
+
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const loadingOverlay = document.getElementById('page-loading');
+                const mainContent = document.getElementById('main-content');
+                
+                
+                mainContent.style.opacity = '0';
+                mainContent.style.transform = 'translateY(20px)';
+                
+                
+                setTimeout(function() {
+                    
+                    loadingOverlay.style.opacity = '0';
+                    loadingOverlay.style.visibility = 'hidden';
+                    
+                    
+                    mainContent.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateY(0)';
+                    
+                    
+                    setTimeout(function() {
+                        loadingOverlay.remove();
+                    }, 600);
+                }, 800); 
+            });
+        </script>
+    </body>
+</html>
