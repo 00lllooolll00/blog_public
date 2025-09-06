@@ -3,6 +3,10 @@
 
 #include "SysConfig.h"
 
+#ifdef __cplusplus
+}
+#endif
+
 #define GD25Q40E_SPI &hspi1
 
 /* GD25Q40E 命令定义 */
@@ -52,5 +56,9 @@ void GD25Q40E_WakeUp(void);
 uint16_t GD25Q40E_ReadREMS(void);
 uint32_t GD25Q40E_ReadID(void);
 uint16_t GD25Q40E_ReadUniqueID(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

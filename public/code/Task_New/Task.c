@@ -380,7 +380,7 @@ TaskRes_t rTaskInit(void)
  * @return pTaskHandler_t 返回节点中的任务句柄指针，失败返回NULL
  * @note 适用于静态分配场景，节点内存和函数指针都由用户管理，不使用内存池
  */
-pTaskCreate_Static rTaskCreate_Static(TaskNode_t *node, TaskHandler_t *static_handler)
+pTaskHandler_t pTaskCreate_Static(TaskNode_t *node, TaskHandler_t *static_handler)
 {
     if (node == NULL || static_handler == NULL) return NULL;
 

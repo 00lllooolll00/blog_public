@@ -12,6 +12,17 @@
 #ifndef __OLED_h
 #define __OLED_h
 
+#include "SysConfig.h"
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <math.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /* OLED屏幕尺寸配置 */
 #define OLED_0_96_INCH 1 // 0.96英寸OLED
 #define OLED_1_3_INCH  0 // 1.3英寸OLED
@@ -21,12 +32,6 @@
 #define OLED_SIZE OLED_0_96_INCH // 默认使用0.96英寸OLED
 
 #endif
-
-#include "SysConfig.h"
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <math.h>
 
 #define OLED_SPI       &hspi1
 
@@ -104,5 +109,9 @@ void OLED_DrawFrame(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t
 void OLED_DrawRoundRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t radius, uint8_t color);
 void OLED_DrawEllipse(uint8_t x0, uint8_t y0, uint8_t rx, uint8_t ry, uint8_t color);
 void OLED_DrawArrow(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t size, uint8_t color);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __OLED_h */

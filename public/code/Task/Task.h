@@ -14,9 +14,24 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
-/* ========================= 宏定义 ========================= */
-#define __weak __attribute__((weak))
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+/* ========================= 宏定义 ========================= */
+#ifndef __weak
+#if defined(__GNUC__) || defined(__clang__)
+#define __weak __attribute__((weak))
+#elif defined(__IAR_SYSTEMS_ICC__)
+#define __weak __weak
+#elif defined(__CC_ARM) || defined(__ARMCC_VERSION)
+#define __weak __weak
+#else
+#define __weak
+#endif
+#endif
 /**
  * @brief   是否开启动态调整
  */
@@ -98,5 +113,9 @@ bool Task_Suspend(const char *taskName);
 bool Task_Resume(const char *taskName);
 bool Task_Delete(const char *taskName);
 bool Task_GetMaxUsed(const char *taskName, uint16_t *time_ms);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __TASK_h */

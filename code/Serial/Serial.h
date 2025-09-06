@@ -15,6 +15,12 @@
 #define __SERIAL_h
 
 #include "SysConfig.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /* ========================= 宏定义区 ========================= */
 
 #define USER_UART              &huart1 //用户自选的串口号
@@ -67,5 +73,10 @@ void Serial_Init(void);
 uint16_t MyPrintf(UART_HandleTypeDef *huart, const char *format, ...);
 uint16_t MyPrintf_DMA(UART_HandleTypeDef *huart, const char *format, ...);
 void Serial_Idle_Handler(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

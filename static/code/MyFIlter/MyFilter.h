@@ -7,6 +7,11 @@
 #include <math.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /**
  * @brief 低通滤波器结构体
  * 
@@ -80,5 +85,9 @@ bool Avg_Filter(average_filter_t *filter, float input);
 //卡尔曼滤波
 void Kalman_Filter_Init(kalman_filter_t *filter, float q, float r, float initial_value);
 bool Kalman_Filter(kalman_filter_t *filter, float measurement);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -6,6 +6,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /*弱定义宏*/
 #ifndef __weak
 #if defined(__GNUC__) || defined(__clang__)
@@ -130,5 +135,9 @@ TaskRes_t rTaskSetPriority(pTaskHandler_t task_handler, uint8_t Priority);
 TaskRes_t rTaskGetInfo(pTaskHandler_t task_handler, TaskInfo_t *task_info);
 size_t uTaskGetFreeMemory(void);
 void vTaskStart(uint32_t (*tick_get)(void));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

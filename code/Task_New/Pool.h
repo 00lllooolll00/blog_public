@@ -16,6 +16,11 @@
 #include <stdbool.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /* ========================= 宏定义区 ========================= */
 /**
  * @brief 内存池总大小 (字节)
@@ -64,5 +69,9 @@ bool MemPool_Free(void *ptr);
 void MemPool_GetStats(pool_stats_t *stats);
 size_t MemPool_GetFreeSize(void);
 bool MemPool_CheckIntegrity(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

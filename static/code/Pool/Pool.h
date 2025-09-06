@@ -15,6 +15,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /* ========================= 宏定义区 ========================= */
 /**
  * @brief 使用默认参数初始化内存池，块大小64字节，块数量1024
@@ -63,5 +68,9 @@ bool MemPool_Init(uint32_t block_size, uint32_t block_num);
 void MemPool_Deinit(void);
 void *MemPool_Malloc(size_t size);
 bool MemPool_Free(void *ptr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
