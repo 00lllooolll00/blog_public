@@ -2,7 +2,7 @@
 title: Rust自学笔记
 description: 根据官网学习Rust时做的笔记
 date: 2025-08-21
-lastmod: 2025-09-05
+lastmod: 2025-09-07
 slug: rust-self-teach
 image: rust-2.jpg
 comments: true
@@ -11085,3 +11085,523 @@ fn main() {
 ## 15.6 引用循环会导致内存泄露！
 
 Rust的内存安全保证使得意外创建永远不会被清理的内存（即**内存泄漏（*memory  leak*）**）变得困难，但并非不可能。完全防止内存泄漏并非Rust的保证之一，这意味着在Rust中内存泄漏是内存安全的。我们可以通过使用`Rc<T>`和`RefCell<T>`看到Rust允许内存泄漏：**有可能创建一些引用，其中的项形成相互引用的循环**。这会导致内存泄漏，**因为循环中每个项的引用计数永远不会达到0，这些值也永远不会被丢弃**。
+
+---
+
+### 15.6.1 创建一个引用循环
+
+我们通过下面这个例子来看一下一个引用循环会发生什么，和我们要如何去阻止它，我们依旧使用之前的`List`枚举和一个`tail`方法：
+
+```rust
+use crate::List::{Cons, Nil};
+use std::cell::RefCell;
+use std::rc::Rc;
+
+#[derive(Debug)]
+enum List {
+    Cons(i32, RefCell<Rc<List>>),
+    Nil,
+}
+
+impl List {
+    fn tail(&self) -> Option<&RefCell<Rc<List>>> {
+        match self {
+            Cons(_, item) => Some(item),
+            Nil => None,
+        }
+    }
+}
+
+```
+
+我们对`List`的枚举中的`Cons`变体的第二个值定义为`RefCell<Rc<List>>`，意味着，**我们可能会修改`Cons`变体中指向的`List`的值**。这个`tail`方法也让我们更加简单的找到下一项。
+
+我们添加了一个`main`函数，这段代码在`a`中创建了一个列表，并在`b`中创建了一个指向`a`中列表的列表。然后，它修改`a`中的列表以指向`b`，从而形成一个引用循环。过程中还穿插了一些`println!`语句，用于显示该过程中各个节点的引用计数：
+
+```rust
+fn main() {
+    // a -> Nil
+    let a = Rc::new(Cons(5, RefCell::new(Rc::new(Nil))));
+
+    println!("a initial rc count = {}", Rc::strong_count(&a));
+    println!("a next item = {:?}", a.tail());
+
+    // b -> a -> Nil
+    let b = Rc::new(Cons(10, RefCell::new(Rc::clone(&a))));
+
+    println!("a rc count after b creation = {}", Rc::strong_count(&a));
+    println!("b initial rc count = {}", Rc::strong_count(&b));
+    println!("b next item = {:?}", b.tail());
+
+   	// 修改 a 让 a 的下一个节点指向 b
+    // a -> b -> a -> ...
+    if let Some(link) = a.tail() {
+        *link.borrow_mut() = Rc::clone(&b);
+    }
+
+    println!("b rc count after changing a = {}", Rc::strong_count(&b));
+    println!("a rc count after changing a = {}", Rc::strong_count(&a));
+    
+    // 解除注释会导致 stack overflow
+    // println!("a next item = {:?}", a.tail());
+}
+
+```
+
+我们创建了一个`Rc<List>`实例，在变量`a`中存储了一个`List`值，初始列表为`5, Nil`。然后，我们在变量`b`中创建了另一个`Rc<List>`实例，该实例存储了另一个`List`值，其中包含值`10`，并指向`a`中的列表。
+
+**我们修改`a`，使其指向`b`而非`Nil`，从而创建一个循环**。我们通过使用`tail`方法获取`a`中`RefCell<Rc<List>>`的引用，并将其存入变量`link`来实现这一点。然后，我们对`RefCell<Rc<List>>`调用`borrow_mut`方法，将其中的值从一个持有`Nil`值的`Rc<List>`修改为`b`中的`Rc<List>`。
+
+编译结果如下：
+
+![image-20250907171114455](./index.assets/image-20250907171114455.png)
+
+在我们将`a`中的列表改为指向`b`后，`a`和`b`中`Rc<List>`实例的引用计数均为2。**在`main`结束时，Rust会丢弃变量`b`，这会减少`b`的引用计数，`b`的`Rc<List>` 实例从 2 减到 1**。此时，`Rc<List>` 在堆上的内存不会被释放，因为它的引用计数是 1，而不是 0。然后 Rust 释放 `a`，这会减少 `a` 的引用计数：`a`的 ``Rc<List>`实例也从2减到1。**这个实例的内存也不能被释放，因为另一个`Rc<List>`实例仍然引用着它。分配给这个列表的内存将永远无法被回收**。如下图：
+
+<img src="./index.assets/image-20250907171450057.png" alt="image-20250907171450057" style="zoom:80%;" />
+
+如果你取消最后一个`println!`的注释并运行程序，**Rust会尝试打印这个循环——`a`指向`b`，b又指向`a`，如此反复，直到栈溢出**。
+
+与现实世界中的程序相比，在这个例子中创建引用循环的后果并不严重：**我们创建引用循环后，程序就会立即结束**。然而，如果一个更复杂的程序在循环中分配了大量内存并长时间持有这些内存，**该程序所使用的内存就会超过实际需求，可能会使系统不堪重负，导致可用内存耗尽**。
+
+避免引用循环的另一个解决方案是重新组织数据结构，使部分引用表示所有权，部分引用不表示所有权。这样一来，循环可以由一些所有权关系和一些非所有权关系构成，而只有所有权关系会影响一个值是否可以被丢弃。
+
+---
+
+### 15.6.2 使用`Weak<T>`来避免循环引用
+
+到目前为止，我们已经证明，调用`Rc::clone`会增加`Rc<T>`实例的`strong_count`，**而只有当Rc<T>实例的`strong_count`为0时，它才会被清理**。你还可以通过调用`Rc::downgrade`并传递对`Rc<T>`的引用来创建指向`Rc<T>`实例内部值的**弱引用（*weak reference*）**。强引用是你可以共享`Rc<T>`实例所有权的方式。**弱引用不会表达所有权关系，它们的计数也不会影响`Rc<T>`实例的清理时机**。它们不会导致引用循环，因为一旦涉及的值的强引用计数为0，任何包含一些弱引用的循环都会被打破。
+
+当你调用`Rc::downgrade`时，会得到一个类型为`Weak<T>`的智能指针。调用`Rc::downgrade`不会将`Rc<T>`实例中的`strong_count`加1，**而是会将`weak_count`加1**。**`Rc<T>`类型使用`weak_count`来跟踪存在多少个`Weak<T>`引用**，这与`strong_count`类似。不同之处在于，**要清理`Rc<T>`实例，`weak_count`不必为0**。
+
+由于 `Weak<T>` 所引用的值可能已经被丢弃，因此要对 `Weak<T>` 指向的值进行任何操作，**必须确保该值仍然存在**。可以通过在 `Weak<T>` **实例上调用 `upgrade` 方法来实现，该方法会返回一个 `Option<Rc<T>>`**。如果 `Rc<T>` 的值尚未被丢弃，你会得到 `Some` 的结果；如果 `Rc<T>` 的值已经被丢弃，则会得到 `None` 的结果。因为 `upgrade `会返回 `Option<Rc<T>>`，Rust 会确保 `Some` 情况和 `None` 情况都得到处理，从而不会出现无效指针。
+
+举个例子，我们不会使用一种列表（其中的条目只知道下一个条目），而是会创建一种树状结构，其中的条目既知道自己的子条目，也知道自己的父条目。
+
+----
+
+### 15.6.3 创建一个树状结构
+
+首先，我们将构建一个树，其节点知晓自己的子节点。我们会创建一个名为`Node`的结构体，它既包含自身的`i32`值，也包含对其子节点`Node`值的引用：
+
+```rust
+use std::cell::RefCell;
+use std::rc::Rc;
+
+#[derive(Debug)]
+struct Node {
+    value: i32,
+    children: RefCell<Vec<Rc<Node>>>,
+}
+
+```
+
+**我们希望一个`Node`拥有它的子节点，并且希望与变量共享这种所有权，这样我们就可以直接访问树中的每个`Node`**。为了实现这一点，我们将`Vec<T>`项定义为`Rc<Node>`类型的值。我们还希望修改那些是另一个节点的子节点的节点，因此在`children`中，我们在`Vec<Rc<Node>>`周围设置了一个`RefCell<T>`。
+
+接下来，我们将使用结构体定义创建一个名为`leaf`的`Node`实例，其值为3且没有子节点，另一个实例名为`branch`，值为5，并将`leaf`作为其子节点之一，如代码：
+
+```rust
+fn main() {
+    let leaf = Rc::new(Node {
+        value: 3,
+        children: RefCell::new(vec![]), // 空向量来表示无子节点
+    });
+
+    let branch =  Rc::new(Node {
+        value: 5,
+        children: RefCell::clone(vec![Rc::clone(&leaf)]),
+    });
+}
+
+```
+
+我们克隆了`Rc<Node>`并将其存储在`leaf`中，然后把它存到`branch`里，**这意味着`leaf`中的`Node`现在有两个所有者：`leaf`和`branch`**。我们可以通过`branch.children`从`branch`访问到`leaf`，但无法从`leaf`访问到`branch`。原因是`leaf`没有指向`branch`的引用，不知道它们之间有关联。我们希望`leaf`知道`branch`是它的父节点。接下来我们就来实现这一点。
+
+---
+
+### 15.6.4 创建一个从子到父的引用
+
+为了让子节点知晓其父节点，我们需要在`parent`字段中添加`Node`结构体定义。问题在于确定`parent`的类型。**我们知道它不能包含`Rc<T>`，因为这会创建一个引用循环**：`leaf.parent`指向`branch`，而`branch.children`指向`leaf`，这会导致它们的`strong_count`值永远不会为0。
+
+换个角度思考这种关系，父节点应该拥有其子节点：如果父节点被删除，其子节点也应该被删除。但是，子节点不应该拥有其父节点：如果我们删除子节点，父节点应该仍然存在。这就是弱引用的用武之地。
+
+因此，我们不会使用`Rc<T>`，而是让`parent`的类型使用`Weak<T>`，具体来说是`RefCell<Weak<Node>>`。现在我们的`Node`结构体定义如下：
+
+```rust
+use std::cell::RefCell;
+use std::rc::{Rc,Weak};
+
+#[derive(Debug)]
+struct Node {
+    value: i32,
+    parent:RefCell<Weak<Node>>,
+    children: RefCell<Vec<Rc<Node>>>,
+}
+```
+
+一个节点可以引用其父节点，但并不拥有其父节点；我们更新了`main`以使用这个新定义，这样`leaf`节点就能够引用其父节点`branch`了：
+
+```rust
+fn main() {
+    let leaf = Rc::new(Node {
+        value: 3,
+        parent: RefCell::new(Weak::new()),
+        children: RefCell::new(vec![]), // 空向量来表示无子节点
+    });
+
+    println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+
+    let branch = Rc::new(Node {
+        value: 5,
+        parent: RefCell::new(Weak::new()),
+        children: RefCell::new(vec![Rc::clone(&leaf)]),
+    });
+
+    *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
+    println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+}
+
+```
+
+创建`leaf`节点的过程与之前类似，不同之处在于`parent`字段：`leaf`节点初始时没有父节点，因此我们创建一个新的、空的`Weak<Node>`引用实例。
+
+此时，当我们尝试通过使用`upgrade`方法获取`leaf`的父节点引用时，得到的是一个`None`值。我们在第一个`println!`语句的输出中可以看到这一点：
+
+![image-20250907180554939](./index.assets/image-20250907180554939.png)
+
+**当我们创建`branch`节点时，它的`parent`字段中也会有一个新的`Weak<Node>`引用，因为`branch`没有父节点**。我们仍然将`leaf`作为`branch`的子节点之一。一旦在`branch`中获得了`Node`实例，我们就可以修改`leaf`，使其拥有一个指向其父节点的`Weak<Node>`引用。我们对`leaf`的`parent`字段中的`RefCell<Weak<Node>>`调用`borrow_mut`方法，然后使用`Rc::downgrade`函数从`branch`中的`Rc<Node>`创建一个指向`branch`的`Weak<Node>`引用：
+
+![image-20250907180757334](./index.assets/image-20250907180757334.png)
+
+输出不是无限的，这表明这段代码没有创建引用循环。我们也可以通过调用`Rc::strong_count`和`Rc::weak_count`得到的值来确认这一点。
+
+---
+
+### 15.6.5 可视化`strong_count`和`weak_count`的变化
+
+让我们通过创建一个新的内部作用域并将`branch`的创建移到该作用域中，来看看`Rc<Node>`实例的`strong_count`和`weak_count`值是如何变化的。通过这种方式，我们可以观察到当`branch`被创建，然后在超出作用域时被丢弃时会发生什么。
+
+```rust
+fn main() {
+    let leaf = Rc::new(Node {
+        value: 3,
+        parent: RefCell::new(Weak::new()),
+        children: RefCell::new(vec![]),
+    });
+
+    println!(
+        "leaf strong = {}, weak = {}",
+        Rc::strong_count(&leaf),
+        Rc::weak_count(&leaf),
+    );
+
+    {
+
+        let branch = Rc::new(Node {
+            value: 5,
+            parent: RefCell::new(Weak::new()),
+            children: RefCell::new(vec![Rc::clone(&leaf)]),
+        });
+        // 进入 branch 的作用域 强引用 leaf +1
+        
+        *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
+		// leaf 对 branch 弱引用 +1
+        
+        println!(
+            "branch strong = {}, weak = {}",
+            Rc::strong_count(&branch),
+            Rc::weak_count(&branch),
+        );
+        // strong = 1 weak = 1
+
+        println!(
+            "leaf strong = {}, weak = {}",
+            Rc::strong_count(&leaf),
+            Rc::weak_count(&leaf),
+        );
+        // strong = 2 weak = 0
+        
+    }// 退出 branch 作用域 branch 被释放
+
+    println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());// None
+    println!(
+        "leaf strong = {}, weak = {}",
+        Rc::strong_count(&leaf),
+        Rc::weak_count(&leaf),
+    );// strong = 1 weak = 0
+}
+```
+
+编译结果如下：
+
+![image-20250907181338446](./index.assets/image-20250907181338446.png)
+
+创建`leaf`后，**其`Rc<Node>`的强引用计数为1**，弱引用计数为0。在内部作用域中，我们创建`branch`并将其与`leaf`关联，此时当我们打印计数时，`branch`中的`Rc<Node>`强引用计数为1，弱引用计数为1（因为`leaf.parent`通过`Weak<Node>`指向`branch`）。当我们打印`leaf`的计数时，会发现其强引用计数为2，因为`branch`现在在`branch.children`中存储了`leaf`的`Rc<Node>`的一个克隆，但弱引用计数仍为0。
+
+当内部作用域结束时，`branch` 超出作用域，`Rc<Node>` 的强引用计数减少到 0，因此其 `Node` 会被丢弃。来自 `leaf.parent` 的 1 个弱引用计数不影响 Node</b4 是否被丢弃，所以我们不会有任何内存泄漏！
+
+如果我们在作用域结束后尝试访问`leaf`的父节点，会再次得到`None`。程序结束时，`leaf`中的`Rc<Node>`的强引用计数为1，弱引用计数为0，因为此时变量`leaf`再次成为指向`Rc<Node>`的唯一引用。
+
+所有用于管理计数和值释放的逻辑都内置在`Rc<T>`、`Weak<T>`及其对`Drop` trait的实现中。**通过在`Node`的定义中指定子节点到父节点的关系应为`Weak<T>`引用，你可以让父节点指向子节点，反之亦然，且不会产生引用循环和内存泄漏**。
+
+----
+
+## 15.7 总结
+
+本章介绍了如何使用智能指针来实现与Rust默认通过常规引用来提供的不同保证和权衡。`Box<T>`类型具有已知大小，指向堆上分配的数据。`Rc<T>`类型会跟踪堆上数据的引用数量，因此数据可以有多个所有者。具有内部可变性的`RefCell<T>`类型为我们提供了一种类型，当我们需要一个不可变类型但又需要更改该类型的内部值时，可以使用它；它还在运行时而不是编译时强制执行借用规则。
+
+还讨论了`Deref`和`Drop` trait，它们为智能指针提供了诸多功能。我们探讨了可能导致内存泄漏的引用循环，以及如何使用`Weak<T>`来防止这种情况。
+
+如果本章引起了你的兴趣，并且你想实现自己的智能指针，可以查阅*[The Rustonomicon]([Introduction - The Rustonomicon](https://doc.rust-lang.org/nomicon/index.html))*以获取更多有用的信息。
+
+接下来，我们将讨论Rust中的并发。你甚至会了解到一些新的智能指针。
+
+---
+
+# Chapter 16：无畏并发（*Concurrency*）
+
+安全高效地处理并发编程是 Rust 的另一个主要目标。**并发编程（*Concurrent programming*）指程序的不同部分独立执行，并行编程（*parallel programming*）指程序的不同部分同时执行**，随着越来越多的计算机利用其多处理器，这两者正变得日益重要。从历史上看，在这些场景下编程一直是困难且容易出错的。Rust 希望改变这种状况。
+
+起初，Rust 团队认为，确保内存安全和防止并发问题是两个需要用不同方法解决的独立挑战。随着时间的推移，团队发现所有权和类型系统是一套强大的工具，有助于管理内存安全*和*并发问题！通过利用所有权和类型检查，许多并发错误在 Rust 中是编译时错误，而非运行时错误。**因此，错误的代码不会让你花费大量时间去重现运行时并发 bug 出现的确切环境，而是会拒绝编译，并给出解释问题的错误提示**。这样一来，你可以在编写代码时就修复问题，而不是可能在代码投入生产环境之后才去修复。我们将 Rust 的这一特性称为**无畏并发（*Fearless Concurrency*）**。无畏并发使你能够编写没有细微错误的代码，并且易于重构，不会引入新的错误。
+
+> [!NOTE]
+>
+> 注意：为简洁起见，我们将许多问题称为*并发的*，而非更精确地表述为*并发和/或并行的*。在本章中，每当我们使用*并发的*这一表述时，请在心中替换为*并发和/或并行的*。在下一章中，由于这一区分更为重要，我们会表述得更加具体。
+
+----
+
+## 16.1 使用线程同时运行多个代码
+
+在大多数当前的操作系统中，已执行程序的代码在**进程（*process*）**中运行，操作系统会同时管理多个进程。在一个程序内部，也可以有同时运行的独立部分。运行这些独立部分的功能称为**线程（*thread*）**。例如，Web服务器可以有多个线程，这样它就能同时响应多个请求。
+
+将程序中的计算拆分为多个线程以同时运行多项任务可以提高性能，但这也会增加复杂性。由于线程可以同时运行，**无法保证不同线程上的代码部分的执行顺序**。这可能会导致诸如以下的问题：
+
+- **竞态条件，即线程以不一致的顺序访问数据或资源**
+- **死锁是指两个线程相互等待，导致两者都无法继续运行的情况。**
+- **仅在特定情况下出现且难以稳定复现和修复的漏洞**
+
+Rust 试图减轻使用线程带来的负面影响，但在多线程环境中编程仍需谨慎思考，并且需要与单线程程序不同的代码结构。
+
+编程语言以几种不同的方式实现线程，许多操作系统提供了一种API，供编程语言调用以创建新线程。Rust标准库采用1:1的线程实现模型，即程序中每个语言线程对应一个操作系统线程。有一些 crate 实现了其他线程模型，与1:1模型相比各有不同的取舍。
+
+----
+
+### 16.1.1 使用`spawn`来创建一个新的线程
+
+**我们首先需要给文件添加上`std::thread`，来引入标准库线程相关的crate；之后使用`thread::spawn`，为其传入一个闭包，闭包中就是我们想要新线程运行的代码**。就比如下面这个例子：
+
+```rust
+use std::thread;
+use std::time::Duration; // 时间相关api
+
+fn main() {
+    thread::spawn(|| {
+        for i in 1..10 {
+            println!("hi number {i} from the spawned thread!");
+            thread::sleep(Duration::from_millis(1)); // 1ms 延时
+        }
+    });
+
+    for i in 1..5 {
+        println!("hi number {i} from the main thread!");
+        thread::sleep(Duration::from_millis(1));
+    }
+}
+
+```
+
+程序输出如下：
+
+![image-20250907194209074](./index.assets/image-20250907194209074.png)
+
+**可以看到，我们创建的线程并没有运行完，而是由于主线程结束之后所有的线程都会被强制结束！**每一次的输出可能都不尽相同。
+
+**`thread::sleep`的调用会迫使线程暂停执行一小段时间，让其他线程得以运行**。这些线程可能会交替执行，但这并不能保证：这取决于操作系统对线程的调度方式。在本次运行中，主线程先打印了内容，尽管新生成线程的打印语句在代码中出现得更早。**而且，虽然我们让新生成的线程打印到`i`为`9`，但它只打印到`4`，主线程就终止了**。
+
+如果你运行这段代码，却只看到主线程的输出，或者没有看到任何重叠部分，可以尝试增大范围中的数值，为操作系统创造更多在线程之间切换的机会。
+
+---
+
+### 16.1.2 使用`JoinHandle`来等待所有线程结束
+
+上面的示例，只要主线程结束就会让所有的线程全部结束，而且由于无法保证线程的运行顺序，我们也不能确保生成的线程一定会运行。
+
+我们可以通过将`thread::spawn`的返回值保存到变量中，来解决生成的线程不运行或过早结束的问题。`thread::spawn`的返回类型是`JoinHandle<T>`。**`JoinHandle<T>`是一个拥有所有权的值，当我们在它上面调用`join`方法时，会等待其对应的线程完成**。下面展示了如何使用我们创建的线程的`JoinHandle<T>`，以及如何调用`join`以确保生成的线程在`main`退出之前完成：
+
+```rust
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    let handle = thread::spawn(|| {
+        for i in 1..10 {
+            println!("hi number {i} from the spawned thread!");
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+
+    for i in 1..5 {
+        println!("hi number {i} from the main thread!");
+        thread::sleep(Duration::from_millis(1));
+    }
+
+    handle.join().unwrap();
+}
+
+```
+
+在句柄上调用`join`会阻塞当前运行的线程，直到该句柄所代表的线程终止。*阻塞*线程意味着该线程无法执行工作或退出。由于我们将对`join`的调用放在了主线程的`for`循环之后，会产生类似如下的输出：
+
+![image-20250907194856887](./index.assets/image-20250907194856887.png)
+
+这两个线程继续交替运行，但主线程因调用`handle.join()`而等待，直到派生线程完成后才会结束。但让我们看看，如果我们将`handle.join()`移到`main`中的`for`循环之前，会发生什么情况：
+
+```rust
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    let handle = thread::spawn(|| {
+        for i in 1..10 {
+            println!("hi number {i} from the spawned thread!");
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+    
+    handle.join().unwrap();// 在主线程的循环之前加入线程
+
+    for i in 1..5 {
+        println!("hi number {i} from the main thread!");
+        thread::sleep(Duration::from_millis(1));
+    }
+}
+
+```
+
+**现在主线程会等待子线程全部完成之后，才会运行自己的`for`循环**，所以输出是这样的：
+
+![image-20250907195155280](./index.assets/image-20250907195155280.png)
+
+**所以说，调用`join`的位置，会影响你的多线程是否可以同时运行！**
+
+----
+
+### 16.1.3 在线程中使用`move`闭包
+
+我们经常会将`move`关键字与传递给`thread::spawn`的闭包一起使用，**因为这样闭包就会从环境中获取它所使用的值的所有权**，从而**将这些值的所有权从一个线程转移到另一个线程**。在第13章中，我们讨论了闭包上下文中的`move`。现在，我们将更专注于`move`和`thread::spawn`之间的交互。
+
+比如下面这个例子，我们传递给`thread::spawn`的闭包不接受任何参数：**我们在衍生线程的代码中没有使用主线程的任何数据**。要在衍生线程中使用主线程的数据，衍生线程的闭包必须捕获它所需的值。例子中展示了一种尝试，即在主线程中创建一个向量并在衍生线程中使用它。不过，你马上就会发现，这目前还无法正常工作：
+
+```rust
+use std::thread;
+
+fn main() {
+    let v = vec![1, 2, 3]; // 在主线程中创建一个向量
+
+    let handle = thread::spawn(|| {
+        println!("{v:?}"); // 在子线程中尝试打印主线程中的向量
+    });
+
+    handle.join().unwrap();
+}
+
+```
+
+**这个闭包使用了`v`，所以它会捕获`v`并将其作为闭包环境的一部分**。由于`thread::spawn`会在新线程中运行这个闭包，我们应该能够在那个新线程中访问`v`。但是当我们编译这个示例时，会得到以下错误：
+
+![image-20250907195843473](./index.assets/image-20250907195843473.png)
+
+Rust会推断如何捕获`v`，并且由于println!只需要`v`的一个引用，该闭包会尝试借用`v`。然而，这里存在一个问题：**Rust无法判断衍生线程会运行多久，因此它不知道对`v`的引用是否始终有效**。下面这个就是一种可能会导致`v`不合法的一种情况：
+
+```rust
+use std::thread;
+
+fn main() {
+    let v = vec![1, 2, 3];
+
+    let handle = thread::spawn(|| {
+        println!("{v:?}");
+    });
+
+    drop(v); // 如果主线程在子线程还没开始运行的时候就将 v 给释放掉了 此时对于子线程来说，v就不合法了
+
+    handle.join().unwrap();
+}
+```
+
+如果Rust允许我们运行这段代码，**那么有可能生成的线程会立即被置于后台，根本不运行**。生成的线程内部有一个对`v`的引用，但主线程会立即使用我们在第15章讨论过的`drop`函数丢弃`v`。这样一来，当生成的线程开始执行时，`v`就不再有效了，所以对它的引用也无效。
+
+为了修复这个问题，我们可以使用`move`关键字，放置于闭包的前面；这样，我们会让闭包强行将捕获的值的所有权占为己有，而不是让编译器去推断：
+
+```rust
+use std::thread;
+
+fn main() {
+    let v = vec![1, 2, 3]; 
+
+    let handle = thread::spawn(move || {
+        println!("{v:?}"); 
+    });
+
+    handle.join().unwrap();
+}
+
+```
+
+现在，这段代码就可以正常编译并且运行了。
+
+但是对于我们在主线程中，主动调用`drop`来释放掉`v`的情况呢？如下：
+
+```rust
+use std::thread;
+
+fn main() {
+    let v = vec![1, 2, 3]; 
+
+    let handle = thread::spawn(move || {
+        println!("{v:?}"); 
+    });
+
+    drop(v);
+
+    handle.join().unwrap();
+}
+
+```
+
+运行这段代码，编译器会报错如下：
+
+![image-20250907200538449](./index.assets/image-20250907200538449.png)
+
+**编译器告诉我们，`Vec<i32>`由于没有实现`Copy` trait，所以`move`不能创建一个新的副本，而是直接转交所有权，导致我们不能在主线程中使用一个已经被移动到子线程中的向量**！
+
+那如果我们将这里的`Vec<i32>`换成一个实现了`Copy` trait的数据类型，比如`i32`：
+
+```rust
+use std::thread;
+
+fn main() {
+    let num = 9999; 
+
+    let handle = thread::spawn(move || {
+        // 这里不加上 move 也是会报错的！
+        println!("{num}"); 
+    });
+
+    drop(num);
+
+    handle.join().unwrap();
+}
+
+```
+
+代码编译结果如下：
+
+![image-20250907201020892](./index.assets/image-20250907201020892.png)
+
+显然这是可行的！**说明对于`move`，实现了`Copy` trait的数据类型是会复制一个副本到子线程，而不是转接所有权！**
+
+既然我们已经介绍了线程是什么以及threadAPI提供的方法，接下来让我们看看一些可以使用线程的场景。
+
+---
+
