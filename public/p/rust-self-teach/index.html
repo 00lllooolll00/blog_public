@@ -10,7 +10,7 @@
 <meta property='og:description' content="根据官网学习Rust时做的笔记">
 <meta property='og:url' content='https://example.com/p/rust-self-teach/'>
 <meta property='og:site_name' content='N1ntyNine99'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-09-07T20:12:29&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rust' /><meta property='article:published_time' content='2025-08-21T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-09-18T17:27:56&#43;08:00'/><meta property='og:image' content='https://example.com/p/rust-self-teach/rust-2.jpg' />
 <meta name="twitter:title" content="Rust自学笔记">
 <meta name="twitter:description" content="根据官网学习Rust时做的笔记"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://example.com/p/rust-self-teach/rust-2.jpg' />
@@ -768,6 +768,7 @@
         <li><a href="#1613-在线程中使用move闭包">16.1.3 在线程中使用<code>move</code>闭包</a></li>
       </ol>
     </li>
+    <li><a href="#162-使用消息传递message-passing在线程之间传递数据">16.2 使用消息传递（<em>Message Passing</em>）在线程之间传递数据</a></li>
   </ol>
 </nav>
         </div>
@@ -858,7 +859,7 @@
 
 
             <time class="article-time--reading">
-                阅读时长: 343 分钟
+                阅读时长: 347 分钟
             </time>
         </div>
         
@@ -870,8 +871,8 @@
 <path d="M15 6L18 9" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M13 20H21" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-            <time class="article-time--updated" datetime=" 2025-09-07T20:12:29.000Z">
-                2025年9月7日
+            <time class="article-time--updated" datetime=" 2025-09-18T17:27:56.000Z">
+                2025年9月18日
             </time>
         </div>
         
@@ -17512,6 +17513,108 @@
 <p>显然这是可行的！<strong>说明对于<code>move</code>，实现了<code>Copy</code> trait的数据类型是会复制一个副本到子线程，而不是转接所有权！</strong></p>
 <p>既然我们已经介绍了线程是什么以及threadAPI提供的方法，接下来让我们看看一些可以使用线程的场景。</p>
 <hr>
+<h2 id="162-使用消息传递message-passing在线程之间传递数据">16.2 使用消息传递（<em>Message Passing</em>）在线程之间传递数据
+</h2><p>“不要通过共享内存来传递让不同线程交流，而是使用交流来共享数据”；为了确保并发的安全性，我们使用消息传递——<strong>通过线程之间互相发送包含数据的消息来让不同线程之间交流</strong>。</p>
+<p>Rust的标准库提供了一套完整的消息传递机制，通过<em>channel</em>。<strong><em>channel</em>是编程概念中的通用概念，来表示数据通过哪里来在两个线程之间传递数据</strong>。</p>
+<p>在消息传递中有两个部分，一个部分是<strong>发送方（<em>transmitter</em>）</strong>，对应的就是<strong>接收方（<em>receiver</em>）</strong>。顾名思义，发送方就是数据来源地，接收方就是数据接收地。</p>
+<p>在这里，我们将编写一个程序，其中一个线程生成值并通过通道发送这些值，另一个线程接收这些值并将其打印出来。我们会使用通道在线程之间发送简单的值，以此来演示这一特性。一旦你熟悉了这种技术，就可以将通道用于任何需要相互通信的线程，比如聊天系统，或者在一个系统中，多个线程执行计算的不同部分，并将这些部分发送给一个线程，由该线程汇总结果。</p>
+<p>如下列的代码，我们会创建一个channel，但是不做其他的任何事情。当前的代码还不能编译，因为Rust并不知道我们想要发送的信息的数据类型：</p>
+<p>Filename: src/main.rs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">sync</span>::<span class="n">mpsc</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span><span class="n">rx</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mpsc</span>::<span class="n">channel</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>我们使用<code>mpsc::channel</code>函数创建一个新通道；<code>mpsc</code>代表多生产者、单消费者（<em>multiple producer single consumer</em>）</strong>。简而言之，Rust标准库实现通道的方式意味着一个通道可以有多个用于生成值的发送端，但只有一个用于消费这些值的接收端。想象一下，多条溪流汇聚成一条大河：任何一条溪流中流下的所有东西最终都会汇入同一条河。现在我们先从单个生产者开始，但当这个示例能正常运行时，我们会添加多个生产者。</p>
+<p><strong><code>mpsc::channel</code> 函数会返回一个元组，其中第一个元素是发送端——发送者，第二个元素是接收端——接收者</strong>。在许多领域中，缩写 <code>tx</code> 和 <code>rx</code> 传统上分别用于表示 <strong><em>发送器</em> 和 <em>接收器</em></strong>，因此我们也用这样的名称来命名变量，以表明各自的端。我们使用带有解构元组模式的 <code>let</code> 语句；我们将在第 19 章讨论 <code>let</code> 语句中模式的使用和解构。目前，只需知道以这种方式使用 <code>let</code> 语句是提取 <code>mpsc::channel</code> 返回的元组各部分的便捷方法。</p>
+<p>让我们把发送端移到一个生成的线程中，并让它发送一个字符串，这样生成的线程就能与主线程进行通信：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">sync</span>::<span class="n">mpsc</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">thread</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">tx</span><span class="p">,</span><span class="w"> </span><span class="n">rx</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mpsc</span>::<span class="n">channel</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">thread</span>::<span class="n">spawn</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;hi&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">tx</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">val</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w"> 
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们先使用<code>thread::spawn</code>创建了一个线程，然后使用<code>move</code>将<code>tx</code>的所有权移动到当前的子线程中，再在子线程中调用<code>send</code>将数据发送出去，由于<code>send</code>的返回值是<code>Result&lt;T,E&gt;</code>；所以如果接收方已经被释放，或者没有接收方的时候，就会出现错误。在这里，我们只是简单的使用<code>unwrap</code>来在错误的时候让程序panic。</p>
+<p>接下来，我们让主线程就作为接收端，接收到消息然后打印出来：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">sync</span>::<span class="n">mpsc</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">thread</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">tx</span><span class="p">,</span><span class="w"> </span><span class="n">rx</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mpsc</span>::<span class="n">channel</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">thread</span>::<span class="n">spawn</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&#34;hi&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">tx</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">val</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">received</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rx</span><span class="p">.</span><span class="n">recv</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;Got:</span><span class="si">{received}</span><span class="s">&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>对于接收方，有两种方式接收消息，一种是我们这里的<code>recv()</code>（<em>receive</em>的简写），<strong>该方法是阻塞式的，会一直等待接收到了数据才会往后执行，当发送方发送一个值，它会返回一个<code>Result&lt;T,E&gt;</code>的数据类型，当发送方结束了线程还没接收到数据，他就会返回一个错误</strong>。</p>
+<p>另外一种就是<code>try_recv()</code>不会阻塞，<strong>而是会立刻返回一个<code>Result&lt;T,E&gt;</code>：如果此时有消息则会返回<code>Ok</code> ，<code>OK</code>会持有消息的值，如果此时没有任何消息则会返回一个<code>Err</code>的值</strong>。这种非阻塞的接收很适用于一个线程不仅需要接受数据还需要有其他的功能；我们可以编写一个循环，每隔一段时间调用一次<code>try_recv</code>，如果有消息的话就进行处理，否则就先做一会儿其他工作，之后再重新检查。</p>
+<p>在这个示例中，我们使用<code>recv</code>是为了简洁起见；主线程除了等待消息外没有其他工作要做，因此阻塞主线程是合适的。</p>
+<p>运行这个代码就可以看见：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250912182515719.png">
+<img src="./index.assets/image-20250912182515719.png" alt="image-20250912182515719"  />
+</a>
+</div>
+
+</p>
 
 </section>
 
@@ -17673,13 +17776,15 @@
         
         
         
-        共发表 10 篇文章 · 总计 192.49 k 字
+        
+        
+        共发表 11 篇文章 · 总计 198.01 k 字
     </div>
     <div>
         
         
 
-        最近一次更新时间：<span id="last-commit-time">2025-09-07 20:12</span>
+        最近一次更新时间：<span id="last-commit-time">2025-09-18 17:28</span>
     </div>
 </section>
 

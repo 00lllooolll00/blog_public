@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="从0开始写一个适用于CortexM的协程调度器">
+<title>协程调度器</title>
+
+<link rel='canonical' href='https://example.com/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/'>
+
+<link rel="stylesheet" href="/scss/style.min.72046820872168f5d569663e9f50eda0279d97bcfdddc13167ba0bb0dd5c1376.css"><meta property='og:title' content="协程调度器">
+<meta property='og:description' content="从0开始写一个适用于CortexM的协程调度器">
+<meta property='og:url' content='https://example.com/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/'>
+<meta property='og:site_name' content='N1ntyNine99'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='调度器' /><meta property='article:published_time' content='2025-09-18T00:00:00&#43;08:00'/><meta property='article:modified_time' content='2025-09-18T00:00:00&#43;08:00'/><meta property='og:image' content='https://example.com/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/GeminiCover.png' />
+<meta name="twitter:title" content="协程调度器">
+<meta name="twitter:description" content="从0开始写一个适用于CortexM的协程调度器"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://example.com/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/GeminiCover.png' />
+    <link rel="shortcut icon" href="/favicon.svg" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+
+        <div id="page-loading" class="page-loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner-container">
+                    <div class="loading-spinner"></div>
+                </div>
+                <div class="loading-text">加载中...</div>
+            </div>
+        </div>
+
+        <div class="container main-container flex on-phone--column extended" id="main-content"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/blog_avtatar_hu_2fcd01c874799bc3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">N1ntyNine99</a></h1>
+            <h2 class="site-description">一个电子、编程苦逼爱好者</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/97101368'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg height="2500" viewBox="51.2 51.2 921.6 921.6" width="2500" xmlns="http://www.w3.org/2000/svg"><g fill="#f16c8d"><path d="m729.329 373.95c-9.795-5.945-19.062-6.785-19.144-6.785l-1.065-.05c-57.2-3.866-121.165-5.832-190.126-5.832l-13.988.005c-68.956 0-132.925 1.96-190.12 5.831l-1.066.052c-.082 0-9.349.84-19.144 6.784-15.047 9.129-24.273 25.948-27.417 49.97-10.071 76.913-4.383 173.65.19 251.393 2.938 49.966 33.407 62.459 85.048 67.149 10.782.988 69.089 5.867 159.508 5.893v-.005c90.42-.02 148.726-4.905 159.514-5.888 51.64-4.69 82.11-17.183 85.043-67.15 4.577-77.741 10.26-174.479.19-251.391-3.15-24.028-12.376-40.848-27.423-49.977zm-390.99 172.718a23.65 23.65 0 0 1 -31.687-10.845 23.68 23.68 0 0 1 10.844-31.687c2.038-1.004 50.693-24.725 110.541-43.065a23.68 23.68 0 1 1 13.88 45.292c-56.294 17.25-103.111 40.074-103.577 40.305zm268.898 35.886c-.44 2.232-11.269 54.64-50.939 54.64-21.442 0-36.1-14.049-44.984-26.772-8.694 12.708-22.805 26.772-42.655 26.772-35.533 0-50.135-48.266-51.681-53.77a11.366 11.366 0 0 1 21.878-6.17c2.75 9.652 14.13 37.202 29.798 37.202 16.374 0 28.892-23.644 31.985-31.928a11.372 11.372 0 0 1 10.65-7.388h.06a11.376 11.376 0 0 1 10.63 7.506c.107.286 11.965 31.815 34.314 31.815 20.864 0 28.565-35.952 28.641-36.32a11.346 11.346 0 0 1 13.358-8.94 11.361 11.361 0 0 1 8.945 13.353zm110.116-46.736a23.68 23.68 0 0 1 -31.683 10.844c-.47-.23-47.472-23.116-103.572-40.31a23.69 23.69 0 0 1 -15.708-29.583 23.67 23.67 0 0 1 29.578-15.703c59.848 18.34 108.498 42.061 110.551 43.065a23.68 23.68 0 0 1 10.834 31.687z"/><path d="m849.92 51.2h-675.84c-67.866 0-122.88 55.014-122.88 122.88v675.84c0 67.87 55.014 122.88 122.88 122.88h675.84c67.87 0 122.88-55.01 122.88-122.88v-675.84c0-67.86-55.01-122.88-122.88-122.88zm-36.603 627.45c-2.626 44.58-21.821 78.634-55.516 98.49-25.682 15.134-54.175 19.486-81.137 21.938-32.455 2.95-92.718 6.098-164.664 6.119-71.941-.02-132.209-3.164-164.664-6.119-26.962-2.452-55.455-6.804-81.132-21.939-33.695-19.855-52.89-53.903-55.51-98.483-4.706-80.133-10.574-179.855.194-262.108 10.654-81.383 70.102-104.976 100.612-106.168a2482.642 2482.642 0 0 1 81.423-4.086c-7.536-8.535-19.88-23.322-28.815-38.114-13.737-22.737 8.53-41.687 8.53-41.687s23.68-20.367 44.528 5.213c15.698 19.266 38.38 55.997 48.62 72.954l53.207-.215c13.26 0 26.332.072 39.22.215 10.24-16.957 32.92-53.683 48.619-72.954 20.843-25.58 44.528-5.213 44.528-5.213s22.262 18.95 8.525 41.687c-8.934 14.792-21.279 29.579-28.815 38.114 28.36.978 55.562 2.34 81.423 4.08 30.515 1.198 89.958 24.791 100.613 106.174 10.778 82.248 4.915 181.97.21 262.103z"/></g></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/00lllooolll00'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg width="2500" height="2432" viewBox="0 0 256 249" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet"><g fill="#161614"><path d="M127.505 0C57.095 0 0 57.085 0 127.505c0 56.336 36.534 104.13 87.196 120.99 6.372 1.18 8.712-2.766 8.712-6.134 0-3.04-.119-13.085-.173-23.739-35.473 7.713-42.958-15.044-42.958-15.044-5.8-14.738-14.157-18.656-14.157-18.656-11.568-7.914.872-7.752.872-7.752 12.804.9 19.546 13.14 19.546 13.14 11.372 19.493 29.828 13.857 37.104 10.6 1.144-8.242 4.449-13.866 8.095-17.05-28.32-3.225-58.092-14.158-58.092-63.014 0-13.92 4.981-25.295 13.138-34.224-1.324-3.212-5.688-16.18 1.235-33.743 0 0 10.707-3.427 35.073 13.07 10.17-2.826 21.078-4.242 31.914-4.29 10.836.048 21.752 1.464 31.942 4.29 24.337-16.497 35.029-13.07 35.029-13.07 6.94 17.563 2.574 30.531 1.25 33.743 8.175 8.929 13.122 20.303 13.122 34.224 0 48.972-29.828 59.756-58.22 62.912 4.573 3.957 8.648 11.717 8.648 23.612 0 17.06-.148 30.791-.148 34.991 0 3.393 2.295 7.369 8.759 6.117 50.634-16.879 87.122-64.656 87.122-120.973C255.009 57.085 197.922 0 127.505 0"/><path d="M47.755 181.634c-.28.633-1.278.823-2.185.389-.925-.416-1.445-1.28-1.145-1.916.275-.652 1.273-.834 2.196-.396.927.415 1.455 1.287 1.134 1.923M54.027 187.23c-.608.564-1.797.302-2.604-.589-.834-.889-.99-2.077-.373-2.65.627-.563 1.78-.3 2.616.59.834.899.996 2.08.36 2.65M58.33 194.39c-.782.543-2.06.034-2.849-1.1-.781-1.133-.781-2.493.017-3.038.792-.545 2.05-.055 2.85 1.07.78 1.153.78 2.513-.019 3.069M65.606 202.683c-.699.77-2.187.564-3.277-.488-1.114-1.028-1.425-2.487-.724-3.258.707-.772 2.204-.555 3.302.488 1.107 1.026 1.445 2.496.7 3.258M75.01 205.483c-.307.998-1.741 1.452-3.185 1.028-1.442-.437-2.386-1.607-2.095-2.616.3-1.005 1.74-1.478 3.195-1.024 1.44.435 2.386 1.596 2.086 2.612M85.714 206.67c.036 1.052-1.189 1.924-2.705 1.943-1.525.033-2.758-.818-2.774-1.852 0-1.062 1.197-1.926 2.721-1.951 1.516-.03 2.758.815 2.758 1.86M96.228 206.267c.182 1.026-.872 2.08-2.377 2.36-1.48.27-2.85-.363-3.039-1.38-.184-1.052.89-2.105 2.367-2.378 1.508-.262 2.857.355 3.049 1.398"/></g></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#arm架构的msppsp双堆栈指针">ARM架构的MSP、PSP双堆栈指针</a>
+      <ol>
+        <li><a href="#线程模式">线程模式</a></li>
+        <li><a href="#处理模式">处理模式</a></li>
+      </ol>
+    </li>
+    <li><a href="#arm架构中的通用寄存器与arm汇编基础语法">ARM架构中的通用寄存器与ARM汇编基础语法</a>
+      <ol>
+        <li><a href="#通用寄存器">通用寄存器</a>
+          <ol>
+            <li><a href="#r0--r12">R0 — R12</a></li>
+            <li><a href="#r13-栈顶指针-spstack-pointer">R13 栈顶指针 SP（<em>Stack Pointer</em>）</a></li>
+            <li><a href="#r14-链接指针-lr-link-register">R14 链接指针 LR （<em>Link Register</em>）</a></li>
+            <li><a href="#r15-程序计数器-pc-promgram-counter">R15 程序计数器 PC （<em>Promgram Counter</em>）</a></li>
+            <li><a href="#寄存器的命名">寄存器的命名</a></li>
+          </ol>
+        </li>
+        <li><a href="#arm汇编">ARM汇编</a>
+          <ol>
+            <li><a href="#通用寄存器的访问r0-r12lrpc">通用寄存器的访问（R0-R12、LR、PC）</a></li>
+            <li><a href="#特殊功能寄存器的访问mrsmsr">特殊功能寄存器的访问：<code>MRS</code>/<code>MSR</code></a></li>
+            <li><a href="#栈操作指令">栈操作指令</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+            
+                
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/">
+                <img src="/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/GeminiCover_hu_3c3ede1e20d5fc01.png"
+                        srcset="/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/GeminiCover_hu_3c3ede1e20d5fc01.png 800w, /p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/GeminiCover_hu_c9d9fba7c4e215ee.png 1600w"
+                        width="800" 
+                        height="800" 
+                        loading="lazy"
+                        alt="Featured image of post 协程调度器" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+        <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="background-color: #2a9d8f; color: #fff;" >
+            嵌入式
+        </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/">协程调度器</a>
+        </h2>
+
+        
+        <h3 class="article-subtitle">
+            从0开始写一个适用于CortexM的协程调度器
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    
+    
+    <footer class="article-time">
+        
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+            <time class="article-time--published">2025年9月18日</time>
+        </div>
+        
+
+        
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+            <time class="article-time--reading">
+                阅读时长: 8 分钟
+            </time>
+        </div>
+        
+
+        
+        <div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M5 16L4 20L8 19L19.5858 7.41421C20.3668 6.63316 20.3668 5.36683 19.5858 4.58579L19.4142 4.41421C18.6332 3.63316 17.3668 3.63317 16.5858 4.41421L5 16Z" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M15 6L18 9" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13 20H21" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+            <time class="article-time--updated" datetime=" 2025-09-18T00:00:00.000Z">
+                2025年9月18日
+            </time>
+        </div>
+        
+    </footer>
+    
+
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1准备工作">1、准备工作
+</h1><h2 id="arm架构的msppsp双堆栈指针">ARM架构的MSP、PSP双堆栈指针
+</h2><p>在Cortex-M架构中，<strong>MSP（<em>Main Stack Pointer</em>）主栈指针</strong>，和<strong>PSP（<em>Process Stack Pointer</em>）进程栈指针</strong>，是两套独立的栈指针，主要是用来将从<strong>操作系统的内核调度</strong>和<strong>用户的任务私有栈</strong>分开；可以用来稳步构建多任务系统，比如我们这里想要实现的协程调度器。</p>
+<p>在开始之前，还要引入ARM架构的一个重要的内容：<strong>线程模式（<em>Thread Mode</em>）</strong>、<strong>处理模式（<em>Hanlder Mode</em>）</strong>。两者是本质是通过<strong>权限划分</strong>和<strong>功能隔离</strong>，来让调度器内核和用户任务安全共存。</p>
+<p>关于权限和栈指针选择的部分，又涉及到了<code>CONTROL</code>寄存器，所以我们要先讲讲该寄存器。对于<code>CONTROL</code>寄存器，我们这里只需要关注<code>CONTROL[0]</code>和<code>CONTROL[1]</code>，如下图所示：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250918123404303.png">
+<img src="./index.assets/image-20250918123404303.png" alt="image-20250918123404303"  />
+</a>
+</div>
+
+</p>
+<p><code>CONTROL[0]</code>（<em>nPRIV</em>）是设置<strong>线程模下</strong>的权限模式的：**当这一位为0的时候（默认为0），在线程模式下是特权模式，为1的时候是非特权模式。**对于在处理模式下，<strong>处理器总是处于权限模式</strong>。</p>
+<p><code>CONTROL[1]</code>（<em>SPSEL</em>）是设置使用哪个指针的：<strong>当这一位为0（默认为0）的时候，线程模式下会操作MSP指针，为1的时候会操作PSP指针</strong>；对于处理器模式下，<strong>这一位永远是0，并且尝试在写这一位操作的时候，该操作会被忽略。</strong></p>
+<hr>
+<h3 id="线程模式">线程模式
+</h3><p>线程模式，顾名思义就是一个用来给用户任务使用的一个普通模式，可以配置权限等级，<strong>非权限模式下只能访问自己私有栈和自己的用户内存</strong>。主要用来运行用户的任务；**系统复位之后默认进入这个模式、异常返回后也是默认回到这个模式。**同时根据上面的论述，该模式下两种栈指针都可以使用，只需要配置相关的寄存器即可。</p>
+<hr>
+<h3 id="处理模式">处理模式
+</h3><p>这个模式主要用于运行<strong>中断服务函数</strong>和**内核调度（PendSV）**的部分，<strong>当发生中断或者异常的时候，就会进入这个模式</strong>，处理模式下，<strong>强制使用MSP指针（为了和用户任务栈区分开来），并且固定为特权模式</strong>，有权访问所有的CPU资源。</p>
+<hr>
+<p>下面这张图可以很清晰的表示上述的关系：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250918125919514.png">
+<img src="./index.assets/image-20250918125919514.png" alt="image-20250918125919514"  />
+</a>
+</div>
+
+</p>
+<p>这张图可以展示线程模式下在两种特权模式的切换：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250918130055495.png">
+<img src="./index.assets/image-20250918130055495.png" alt="image-20250918130055495"  />
+</a>
+</div>
+
+</p>
+<hr>
+<h2 id="arm架构中的通用寄存器与arm汇编基础语法">ARM架构中的通用寄存器与ARM汇编基础语法
+</h2><p>在 ARM Cortex-M 架构（如 M3/M4/M7）上实现协程调度器，核心依赖与 <strong>上下文切换、堆栈操作、异常处理</strong> 相关的 ARM 汇编语法（Thumb-2 指令集，Cortex-M 强制要求）。所以我们还需要了解一些ARM寄存器和我们将要用到的ARM汇编语法。</p>
+<hr>
+<h3 id="通用寄存器">通用寄存器
+</h3><p>和其他的处理器一样，Cortex-M系列的处理器有很多的寄存器，对于我们想要实现一个协程调度器，我们目前需要先了解常见的通用寄存器。</p>
+<p>在Cortex-M中，<strong>绝大多数的寄存器都会被组合在一个单元之中</strong>，这个单元就叫做<strong>寄存器组(<em>register bank</em>)</strong>。在ARM架构中，如果想要处理一个存储在内存中的一个数据，<strong>需要将该数据从内存中装载到bank中的寄存器中，然后再寄存器中处理数据，之后如果有需要的话，又把数据返回到内存里面</strong>。在实际中，当CPU处理其他数的时候，一个寄存器组可以短时间暂存很多的变量，而不需要每次使用都更新到系统内存并且重新处理。</p>
+<p>在CortexM3/4的架构中，寄存器组拥有16个寄存器，其中有13个寄存器是通用寄存器，其他三个为特殊功能寄存器，如下图所示：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250918131418694.png">
+<img src="./index.assets/image-20250918131418694.png" alt="image-20250918131418694"  />
+</a>
+</div>
+
+</p>
+<hr>
+<h4 id="r0--r12">R0 — R12
+</h4><p>对于R0到R12这13个寄存器，我们称之为<strong>通用寄存器（<em>general purpose registers</em>）</strong>。同时，对于前8个寄存器(R0 — R7)，又称之为<strong>低位寄存器（<em>low registers</em>）</strong>，之后的五个就叫做<strong>高位寄存器（<em>high registers</em>）</strong>。由于指令集的空间有限，大多数16为的指令只能操作低位寄存器；而高位寄存器可以被32位的指令和部分的16位指令操作，比如**<code>MOV</code>**指令。值得注意的是：<strong>R0到R12的初始化的值是不确定的。</strong></p>
+<hr>
+<h4 id="r13-栈顶指针-spstack-pointer">R13 栈顶指针 SP（<em>Stack Pointer</em>）
+</h4><p>R13就是栈顶指针，被用来操控栈中的内存，使用**<code>PUSH</code><strong>和</strong><code>POP</code>**指令。物理上，存在有两个不同的指针MSP和PSP。<strong>当系统重启或者系统处于处理模式的时候，默认使用MSP指针</strong>。而PSP只能在线程模式下使用；但是同一时间只能存在一种指针。</p>
+<p>**MSP和PSP都是32位的指针，但是他们的最低的两位始终是0，并且对于这两位的写操作会被忽略。**在CortexM中，<code>PUSH</code>和<code>POP</code>都是一个32位的，并且传输操作中的地址必须对其32位的边界。</p>
+<p>大多数不适用操作系统的时候，我们不会使用到PSP指针；这种场景下完全可以只依赖MSP指针。在我们的预期中，每一个协程任务都需要有一个自己的任务栈，需要与内核隔离开，所以我们要引入PSP指针。</p>
+<hr>
+<h4 id="r14-链接指针-lr-link-register">R14 链接指针 LR （<em>Link Register</em>）
+</h4><p>R14作为链接指针，通常用于存储在调用函数或者子线程之后的返回地址（<strong>注意不是返回值的地址！是调用完函数之后程序需要回到的地址</strong>）。在一个函数或者子线程的调用结束之后，程序会返回到调用函数的位置然后通过将LR的值装在到PC中来回到程序的执行；当我们调用一个函数或者子线程之后，<strong>LR的值会自动立刻更新</strong>。<strong>如果涉及到在函数中调用另一个函数，则需要先将LR的值存储到栈中，然后再次更新，以此来避免当前的LR的值丢失</strong>。</p>
+<p>即使大多数时候，CortexM的返回地址都是偶数，LR的第0位也是可以读写的。比如一些调用操作要求LR的第0位设置为1来指示 **Thumb（ARM的一种指令集）**的状态。</p>
+<hr>
+<h4 id="r15-程序计数器-pc-promgram-counter">R15 程序计数器 PC （<em>Promgram Counter</em>）
+</h4><p>PC是可以读写的：<strong>读取到的值代表当前指令的地址再加上4</strong>，这是由于ARM采用了三级流水线模式：<strong>取值—译码—执行</strong>；当处理器正在<strong>执行</strong>地址A的指令的时候，就已经完成了对地址A+2处的指令的<strong>译码</strong>，并且正在<strong>读取</strong>地址A+4处的指令，所以为了让PC指针永远指向下一条要读取的指令的地址，PC的值会被设置为当前指向的指令的地址+指令长度：</p>
+<ul>
+<li><strong>对于32位的ARM指令，每条指令占用4个字节，所以PC=当前执行指令的地址+4</strong></li>
+<li><strong>对于16位的Thumb指令，每条指令占用2个字节，所以PC=当前执行指令的地址+2</strong></li>
+</ul>
+<p>对PC指针进行写操作就是让程序跳转到某个地方。</p>
+<p>由于指令必须对齐**半字（<em>Half-Word</em> 16位）**或 <strong>全字（<em>Word</em> 32位）</strong>，所以PC指针的最低位必须是0，但是有时候执行一些跳转操作的时候，我们需要手动将该位置1来指示Thumb的状态；否则，可能会触发一个错误。但是对于使用C/C++来编写代码的时候，编译器会自动帮我们处理这个过程。</p>
+<hr>
+<h4 id="寄存器的命名">寄存器的命名
+</h4><p>在多数的ARM汇编工具中，我们可以使用下表的名字来代表一个寄存器：</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250918140827807.png">
+<img src="./index.assets/image-20250918140827807.png" alt="image-20250918140827807"  />
+</a>
+</div>
+
+</p>
+<hr>
+<h3 id="arm汇编">ARM汇编
+</h3><p>协程调度的本质是 “保存 / 恢复任务的寄存器状态”，需熟练操作通用寄存器、特殊功能寄存器（如 <code>MSP/PSP</code>、<code>CONTROL</code>、<code>xPSR</code>）。</p>
+<hr>
+<h4 id="通用寄存器的访问r0-r12lrpc">通用寄存器的访问（R0-R12、LR、PC）
+</h4><p>对于通用寄存器，我们可以直接使用寄存器的名称来临时存储数据、参数传递（<strong>遵循 ARM AAPCS 规范：R0-R3 传前 4 个参数，R4-R11 需手动保存</strong>），比如下面这个例子就是将当前任务保存到栈中：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl">STMDB <span class="err">R0!</span>, <span class="err">{R4-R11}</span>  <span class="c1">; 将 R4-R11 寄存器值压入 R0 指向的栈（R0 是 PSP 指针）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>LDMIA <span class="err">R0!</span>, <span class="err">{R4-R11}</span>  <span class="c1">; 从 R0 指向的栈中弹出值，恢复到 R4-R11 寄存器
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h4 id="特殊功能寄存器的访问mrsmsr">特殊功能寄存器的访问：<code>MRS</code>/<code>MSR</code>
+</h4><p>Cortex-M 的特殊寄存器（如 MSP、PSP、CONTROL、xPSR）无法通过普通指令访问，必须使用 <strong><code>MRS</code>（读特殊寄存器）</strong> 和 <strong><code>MSR</code>（写特殊寄存器）</strong>，这是调度器操作堆栈指针和处理器模式的核心。</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>指令</th>
+          <th>功能</th>
+          <th>例子</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>MRS Rd, SFR</code></td>
+          <td>将特殊寄存器（SFR）的值读入通用寄存器 Rd</td>
+          <td><code>MRS R0, PSP</code> // 读取当前 PSP（进程栈指针）的值到 R0，用于保存任务栈顶到 TCB</td>
+      </tr>
+      <tr>
+          <td><code>MSR SFR, Rs</code></td>
+          <td>将通用寄存器 Rs 的值写入特殊寄存器（SFR）</td>
+          <td><code>MSR PSP, R0</code> // 将 R0（新任务的栈顶指针）写入 PSP，为恢复任务上下文做准备</td>
+      </tr>
+  </tbody>
+</table></div>
+<p><strong>常见的特殊寄存器：</strong></p>
+<ul>
+<li><code>PSP</code>：进程栈指针（用户私有栈）</li>
+<li><code>MSP</code>：主栈指针 （内核 / 中断栈）</li>
+<li><code>CONTROL</code>：控制寄存器（配置线程模式权限、栈指针选择）</li>
+<li><code>xPSR</code>：程序状态寄存器（标记 Thumb 模式、中断状态等）</li>
+</ul>
+<p>示例</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl">MOV <span class="err">R0</span>, #<span class="mh">0x02</span>        <span class="c1">; CONTROL[1] = 1（线程模式使用 PSP）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>MSR <span class="err">CONTROL</span>, <span class="err">R0</span>      <span class="c1">; 将 R0 的值写入 CONTROL 寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>ISB                  <span class="c1">; 指令同步屏障，确保配置立即生效（Cortex-M 必需）
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h4 id="栈操作指令">栈操作指令
+</h4><p>协程的上下文保存在任务私有栈中，而 Cortex-M 采用 <strong>满递减栈（Full Descending Stack）</strong>（栈顶指向最后一个已压入的数据，栈向低地址增长），需使用配套的栈操作指令。</p>
+<h5 id="1-多寄存器压栈--出栈stmdbldmia">1. 多寄存器压栈 / 出栈：<code>STMDB/LDMIA</code>
+</h5><p>这是上下文保存 / 恢复的 “主力指令”，一次性操作多个寄存器（如 R4-R11），效率远高于单寄存器指令。</p>
+<ul>
+<li><strong><code>STMDB Rd!, {寄存器列表}</code></strong>：
+<ul>
+<li><strong><code>STM</code>（<em>Store Multiple</em>）：多寄存器存储——压栈</strong></li>
+<li><strong><code>DB</code>（<em>Decrement Before</em>）：每次压栈前都将栈指针<code>Rd</code>减去4（其实就是指向下一个内存中的位置）</strong></li>
+<li><strong><code>!</code>（<em>Write Back</em>）:操作之后更新栈指针(<code>Rd</code>)到栈中</strong></li>
+</ul>
+</li>
+</ul>
+<p>示例（保存 R4-R11 到 PSP 指向的任务栈）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl">MRS <span class="err">R0</span>, <span class="err">PSP</span>          <span class="c1">; R0 = 当前任务的栈指针（PSP）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>STMDB <span class="err">R0!</span>, <span class="err">{R4-R11}</span>  <span class="c1">; 压栈 R4-R11到PSP指向的内存，栈指针 R0 自动递减（每次减4，共减 8*4=32）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>				     <span class="c1">; !R0 将最后一次存储操作之后的地址写回R0 让R0始终指向最新的栈顶位置
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>STR <span class="err">R0</span>, <span class="err">[R1]</span>         <span class="c1">; 将更新后的栈指针（新栈顶）保存到 TCB 的 SP 成员
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong><code>LDMIA Rd!, {寄存器列表}</code></strong>：
+<ul>
+<li><strong><code>LDM</code>（<em>Load Multiple</em>）：多寄存器加载——出栈</strong>；</li>
+<li><strong><code>IA</code>（<em>Increment After</em>）：出栈后将栈指针（<code>Rd</code>）加 4；</strong></li>
+<li><strong><code>!</code>（<em>Write-Back</em>）：操作后更新栈指针（<code>Rd</code>）为新地址。</strong></li>
+</ul>
+</li>
+</ul>
+<p>示例（从新任务的栈中恢复 R4-R11）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl">LDR <span class="err">R0</span>, <span class="err">[R1]</span>         <span class="c1">; R0 = 新任务 TCB 中的栈顶指针（SP）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>LDMIA <span class="err">R0!</span>, <span class="err">{R4-R11}</span>  <span class="c1">; 出栈 R4-R11，栈指针 R0 自动递增
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>					 <span class="c1">; !R0 将最后一次存储操作之后的地址写回R0 让R0始终指向最新的栈顶位置
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>MSR <span class="err">PSP</span>, <span class="err">R0</span>          <span class="c1">; 将新栈指针写入 PSP，完成栈切换
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E8%B0%83%E5%BA%A6%E5%99%A8/">调度器</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    
+
+
+</footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+	const mainArticleElement = document.querySelector(".main-article");
+        renderMathInElement(mainArticleElement, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/unnamed.087fa36b37c50005a092b4c21f07e780_hu_9984d159d1800aa6.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 任务调度器新版"
+                        data-key="新任务调度器" 
+                        data-hash="md5-CH&#43;jazfFAAWgkrTCHwfngA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">任务调度器新版</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/gd25q40e/">
+        
+        
+            <div class="article-image">
+                <img src="/p/gd25q40e/pic2.0b31f81dea2fe410f95fea09ce0513ad_hu_15a6fe78f23e68c0.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post GD25Q40E驱动"
+                        data-key="gd25q40e" 
+                        data-hash="md5-CzH4Heov5BD5X&#43;oJzgUTrQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">GD25Q40E驱动</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/hwt101%E9%99%80%E8%9E%BA%E4%BB%AA/">
+        
+        
+            <div class="article-image">
+                <img src="/p/hwt101%E9%99%80%E8%9E%BA%E4%BB%AA/HWT101.6f528cd6ac6e962656f14c1d92f2712a_hu_21edc3bbce63fe98.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post HWT101 驱动"
+                        data-key="hwt101陀螺仪" 
+                        data-hash="md5-b1KM1qxuliZW8UwdkvJxKg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">HWT101 驱动</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/oled-dma%E6%96%B9%E6%A1%88/">
+        
+        
+            <div class="article-image">
+                <img src="/p/oled-dma%E6%96%B9%E6%A1%88/OLED.a7a945a68953a65c27e2ff4070c10fbf_hu_c32fb198071860fb.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post OLED DMA高刷驱动"
+                        data-key="oled dma方案" 
+                        data-hash="md5-p6lFpolTplwn4v9AcMEPvw==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">OLED DMA高刷驱动</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E4%B8%B2%E5%8F%A3/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E4%B8%B2%E5%8F%A3/pic3.e123d956b72f67e4ee9f1e06e0516d44_hu_d38f7587d474ba18.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 串口格式化发送&#43;环形缓冲区"
+                        data-key="串口" 
+                        data-hash="md5-4SPZVrcvZ&#43;Tunx4G4FFtRA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">串口格式化发送&#43;环形缓冲区</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="00lllooolll00/blog_public"
+    data-repo-id="R_kgDOPhv8YA"
+    data-category="General"
+    data-category-id="DIC_kwDOPhv8YM4Cuegh"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="en"
+    data-loading=""
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <section class="count_info">
+    <div>
+        本博客已稳定运行
+        <span id="ds" class="running-days"></span>
+        天
+        <span id="hs" class="running-days"></span>
+        小时
+        <span id="ms" class="running-days"></span>
+        分钟
+    </div>
+    <div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        共发表 11 篇文章 · 总计 198.01 k 字
+    </div>
+    <div>
+        
+        
+
+        最近一次更新时间：<span id="last-commit-time">2025-09-18 17:28</span>
+    </div>
+</section>
+
+
+<script>
+    let s1 = '2025-8-21'; 
+    s1 = new Date(s1.replace(/-/g, "/"));
+    let s2 = new Date();
+    let timeDifference = s2.getTime() - s1.getTime();
+
+    let days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    let hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    let minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+    document.getElementById('ds').innerHTML = days;
+    document.getElementById('hs').innerHTML = hours;
+    document.getElementById('ms').innerHTML = minutes;
+
+</script>
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script><script type="text/javascript" src="/ts/custom.1ad88f4a81a60653bbc89a62cd05504b28b028154b3f3e0f3354d66a9464e625.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+<style>
+    #backTopBtn {
+        display: none;
+         
+        position: fixed;
+         
+         
+        bottom: 30px;
+         
+        right: 400px;
+         
+         
+        z-index: 99;
+         
+        cursor: pointer;
+         
+         
+        width: 60px;
+         
+        height: 60px;
+         
+         
+        background-image: url(/icons/backTop.svg);
+     
+    background-size: contain;
+     
+    background-repeat: no-repeat;
+     
+    background-position: center;
+     
+    border-radius: 50%;
+     
+    background-color: rgba(255, 255, 255, 0.8);
+     
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+     
+     
+    will-change: transform;
+    transition: transform 0.3s ease-in-out,
+    opacity 0.3s ease-in-out;
+     
+    }
+
+     
+    @media screen and (max-width: 768px) {
+        #backTopBtn {
+            right: 20px;
+             
+            bottom: 20px;
+             
+            width: 50px;
+             
+            height: 50px;
+             
+        }
+    }
+
+     
+    #backTopBtn:hover {
+        transform: rotate(360deg);
+         
+        background-color: rgba(255, 255, 255, 1);
+         
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        
+        
+        let articleContent = document.querySelector(".main-article") ||
+            document.querySelector(".article-content") ||
+            document.querySelector(".post-content");
+        let isHomePage = document.querySelector(".article-list");
+
+        if (!articleContent || isHomePage) {
+            return; 
+        }
+        
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";        
+        btn.onclick = backToTop;      
+        document.body.appendChild(btn); 
+
+        
+        window.onscroll = function () {
+            
+            let scrollTop = window.pageYOffset ||
+                document.documentElement.scrollTop ||
+                document.body.scrollTop || 0;
+
+             
+            
+            
+            if (scrollTop > 200) {
+                btn.style.display = "block";  
+            } else {
+                btn.style.display = "none";   
+            }
+             
+        };
+    }
+
+    
+
+    function backToTop() {
+        
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    
+    document.addEventListener('DOMContentLoaded', initScrollTop);
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+    $(document).ready(function () {
+        
+        $('.article-content img').each(function () {
+            var $img = $(this);
+            var src = $img.attr('src');
+
+            
+            $img.wrap('<a href="' + src + '" data-fancybox="gallery" data-caption="' + ($img.attr('alt') || '') + '"></a>');
+        });
+
+        
+        $('[data-fancybox]').fancybox({
+            buttons: [
+                'zoom',
+                'slideShow',
+                'fullScreen',
+                'download',
+                'close'
+            ],
+            loop: true,
+            protect: true
+        });
+    });
+</script>
+
+
+
+
+<style>
+     
+    #live2d-widget {
+        position: fixed;
+        bottom: 80px;
+         
+        left: 20px;
+         
+        z-index: 999;
+         
+        font-size: 0;
+        transition: all 0.5s ease-in-out;
+        opacity: 0;
+         
+        transform: translateY(20px) scale(0.8);
+         
+        pointer-events: none;
+         
+    }
+
+     
+    #live2d-widget.loaded {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+     
+    @media screen and (min-width: 1920px) {
+        #live2d-widget {
+            transform: scale(0.8);
+            transform-origin: bottom left;
+            left: 25px;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.8);
+        }
+    }
+
+    @media screen and (max-width: 1440px) {
+        #live2d-widget {
+            transform: scale(0.9);
+            transform-origin: bottom left;
+            left: 18px;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.9);
+        }
+    }
+
+    @media screen and (max-width: 1200px) {
+        #live2d-widget {
+            transform: scale(0.8);
+            transform-origin: bottom left;
+            left: 15px;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.8);
+        }
+    }
+
+    @media screen and (max-width: 1024px) {
+        #live2d-widget {
+            transform: scale(0.7);
+            left: 12px;
+            bottom: 70px;
+            transform-origin: bottom left;
+        }
+
+        #live2d-widget.loaded {
+            transform: translateY(0) scale(0.7);
+        }
+    }
+
+     
+    @media screen and (max-width: 768px) {
+        #live2d-widget {
+            display: none !important;
+        }
+    }
+
+     
+    @media screen and (min-width: 3000px) {
+        #live2d-widget {
+            display: none !important;
+        }
+    }
+
+     
+    #waifu {
+        position: fixed;
+        bottom: 80px;
+        left: 20px;
+        z-index: 999;
+        font-size: 0;
+        transition: all 0.5s ease-in-out;
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+        pointer-events: none;
+    }
+
+    #waifu.loaded {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+     
+    #live2d-message {
+        position: fixed;
+        bottom: 250px;
+        left: 20px;
+        background: linear-gradient(135deg, #ff69b4, #ff1493);
+        border: 2px solid #fff;
+        border-radius: 15px;
+        padding: 10px 15px;
+        font-size: 14px;
+        color: white;
+        max-width: 200px;
+        z-index: 9999;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+    }
+
+     
+    #live2d canvas {
+        cursor: pointer !important;
+    }
+
+    canvas[id*="live2d"] {
+        cursor: pointer !important;
+    }
+
+     
+    #live2d-message::after {
+        content: '';
+        position: absolute;
+        right: -10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-left: 10px solid #ff1493;
+    }
+
+    #live2d-message.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+
+
+<script>
+    
+    window.live2d_settings = {
+        
+        modelId: 0,                    
+        modelTexturesId: 0,            
+
+        
+        showToolMenu: true,            
+        canCloseLive2d: true,          
+        canSwitchModel: true,          
+        canSwitchTextures: true,       
+
+        
+        showWelcomeMessage: true,      
+
+        
+        waifuSize: '280x250',          
+        waifuMinWidth: '768px',        
+        waifuDraggable: 'axis-x',      
+
+        
+        welcomeMessage: '欢迎来到N1ntyNine99的博客！',
+        clickMessages: [
+            '你好呀！欢迎访问博客~',
+            '今天过得怎么样呢？',
+            '要不要看看最新的文章？',
+            '记得多喝水哦！',
+            '学习使人快乐！',
+            '代码改变世界！',
+            '写代码要注意休息眼睛哦~',
+            '有什么问题可以在评论区留言~',
+            '技术分享让世界更美好！',
+            '保持好奇心，持续学习！',
+            '每一行代码都是艺术品~',
+            '调试是程序员的必修课！',
+            '开源精神值得敬佩！',
+            '算法优化永无止境~',
+            '团队协作很重要哦！',
+            '文档写得好，维护没烦恼~',
+            '测试驱动开发很棒！',
+            '重构让代码更优雅~',
+            '安全编程不能忽视！',
+            '持续集成提高效率！'
+        ]
+    };
+</script>
+
+
+<script src="https://fastly.jsdelivr.net/npm/live2d-widget@3.x/lib/L2Dwidget.min.js"></script>
+<script>
+    
+    L2Dwidget.init({
+        "model": {
+            
+            "jsonPath": "https://unpkg.com/live2d-widget-model-hijiki@1.0.5/assets/hijiki.model.json",
+            "scale": 1.3
+        },
+        "display": {
+            "position": "left",
+            "width": 150,
+            "height": 300,
+            "hOffset": 150,
+            "vOffset": 20
+        },
+        "mobile": {
+            "show": false,              
+            "scale": 0.8
+        },
+        "react": {
+            "opacityDefault": 0.8,
+            "opacityOnHover": 1.0
+        },
+        "log": false,
+        "pluginJsPath": "lib/",
+        "pluginModelPath": "assets/",
+        "tagMode": false,
+        "debug": false
+    });
+</script>
+
+
+<div id="live2d-message"></div>
+
+
+<script>
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Live2D Widget loaded without interaction features');
+
+        
+        function waitForLive2DAndShow() {
+            const widget = document.getElementById('live2d-widget') || document.querySelector('#live2d-widget');
+            const canvas = document.querySelector('canvas');
+
+            if (canvas && canvas.parentElement) {
+                
+                const container = canvas.parentElement;
+                if (!container.id) {
+                    container.id = 'live2d-widget';
+                }
+
+                
+                setTimeout(() => {
+                    container.classList.add('loaded');
+                    console.log('Live2D widget fade-in animation started');
+                }, 1000); 
+
+            } else {
+                
+                setTimeout(waitForLive2DAndShow, 500);
+            }
+        }
+
+        
+        setTimeout(waitForLive2DAndShow, 2000);
+
+        
+        let resizeTimer;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                const widget = document.getElementById('live2d-widget') || document.querySelector('canvas')?.parentElement;
+                if (widget) {
+                    
+                    const viewportWidth = window.innerWidth;
+
+                    
+                    if (viewportWidth > 768 && viewportWidth < 3000) {
+                        widget.classList.add('loaded');
+                    }
+
+                    console.log('Live2D widget responsive adjustment applied, viewport width:', viewportWidth);
+                }
+            }, 250);
+        });
+
+        
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                
+                setTimeout(() => {
+                    const widget = document.getElementById('live2d-widget') || document.querySelector('canvas')?.parentElement;
+                    if (widget && window.innerWidth > 768 && window.innerWidth < 3000) {
+                        widget.classList.add('loaded');
+                    }
+                }, 500);
+            }
+        });
+    });
+</script>
+
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const loadingOverlay = document.getElementById('page-loading');
+                const mainContent = document.getElementById('main-content');
+                
+                
+                mainContent.style.opacity = '0';
+                mainContent.style.transform = 'translateY(20px)';
+                
+                
+                setTimeout(function() {
+                    
+                    loadingOverlay.style.opacity = '0';
+                    loadingOverlay.style.visibility = 'hidden';
+                    
+                    
+                    mainContent.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateY(0)';
+                    
+                    
+                    setTimeout(function() {
+                        loadingOverlay.remove();
+                    }, 600);
+                }, 800); 
+            });
+        </script>
+    </body>
+</html>

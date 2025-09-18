@@ -7,6 +7,215 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>© 2025 N1ntyNine99. 保留所有权利。</copyright><atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>协程调度器</title>
+        <link>https://example.com/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/</link>
+        <pubDate>Thu, 18 Sep 2025 00:00:00 +0800</pubDate>
+        
+        <guid>https://example.com/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/</guid>
+        <description>&lt;img src="https://example.com/p/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8/GeminiCover.png" alt="Featured image of post 协程调度器" /&gt;&lt;h1 id=&#34;1准备工作&#34;&gt;1、准备工作
+&lt;/h1&gt;&lt;h2 id=&#34;arm架构的msppsp双堆栈指针&#34;&gt;ARM架构的MSP、PSP双堆栈指针
+&lt;/h2&gt;&lt;p&gt;在Cortex-M架构中，&lt;strong&gt;MSP（&lt;em&gt;Main Stack Pointer&lt;/em&gt;）主栈指针&lt;/strong&gt;，和&lt;strong&gt;PSP（&lt;em&gt;Process Stack Pointer&lt;/em&gt;）进程栈指针&lt;/strong&gt;，是两套独立的栈指针，主要是用来将从&lt;strong&gt;操作系统的内核调度&lt;/strong&gt;和&lt;strong&gt;用户的任务私有栈&lt;/strong&gt;分开；可以用来稳步构建多任务系统，比如我们这里想要实现的协程调度器。&lt;/p&gt;
+&lt;p&gt;在开始之前，还要引入ARM架构的一个重要的内容：&lt;strong&gt;线程模式（&lt;em&gt;Thread Mode&lt;/em&gt;）&lt;/strong&gt;、&lt;strong&gt;处理模式（&lt;em&gt;Hanlder Mode&lt;/em&gt;）&lt;/strong&gt;。两者是本质是通过&lt;strong&gt;权限划分&lt;/strong&gt;和&lt;strong&gt;功能隔离&lt;/strong&gt;，来让调度器内核和用户任务安全共存。&lt;/p&gt;
+&lt;p&gt;关于权限和栈指针选择的部分，又涉及到了&lt;code&gt;CONTROL&lt;/code&gt;寄存器，所以我们要先讲讲该寄存器。对于&lt;code&gt;CONTROL&lt;/code&gt;寄存器，我们这里只需要关注&lt;code&gt;CONTROL[0]&lt;/code&gt;和&lt;code&gt;CONTROL[1]&lt;/code&gt;，如下图所示：&lt;/p&gt;
+&lt;p&gt;
+&lt;div class=&#34;post-img-view&#34;&gt;
+&lt;a data-fancybox=&#34;gallery&#34; href=&#34;./index.assets/image-20250918123404303.png&#34;&gt;
+&lt;img src=&#34;./index.assets/image-20250918123404303.png&#34; alt=&#34;image-20250918123404303&#34;  /&gt;
+&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;CONTROL[0]&lt;/code&gt;（&lt;em&gt;nPRIV&lt;/em&gt;）是设置&lt;strong&gt;线程模下&lt;/strong&gt;的权限模式的：**当这一位为0的时候（默认为0），在线程模式下是特权模式，为1的时候是非特权模式。**对于在处理模式下，&lt;strong&gt;处理器总是处于权限模式&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;CONTROL[1]&lt;/code&gt;（&lt;em&gt;SPSEL&lt;/em&gt;）是设置使用哪个指针的：&lt;strong&gt;当这一位为0（默认为0）的时候，线程模式下会操作MSP指针，为1的时候会操作PSP指针&lt;/strong&gt;；对于处理器模式下，&lt;strong&gt;这一位永远是0，并且尝试在写这一位操作的时候，该操作会被忽略。&lt;/strong&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;线程模式&#34;&gt;线程模式
+&lt;/h3&gt;&lt;p&gt;线程模式，顾名思义就是一个用来给用户任务使用的一个普通模式，可以配置权限等级，&lt;strong&gt;非权限模式下只能访问自己私有栈和自己的用户内存&lt;/strong&gt;。主要用来运行用户的任务；**系统复位之后默认进入这个模式、异常返回后也是默认回到这个模式。**同时根据上面的论述，该模式下两种栈指针都可以使用，只需要配置相关的寄存器即可。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;处理模式&#34;&gt;处理模式
+&lt;/h3&gt;&lt;p&gt;这个模式主要用于运行&lt;strong&gt;中断服务函数&lt;/strong&gt;和**内核调度（PendSV）**的部分，&lt;strong&gt;当发生中断或者异常的时候，就会进入这个模式&lt;/strong&gt;，处理模式下，&lt;strong&gt;强制使用MSP指针（为了和用户任务栈区分开来），并且固定为特权模式&lt;/strong&gt;，有权访问所有的CPU资源。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;下面这张图可以很清晰的表示上述的关系：&lt;/p&gt;
+&lt;p&gt;
+&lt;div class=&#34;post-img-view&#34;&gt;
+&lt;a data-fancybox=&#34;gallery&#34; href=&#34;./index.assets/image-20250918125919514.png&#34;&gt;
+&lt;img src=&#34;./index.assets/image-20250918125919514.png&#34; alt=&#34;image-20250918125919514&#34;  /&gt;
+&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;/p&gt;
+&lt;p&gt;这张图可以展示线程模式下在两种特权模式的切换：&lt;/p&gt;
+&lt;p&gt;
+&lt;div class=&#34;post-img-view&#34;&gt;
+&lt;a data-fancybox=&#34;gallery&#34; href=&#34;./index.assets/image-20250918130055495.png&#34;&gt;
+&lt;img src=&#34;./index.assets/image-20250918130055495.png&#34; alt=&#34;image-20250918130055495&#34;  /&gt;
+&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;arm架构中的通用寄存器与arm汇编基础语法&#34;&gt;ARM架构中的通用寄存器与ARM汇编基础语法
+&lt;/h2&gt;&lt;p&gt;在 ARM Cortex-M 架构（如 M3/M4/M7）上实现协程调度器，核心依赖与 &lt;strong&gt;上下文切换、堆栈操作、异常处理&lt;/strong&gt; 相关的 ARM 汇编语法（Thumb-2 指令集，Cortex-M 强制要求）。所以我们还需要了解一些ARM寄存器和我们将要用到的ARM汇编语法。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;通用寄存器&#34;&gt;通用寄存器
+&lt;/h3&gt;&lt;p&gt;和其他的处理器一样，Cortex-M系列的处理器有很多的寄存器，对于我们想要实现一个协程调度器，我们目前需要先了解常见的通用寄存器。&lt;/p&gt;
+&lt;p&gt;在Cortex-M中，&lt;strong&gt;绝大多数的寄存器都会被组合在一个单元之中&lt;/strong&gt;，这个单元就叫做&lt;strong&gt;寄存器组(&lt;em&gt;register bank&lt;/em&gt;)&lt;/strong&gt;。在ARM架构中，如果想要处理一个存储在内存中的一个数据，&lt;strong&gt;需要将该数据从内存中装载到bank中的寄存器中，然后再寄存器中处理数据，之后如果有需要的话，又把数据返回到内存里面&lt;/strong&gt;。在实际中，当CPU处理其他数的时候，一个寄存器组可以短时间暂存很多的变量，而不需要每次使用都更新到系统内存并且重新处理。&lt;/p&gt;
+&lt;p&gt;在CortexM3/4的架构中，寄存器组拥有16个寄存器，其中有13个寄存器是通用寄存器，其他三个为特殊功能寄存器，如下图所示：&lt;/p&gt;
+&lt;p&gt;
+&lt;div class=&#34;post-img-view&#34;&gt;
+&lt;a data-fancybox=&#34;gallery&#34; href=&#34;./index.assets/image-20250918131418694.png&#34;&gt;
+&lt;img src=&#34;./index.assets/image-20250918131418694.png&#34; alt=&#34;image-20250918131418694&#34;  /&gt;
+&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;r0--r12&#34;&gt;R0 — R12
+&lt;/h4&gt;&lt;p&gt;对于R0到R12这13个寄存器，我们称之为&lt;strong&gt;通用寄存器（&lt;em&gt;general purpose registers&lt;/em&gt;）&lt;/strong&gt;。同时，对于前8个寄存器(R0 — R7)，又称之为&lt;strong&gt;低位寄存器（&lt;em&gt;low registers&lt;/em&gt;）&lt;/strong&gt;，之后的五个就叫做&lt;strong&gt;高位寄存器（&lt;em&gt;high registers&lt;/em&gt;）&lt;/strong&gt;。由于指令集的空间有限，大多数16为的指令只能操作低位寄存器；而高位寄存器可以被32位的指令和部分的16位指令操作，比如**&lt;code&gt;MOV&lt;/code&gt;**指令。值得注意的是：&lt;strong&gt;R0到R12的初始化的值是不确定的。&lt;/strong&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;r13-栈顶指针-spstack-pointer&#34;&gt;R13 栈顶指针 SP（&lt;em&gt;Stack Pointer&lt;/em&gt;）
+&lt;/h4&gt;&lt;p&gt;R13就是栈顶指针，被用来操控栈中的内存，使用**&lt;code&gt;PUSH&lt;/code&gt;&lt;strong&gt;和&lt;/strong&gt;&lt;code&gt;POP&lt;/code&gt;**指令。物理上，存在有两个不同的指针MSP和PSP。&lt;strong&gt;当系统重启或者系统处于处理模式的时候，默认使用MSP指针&lt;/strong&gt;。而PSP只能在线程模式下使用；但是同一时间只能存在一种指针。&lt;/p&gt;
+&lt;p&gt;**MSP和PSP都是32位的指针，但是他们的最低的两位始终是0，并且对于这两位的写操作会被忽略。**在CortexM中，&lt;code&gt;PUSH&lt;/code&gt;和&lt;code&gt;POP&lt;/code&gt;都是一个32位的，并且传输操作中的地址必须对其32位的边界。&lt;/p&gt;
+&lt;p&gt;大多数不适用操作系统的时候，我们不会使用到PSP指针；这种场景下完全可以只依赖MSP指针。在我们的预期中，每一个协程任务都需要有一个自己的任务栈，需要与内核隔离开，所以我们要引入PSP指针。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;r14-链接指针-lr-link-register&#34;&gt;R14 链接指针 LR （&lt;em&gt;Link Register&lt;/em&gt;）
+&lt;/h4&gt;&lt;p&gt;R14作为链接指针，通常用于存储在调用函数或者子线程之后的返回地址（&lt;strong&gt;注意不是返回值的地址！是调用完函数之后程序需要回到的地址&lt;/strong&gt;）。在一个函数或者子线程的调用结束之后，程序会返回到调用函数的位置然后通过将LR的值装在到PC中来回到程序的执行；当我们调用一个函数或者子线程之后，&lt;strong&gt;LR的值会自动立刻更新&lt;/strong&gt;。&lt;strong&gt;如果涉及到在函数中调用另一个函数，则需要先将LR的值存储到栈中，然后再次更新，以此来避免当前的LR的值丢失&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;即使大多数时候，CortexM的返回地址都是偶数，LR的第0位也是可以读写的。比如一些调用操作要求LR的第0位设置为1来指示 **Thumb（ARM的一种指令集）**的状态。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;r15-程序计数器-pc-promgram-counter&#34;&gt;R15 程序计数器 PC （&lt;em&gt;Promgram Counter&lt;/em&gt;）
+&lt;/h4&gt;&lt;p&gt;PC是可以读写的：&lt;strong&gt;读取到的值代表当前指令的地址再加上4&lt;/strong&gt;，这是由于ARM采用了三级流水线模式：&lt;strong&gt;取值—译码—执行&lt;/strong&gt;；当处理器正在&lt;strong&gt;执行&lt;/strong&gt;地址A的指令的时候，就已经完成了对地址A+2处的指令的&lt;strong&gt;译码&lt;/strong&gt;，并且正在&lt;strong&gt;读取&lt;/strong&gt;地址A+4处的指令，所以为了让PC指针永远指向下一条要读取的指令的地址，PC的值会被设置为当前指向的指令的地址+指令长度：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;对于32位的ARM指令，每条指令占用4个字节，所以PC=当前执行指令的地址+4&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;对于16位的Thumb指令，每条指令占用2个字节，所以PC=当前执行指令的地址+2&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;对PC指针进行写操作就是让程序跳转到某个地方。&lt;/p&gt;
+&lt;p&gt;由于指令必须对齐**半字（&lt;em&gt;Half-Word&lt;/em&gt; 16位）**或 &lt;strong&gt;全字（&lt;em&gt;Word&lt;/em&gt; 32位）&lt;/strong&gt;，所以PC指针的最低位必须是0，但是有时候执行一些跳转操作的时候，我们需要手动将该位置1来指示Thumb的状态；否则，可能会触发一个错误。但是对于使用C/C++来编写代码的时候，编译器会自动帮我们处理这个过程。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;寄存器的命名&#34;&gt;寄存器的命名
+&lt;/h4&gt;&lt;p&gt;在多数的ARM汇编工具中，我们可以使用下表的名字来代表一个寄存器：&lt;/p&gt;
+&lt;p&gt;
+&lt;div class=&#34;post-img-view&#34;&gt;
+&lt;a data-fancybox=&#34;gallery&#34; href=&#34;./index.assets/image-20250918140827807.png&#34;&gt;
+&lt;img src=&#34;./index.assets/image-20250918140827807.png&#34; alt=&#34;image-20250918140827807&#34;  /&gt;
+&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;arm汇编&#34;&gt;ARM汇编
+&lt;/h3&gt;&lt;p&gt;协程调度的本质是 “保存 / 恢复任务的寄存器状态”，需熟练操作通用寄存器、特殊功能寄存器（如 &lt;code&gt;MSP/PSP&lt;/code&gt;、&lt;code&gt;CONTROL&lt;/code&gt;、&lt;code&gt;xPSR&lt;/code&gt;）。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;通用寄存器的访问r0-r12lrpc&#34;&gt;通用寄存器的访问（R0-R12、LR、PC）
+&lt;/h4&gt;&lt;p&gt;对于通用寄存器，我们可以直接使用寄存器的名称来临时存储数据、参数传递（&lt;strong&gt;遵循 ARM AAPCS 规范：R0-R3 传前 4 个参数，R4-R11 需手动保存&lt;/strong&gt;），比如下面这个例子就是将当前任务保存到栈中：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-armasm&#34; data-lang=&#34;armasm&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;STMDB &lt;span class=&#34;err&#34;&gt;R0!&lt;/span&gt;, &lt;span class=&#34;err&#34;&gt;{R4-R11}&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;; 将 R4-R11 寄存器值压入 R0 指向的栈（R0 是 PSP 指针）
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;LDMIA &lt;span class=&#34;err&#34;&gt;R0!&lt;/span&gt;, &lt;span class=&#34;err&#34;&gt;{R4-R11}&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;; 从 R0 指向的栈中弹出值，恢复到 R4-R11 寄存器
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;hr&gt;
+&lt;h4 id=&#34;特殊功能寄存器的访问mrsmsr&#34;&gt;特殊功能寄存器的访问：&lt;code&gt;MRS&lt;/code&gt;/&lt;code&gt;MSR&lt;/code&gt;
+&lt;/h4&gt;&lt;p&gt;Cortex-M 的特殊寄存器（如 MSP、PSP、CONTROL、xPSR）无法通过普通指令访问，必须使用 &lt;strong&gt;&lt;code&gt;MRS&lt;/code&gt;（读特殊寄存器）&lt;/strong&gt; 和 &lt;strong&gt;&lt;code&gt;MSR&lt;/code&gt;（写特殊寄存器）&lt;/strong&gt;，这是调度器操作堆栈指针和处理器模式的核心。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;指令&lt;/th&gt;
+          &lt;th&gt;功能&lt;/th&gt;
+          &lt;th&gt;例子&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;MRS Rd, SFR&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;将特殊寄存器（SFR）的值读入通用寄存器 Rd&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;MRS R0, PSP&lt;/code&gt; // 读取当前 PSP（进程栈指针）的值到 R0，用于保存任务栈顶到 TCB&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;MSR SFR, Rs&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;将通用寄存器 Rs 的值写入特殊寄存器（SFR）&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;MSR PSP, R0&lt;/code&gt; // 将 R0（新任务的栈顶指针）写入 PSP，为恢复任务上下文做准备&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;常见的特殊寄存器：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;PSP&lt;/code&gt;：进程栈指针（用户私有栈）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;MSP&lt;/code&gt;：主栈指针 （内核 / 中断栈）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CONTROL&lt;/code&gt;：控制寄存器（配置线程模式权限、栈指针选择）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;xPSR&lt;/code&gt;：程序状态寄存器（标记 Thumb 模式、中断状态等）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;示例&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-armasm&#34; data-lang=&#34;armasm&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;MOV &lt;span class=&#34;err&#34;&gt;R0&lt;/span&gt;, #&lt;span class=&#34;mh&#34;&gt;0x02&lt;/span&gt;        &lt;span class=&#34;c1&#34;&gt;; CONTROL[1] = 1（线程模式使用 PSP）
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;MSR &lt;span class=&#34;err&#34;&gt;CONTROL&lt;/span&gt;, &lt;span class=&#34;err&#34;&gt;R0&lt;/span&gt;      &lt;span class=&#34;c1&#34;&gt;; 将 R0 的值写入 CONTROL 寄存器
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;ISB                  &lt;span class=&#34;c1&#34;&gt;; 指令同步屏障，确保配置立即生效（Cortex-M 必需）
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;hr&gt;
+&lt;h4 id=&#34;栈操作指令&#34;&gt;栈操作指令
+&lt;/h4&gt;&lt;p&gt;协程的上下文保存在任务私有栈中，而 Cortex-M 采用 &lt;strong&gt;满递减栈（Full Descending Stack）&lt;/strong&gt;（栈顶指向最后一个已压入的数据，栈向低地址增长），需使用配套的栈操作指令。&lt;/p&gt;
+&lt;h5 id=&#34;1-多寄存器压栈--出栈stmdbldmia&#34;&gt;1. 多寄存器压栈 / 出栈：&lt;code&gt;STMDB/LDMIA&lt;/code&gt;
+&lt;/h5&gt;&lt;p&gt;这是上下文保存 / 恢复的 “主力指令”，一次性操作多个寄存器（如 R4-R11），效率远高于单寄存器指令。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;STMDB Rd!, {寄存器列表}&lt;/code&gt;&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;STM&lt;/code&gt;（&lt;em&gt;Store Multiple&lt;/em&gt;）：多寄存器存储——压栈&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;DB&lt;/code&gt;（&lt;em&gt;Decrement Before&lt;/em&gt;）：每次压栈前都将栈指针&lt;code&gt;Rd&lt;/code&gt;减去4（其实就是指向下一个内存中的位置）&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;!&lt;/code&gt;（&lt;em&gt;Write Back&lt;/em&gt;）:操作之后更新栈指针(&lt;code&gt;Rd&lt;/code&gt;)到栈中&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;示例（保存 R4-R11 到 PSP 指向的任务栈）：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-armasm&#34; data-lang=&#34;armasm&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;MRS &lt;span class=&#34;err&#34;&gt;R0&lt;/span&gt;, &lt;span class=&#34;err&#34;&gt;PSP&lt;/span&gt;          &lt;span class=&#34;c1&#34;&gt;; R0 = 当前任务的栈指针（PSP）
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;STMDB &lt;span class=&#34;err&#34;&gt;R0!&lt;/span&gt;, &lt;span class=&#34;err&#34;&gt;{R4-R11}&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;; 压栈 R4-R11到PSP指向的内存，栈指针 R0 自动递减（每次减4，共减 8*4=32）
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;				     &lt;span class=&#34;c1&#34;&gt;; !R0 将最后一次存储操作之后的地址写回R0 让R0始终指向最新的栈顶位置
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;STR &lt;span class=&#34;err&#34;&gt;R0&lt;/span&gt;, &lt;span class=&#34;err&#34;&gt;[R1]&lt;/span&gt;         &lt;span class=&#34;c1&#34;&gt;; 将更新后的栈指针（新栈顶）保存到 TCB 的 SP 成员
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;LDMIA Rd!, {寄存器列表}&lt;/code&gt;&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;LDM&lt;/code&gt;（&lt;em&gt;Load Multiple&lt;/em&gt;）：多寄存器加载——出栈&lt;/strong&gt;；&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;IA&lt;/code&gt;（&lt;em&gt;Increment After&lt;/em&gt;）：出栈后将栈指针（&lt;code&gt;Rd&lt;/code&gt;）加 4；&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;!&lt;/code&gt;（&lt;em&gt;Write-Back&lt;/em&gt;）：操作后更新栈指针（&lt;code&gt;Rd&lt;/code&gt;）为新地址。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;示例（从新任务的栈中恢复 R4-R11）：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-armasm&#34; data-lang=&#34;armasm&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;LDR &lt;span class=&#34;err&#34;&gt;R0&lt;/span&gt;, &lt;span class=&#34;err&#34;&gt;[R1]&lt;/span&gt;         &lt;span class=&#34;c1&#34;&gt;; R0 = 新任务 TCB 中的栈顶指针（SP）
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;LDMIA &lt;span class=&#34;err&#34;&gt;R0!&lt;/span&gt;, &lt;span class=&#34;err&#34;&gt;{R4-R11}&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;; 出栈 R4-R11，栈指针 R0 自动递增
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;					 &lt;span class=&#34;c1&#34;&gt;; !R0 将最后一次存储操作之后的地址写回R0 让R0始终指向最新的栈顶位置
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;MSR &lt;span class=&#34;err&#34;&gt;PSP&lt;/span&gt;, &lt;span class=&#34;err&#34;&gt;R0&lt;/span&gt;          &lt;span class=&#34;c1&#34;&gt;; 将新栈指针写入 PSP，完成栈切换
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        </item>
+        <item>
         <title>任务调度器新版</title>
         <link>https://example.com/p/%E6%96%B0%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/</link>
         <pubDate>Fri, 05 Sep 2025 00:00:00 +0800</pubDate>
@@ -19303,6 +19512,108 @@ A: 可能进入了错误处理死循环，检查错误代码定位问题。&lt;/
 &lt;p&gt;显然这是可行的！&lt;strong&gt;说明对于&lt;code&gt;move&lt;/code&gt;，实现了&lt;code&gt;Copy&lt;/code&gt; trait的数据类型是会复制一个副本到子线程，而不是转接所有权！&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;既然我们已经介绍了线程是什么以及threadAPI提供的方法，接下来让我们看看一些可以使用线程的场景。&lt;/p&gt;
 &lt;hr&gt;
+&lt;h2 id=&#34;162-使用消息传递message-passing在线程之间传递数据&#34;&gt;16.2 使用消息传递（&lt;em&gt;Message Passing&lt;/em&gt;）在线程之间传递数据
+&lt;/h2&gt;&lt;p&gt;“不要通过共享内存来传递让不同线程交流，而是使用交流来共享数据”；为了确保并发的安全性，我们使用消息传递——&lt;strong&gt;通过线程之间互相发送包含数据的消息来让不同线程之间交流&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;Rust的标准库提供了一套完整的消息传递机制，通过&lt;em&gt;channel&lt;/em&gt;。&lt;strong&gt;&lt;em&gt;channel&lt;/em&gt;是编程概念中的通用概念，来表示数据通过哪里来在两个线程之间传递数据&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;在消息传递中有两个部分，一个部分是&lt;strong&gt;发送方（&lt;em&gt;transmitter&lt;/em&gt;）&lt;/strong&gt;，对应的就是&lt;strong&gt;接收方（&lt;em&gt;receiver&lt;/em&gt;）&lt;/strong&gt;。顾名思义，发送方就是数据来源地，接收方就是数据接收地。&lt;/p&gt;
+&lt;p&gt;在这里，我们将编写一个程序，其中一个线程生成值并通过通道发送这些值，另一个线程接收这些值并将其打印出来。我们会使用通道在线程之间发送简单的值，以此来演示这一特性。一旦你熟悉了这种技术，就可以将通道用于任何需要相互通信的线程，比如聊天系统，或者在一个系统中，多个线程执行计算的不同部分，并将这些部分发送给一个线程，由该线程汇总结果。&lt;/p&gt;
+&lt;p&gt;如下列的代码，我们会创建一个channel，但是不做其他的任何事情。当前的代码还不能编译，因为Rust并不知道我们想要发送的信息的数据类型：&lt;/p&gt;
+&lt;p&gt;Filename: src/main.rs&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-rust&#34; data-lang=&#34;rust&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;use&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;sync&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;mpsc&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;fn&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(){&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;mpsc&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;channel&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;我们使用&lt;code&gt;mpsc::channel&lt;/code&gt;函数创建一个新通道；&lt;code&gt;mpsc&lt;/code&gt;代表多生产者、单消费者（&lt;em&gt;multiple producer single consumer&lt;/em&gt;）&lt;/strong&gt;。简而言之，Rust标准库实现通道的方式意味着一个通道可以有多个用于生成值的发送端，但只有一个用于消费这些值的接收端。想象一下，多条溪流汇聚成一条大河：任何一条溪流中流下的所有东西最终都会汇入同一条河。现在我们先从单个生产者开始，但当这个示例能正常运行时，我们会添加多个生产者。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;mpsc::channel&lt;/code&gt; 函数会返回一个元组，其中第一个元素是发送端——发送者，第二个元素是接收端——接收者&lt;/strong&gt;。在许多领域中，缩写 &lt;code&gt;tx&lt;/code&gt; 和 &lt;code&gt;rx&lt;/code&gt; 传统上分别用于表示 &lt;strong&gt;&lt;em&gt;发送器&lt;/em&gt; 和 &lt;em&gt;接收器&lt;/em&gt;&lt;/strong&gt;，因此我们也用这样的名称来命名变量，以表明各自的端。我们使用带有解构元组模式的 &lt;code&gt;let&lt;/code&gt; 语句；我们将在第 19 章讨论 &lt;code&gt;let&lt;/code&gt; 语句中模式的使用和解构。目前，只需知道以这种方式使用 &lt;code&gt;let&lt;/code&gt; 语句是提取 &lt;code&gt;mpsc::channel&lt;/code&gt; 返回的元组各部分的便捷方法。&lt;/p&gt;
+&lt;p&gt;让我们把发送端移到一个生成的线程中，并让它发送一个字符串，这样生成的线程就能与主线程进行通信：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-rust&#34; data-lang=&#34;rust&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;use&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;sync&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;mpsc&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;use&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;fn&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;mpsc&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;channel&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;thread&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;spawn&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;move&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;||&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;val&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;String&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;from&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;hi&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;send&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;val&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;).&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;unwrap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;我们先使用&lt;code&gt;thread::spawn&lt;/code&gt;创建了一个线程，然后使用&lt;code&gt;move&lt;/code&gt;将&lt;code&gt;tx&lt;/code&gt;的所有权移动到当前的子线程中，再在子线程中调用&lt;code&gt;send&lt;/code&gt;将数据发送出去，由于&lt;code&gt;send&lt;/code&gt;的返回值是&lt;code&gt;Result&amp;lt;T,E&amp;gt;&lt;/code&gt;；所以如果接收方已经被释放，或者没有接收方的时候，就会出现错误。在这里，我们只是简单的使用&lt;code&gt;unwrap&lt;/code&gt;来在错误的时候让程序panic。&lt;/p&gt;
+&lt;p&gt;接下来，我们让主线程就作为接收端，接收到消息然后打印出来：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-rust&#34; data-lang=&#34;rust&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;use&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;sync&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;mpsc&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;use&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;fn&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;mpsc&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;channel&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;thread&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;spawn&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;move&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;||&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;val&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;String&lt;/span&gt;::&lt;span class=&#34;n&#34;&gt;from&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;hi&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;send&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;val&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;).&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;unwrap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;let&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;received&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;recv&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;unwrap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;fm&#34;&gt;println!&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Got:&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{received}&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;对于接收方，有两种方式接收消息，一种是我们这里的&lt;code&gt;recv()&lt;/code&gt;（&lt;em&gt;receive&lt;/em&gt;的简写），&lt;strong&gt;该方法是阻塞式的，会一直等待接收到了数据才会往后执行，当发送方发送一个值，它会返回一个&lt;code&gt;Result&amp;lt;T,E&amp;gt;&lt;/code&gt;的数据类型，当发送方结束了线程还没接收到数据，他就会返回一个错误&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;另外一种就是&lt;code&gt;try_recv()&lt;/code&gt;不会阻塞，&lt;strong&gt;而是会立刻返回一个&lt;code&gt;Result&amp;lt;T,E&amp;gt;&lt;/code&gt;：如果此时有消息则会返回&lt;code&gt;Ok&lt;/code&gt; ，&lt;code&gt;OK&lt;/code&gt;会持有消息的值，如果此时没有任何消息则会返回一个&lt;code&gt;Err&lt;/code&gt;的值&lt;/strong&gt;。这种非阻塞的接收很适用于一个线程不仅需要接受数据还需要有其他的功能；我们可以编写一个循环，每隔一段时间调用一次&lt;code&gt;try_recv&lt;/code&gt;，如果有消息的话就进行处理，否则就先做一会儿其他工作，之后再重新检查。&lt;/p&gt;
+&lt;p&gt;在这个示例中，我们使用&lt;code&gt;recv&lt;/code&gt;是为了简洁起见；主线程除了等待消息外没有其他工作要做，因此阻塞主线程是合适的。&lt;/p&gt;
+&lt;p&gt;运行这个代码就可以看见：&lt;/p&gt;
+&lt;p&gt;
+&lt;div class=&#34;post-img-view&#34;&gt;
+&lt;a data-fancybox=&#34;gallery&#34; href=&#34;./index.assets/image-20250912182515719.png&#34;&gt;
+&lt;img src=&#34;./index.assets/image-20250912182515719.png&#34; alt=&#34;image-20250912182515719&#34;  /&gt;
+&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;/p&gt;
 </description>
         </item>
         <item>
