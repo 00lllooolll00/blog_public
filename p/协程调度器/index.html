@@ -264,13 +264,13 @@
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
-    <li><a href="#arm架构的msppsp双堆栈指针">ARM架构的MSP、PSP双堆栈指针</a>
+    <li><a href="#arm-架构的-msppsp-双堆栈指针">ARM 架构的 MSP、PSP 双堆栈指针</a>
       <ol>
         <li><a href="#线程模式">线程模式</a></li>
         <li><a href="#处理模式">处理模式</a></li>
       </ol>
     </li>
-    <li><a href="#arm架构中的通用寄存器与arm汇编基础语法">ARM架构中的通用寄存器与ARM汇编基础语法</a>
+    <li><a href="#arm-架构中的通用寄存器与-arm-汇编基础语法">ARM 架构中的通用寄存器与 ARM 汇编基础语法</a>
       <ol>
         <li><a href="#通用寄存器">通用寄存器</a>
           <ol>
@@ -281,15 +281,23 @@
             <li><a href="#寄存器的命名">寄存器的命名</a></li>
           </ol>
         </li>
-        <li><a href="#arm汇编">ARM汇编</a>
+        <li><a href="#arm-汇编">ARM 汇编</a>
           <ol>
             <li><a href="#通用寄存器的访问r0-r12lrpc">通用寄存器的访问（R0-R12、LR、PC）</a></li>
             <li><a href="#特殊功能寄存器的访问mrsmsr">特殊功能寄存器的访问：<code>MRS</code>/<code>MSR</code></a></li>
             <li><a href="#栈操作指令">栈操作指令</a></li>
+            <li><a href="#异常处理与返回指令">异常处理与返回指令</a></li>
+            <li><a href="#内存访问">内存访问</a></li>
+            <li><a href="#其他指令">其他指令</a></li>
           </ol>
         </li>
       </ol>
     </li>
+    <li><a href="#在c语言中如何使用汇编">在C语言中如何使用汇编</a></li>
+  </ol>
+
+  <ol>
+    <li><a href="#任务控制块">任务控制块</a></li>
   </ol>
 </nav>
         </div>
@@ -376,7 +384,7 @@
 
 
             <time class="article-time--reading">
-                阅读时长: 8 分钟
+                阅读时长: 13 分钟
             </time>
         </div>
         
@@ -404,10 +412,10 @@
     
     
     <h1 id="1准备工作">1、准备工作
-</h1><h2 id="arm架构的msppsp双堆栈指针">ARM架构的MSP、PSP双堆栈指针
-</h2><p>在Cortex-M架构中，<strong>MSP（<em>Main Stack Pointer</em>）主栈指针</strong>，和<strong>PSP（<em>Process Stack Pointer</em>）进程栈指针</strong>，是两套独立的栈指针，主要是用来将从<strong>操作系统的内核调度</strong>和<strong>用户的任务私有栈</strong>分开；可以用来稳步构建多任务系统，比如我们这里想要实现的协程调度器。</p>
-<p>在开始之前，还要引入ARM架构的一个重要的内容：<strong>线程模式（<em>Thread Mode</em>）</strong>、<strong>处理模式（<em>Hanlder Mode</em>）</strong>。两者是本质是通过<strong>权限划分</strong>和<strong>功能隔离</strong>，来让调度器内核和用户任务安全共存。</p>
-<p>关于权限和栈指针选择的部分，又涉及到了<code>CONTROL</code>寄存器，所以我们要先讲讲该寄存器。对于<code>CONTROL</code>寄存器，我们这里只需要关注<code>CONTROL[0]</code>和<code>CONTROL[1]</code>，如下图所示：</p>
+</h1><h2 id="arm-架构的-msppsp-双堆栈指针">ARM 架构的 MSP、PSP 双堆栈指针
+</h2><p>在 Cortex-M 架构中，<strong>MSP（<em>Main Stack Pointer</em>）主栈指针</strong>，和 <strong>PSP（<em>Process Stack Pointer</em>）进程栈指针</strong>，是两套独立的栈指针，主要是用来将从 <strong>操作系统的内核调度</strong> 和 <strong>用户的任务私有栈</strong> 分开；可以用来稳步构建多任务系统，比如我们这里想要实现的协程调度器。</p>
+<p>在开始之前，还要引入 ARM 架构的一个重要的内容：<strong>线程模式（<em>Thread Mode</em>）</strong>、<strong>处理模式（<em>Hanlder Mode</em>）</strong>。两者是本质是通过 <strong>权限划分</strong> 和 <strong>功能隔离</strong>，来让调度器内核和用户任务安全共存。</p>
+<p>关于权限和栈指针选择的部分，又涉及到了 <code>CONTROL</code> 寄存器，所以我们要先讲讲该寄存器。对于 <code>CONTROL</code> 寄存器，我们这里只需要关注 <code>CONTROL[0]</code> 和 <code>CONTROL[1]</code>，如下图所示：</p>
 <p>
 <div class="post-img-view">
 <a data-fancybox="gallery" href="./index.assets/image-20250918123404303.png">
@@ -416,14 +424,14 @@
 </div>
 
 </p>
-<p><code>CONTROL[0]</code>（<em>nPRIV</em>）是设置<strong>线程模下</strong>的权限模式的：**当这一位为0的时候（默认为0），在线程模式下是特权模式，为1的时候是非特权模式。**对于在处理模式下，<strong>处理器总是处于权限模式</strong>。</p>
-<p><code>CONTROL[1]</code>（<em>SPSEL</em>）是设置使用哪个指针的：<strong>当这一位为0（默认为0）的时候，线程模式下会操作MSP指针，为1的时候会操作PSP指针</strong>；对于处理器模式下，<strong>这一位永远是0，并且尝试在写这一位操作的时候，该操作会被忽略。</strong></p>
+<p><code>CONTROL[0]</code>（<em>nPRIV</em>）是设置 <strong>线程模下</strong> 的权限模式的：<strong>当这一位为 0 的时候（默认为 0），在线程模式下是特权模式，为 1 的时候是非特权模式。</strong> 对于在处理模式下，<strong>处理器总是处于权限模式</strong>。</p>
+<p><code>CONTROL[1]</code>（<em>SPSEL</em>）是设置使用哪个指针的：<strong>当这一位为 0（默认为 0）的时候，线程模式下会操作 MSP 指针，为 1 的时候会操作 PSP 指针</strong>；对于处理器模式下，<strong>这一位永远是 0，并且尝试在写这一位操作的时候，该操作会被忽略。</strong></p>
 <hr>
 <h3 id="线程模式">线程模式
-</h3><p>线程模式，顾名思义就是一个用来给用户任务使用的一个普通模式，可以配置权限等级，<strong>非权限模式下只能访问自己私有栈和自己的用户内存</strong>。主要用来运行用户的任务；**系统复位之后默认进入这个模式、异常返回后也是默认回到这个模式。**同时根据上面的论述，该模式下两种栈指针都可以使用，只需要配置相关的寄存器即可。</p>
+</h3><p>线程模式，顾名思义就是一个用来给用户任务使用的一个普通模式，可以配置权限等级，<strong>非权限模式下只能访问自己私有栈和自己的用户内存</strong>。主要用来运行用户的任务；<strong>系统复位之后默认进入这个模式、异常返回后也是默认回到这个模式。</strong> 同时根据上面的论述，该模式下两种栈指针都可以使用，只需要配置相关的寄存器即可。</p>
 <hr>
 <h3 id="处理模式">处理模式
-</h3><p>这个模式主要用于运行<strong>中断服务函数</strong>和**内核调度（PendSV）**的部分，<strong>当发生中断或者异常的时候，就会进入这个模式</strong>，处理模式下，<strong>强制使用MSP指针（为了和用户任务栈区分开来），并且固定为特权模式</strong>，有权访问所有的CPU资源。</p>
+</h3><p>这个模式主要用于运行 <strong>中断服务函数</strong> 和 <strong>内核调度（PendSV）</strong> 的部分，<strong>当发生中断或者异常的时候，就会进入这个模式</strong>，处理模式下，<strong>强制使用 MSP 指针（为了和用户任务栈区分开来），并且固定为特权模式</strong>，有权访问所有的 CPU 资源。</p>
 <hr>
 <p>下面这张图可以很清晰的表示上述的关系：</p>
 <p>
@@ -444,13 +452,13 @@
 
 </p>
 <hr>
-<h2 id="arm架构中的通用寄存器与arm汇编基础语法">ARM架构中的通用寄存器与ARM汇编基础语法
-</h2><p>在 ARM Cortex-M 架构（如 M3/M4/M7）上实现协程调度器，核心依赖与 <strong>上下文切换、堆栈操作、异常处理</strong> 相关的 ARM 汇编语法（Thumb-2 指令集，Cortex-M 强制要求）。所以我们还需要了解一些ARM寄存器和我们将要用到的ARM汇编语法。</p>
+<h2 id="arm-架构中的通用寄存器与-arm-汇编基础语法">ARM 架构中的通用寄存器与 ARM 汇编基础语法
+</h2><p>在 ARM Cortex-M 架构（如 M3/M4/M7）上实现协程调度器，核心依赖与 <strong>上下文切换、堆栈操作、异常处理</strong> 相关的 ARM 汇编语法（Thumb-2 指令集，Cortex-M 强制要求）。所以我们还需要了解一些 ARM 寄存器和我们将要用到的 ARM 汇编语法。</p>
 <hr>
 <h3 id="通用寄存器">通用寄存器
-</h3><p>和其他的处理器一样，Cortex-M系列的处理器有很多的寄存器，对于我们想要实现一个协程调度器，我们目前需要先了解常见的通用寄存器。</p>
-<p>在Cortex-M中，<strong>绝大多数的寄存器都会被组合在一个单元之中</strong>，这个单元就叫做<strong>寄存器组(<em>register bank</em>)</strong>。在ARM架构中，如果想要处理一个存储在内存中的一个数据，<strong>需要将该数据从内存中装载到bank中的寄存器中，然后再寄存器中处理数据，之后如果有需要的话，又把数据返回到内存里面</strong>。在实际中，当CPU处理其他数的时候，一个寄存器组可以短时间暂存很多的变量，而不需要每次使用都更新到系统内存并且重新处理。</p>
-<p>在CortexM3/4的架构中，寄存器组拥有16个寄存器，其中有13个寄存器是通用寄存器，其他三个为特殊功能寄存器，如下图所示：</p>
+</h3><p>和其他的处理器一样，Cortex-M 系列的处理器有很多的寄存器，对于我们想要实现一个协程调度器，我们目前需要先了解常见的通用寄存器。</p>
+<p>在 Cortex-M 中，<strong>绝大多数的寄存器都会被组合在一个单元之中</strong>，这个单元就叫做 <strong>寄存器组(<em>register bank</em>)</strong>。在 ARM 架构中，如果想要处理一个存储在内存中的一个数据，<strong>需要将该数据从内存中装载到 bank 中的寄存器中，然后再寄存器中处理数据，之后如果有需要的话，又把数据返回到内存里面</strong>。在实际中，当 CPU 处理其他数的时候，一个寄存器组可以短时间暂存很多的变量，而不需要每次使用都更新到系统内存并且重新处理。</p>
+<p>在 CortexM3/4 的架构中，寄存器组拥有 16 个寄存器，其中有 13 个寄存器是通用寄存器，其他三个为特殊功能寄存器，如下图所示：</p>
 <p>
 <div class="post-img-view">
 <a data-fancybox="gallery" href="./index.assets/image-20250918131418694.png">
@@ -461,28 +469,28 @@
 </p>
 <hr>
 <h4 id="r0--r12">R0 — R12
-</h4><p>对于R0到R12这13个寄存器，我们称之为<strong>通用寄存器（<em>general purpose registers</em>）</strong>。同时，对于前8个寄存器(R0 — R7)，又称之为<strong>低位寄存器（<em>low registers</em>）</strong>，之后的五个就叫做<strong>高位寄存器（<em>high registers</em>）</strong>。由于指令集的空间有限，大多数16为的指令只能操作低位寄存器；而高位寄存器可以被32位的指令和部分的16位指令操作，比如**<code>MOV</code>**指令。值得注意的是：<strong>R0到R12的初始化的值是不确定的。</strong></p>
+</h4><p>对于 R0 到 R12 这 13 个寄存器，我们称之为 <strong>通用寄存器（<em>general purpose registers</em>）</strong>。同时，对于前 8 个寄存器(R0 — R7)，又称之为 <strong>低位寄存器（<em>low registers</em>）</strong>，之后的五个就叫做 <strong>高位寄存器（<em>high registers</em>）</strong>。由于指令集的空间有限，大多数 16 为的指令只能操作低位寄存器；而高位寄存器可以被 32 位的指令和部分的 16 位指令操作，比如 <strong><code>MOV</code></strong> 指令。值得注意的是：<strong>R0 到 R12 的初始化的值是不确定的。</strong></p>
 <hr>
 <h4 id="r13-栈顶指针-spstack-pointer">R13 栈顶指针 SP（<em>Stack Pointer</em>）
-</h4><p>R13就是栈顶指针，被用来操控栈中的内存，使用**<code>PUSH</code><strong>和</strong><code>POP</code>**指令。物理上，存在有两个不同的指针MSP和PSP。<strong>当系统重启或者系统处于处理模式的时候，默认使用MSP指针</strong>。而PSP只能在线程模式下使用；但是同一时间只能存在一种指针。</p>
-<p>**MSP和PSP都是32位的指针，但是他们的最低的两位始终是0，并且对于这两位的写操作会被忽略。**在CortexM中，<code>PUSH</code>和<code>POP</code>都是一个32位的，并且传输操作中的地址必须对其32位的边界。</p>
-<p>大多数不适用操作系统的时候，我们不会使用到PSP指针；这种场景下完全可以只依赖MSP指针。在我们的预期中，每一个协程任务都需要有一个自己的任务栈，需要与内核隔离开，所以我们要引入PSP指针。</p>
+</h4><p>R13 就是栈顶指针，被用来操控栈中的内存，使用 <strong><code>PUSH</code></strong> 和 <strong><code>POP</code></strong> 指令。物理上，存在有两个不同的指针 MSP 和 PSP。<strong>当系统重启或者系统处于处理模式的时候，默认使用 MSP 指针</strong>。而 PSP 只能在线程模式下使用；但是同一时间只能存在一种指针。</p>
+<p><strong>MSP 和 PSP 都是 32 位的指针，但是他们的最低的两位始终是 0，并且对于这两位的写操作会被忽略。</strong> 在 CortexM 中，<code>PUSH</code> 和 <code>POP</code> 都是一个 32 位的，并且传输操作中的地址必须对其 32 位的边界。</p>
+<p>大多数不适用操作系统的时候，我们不会使用到 PSP 指针；这种场景下完全可以只依赖 MSP 指针。在我们的预期中，每一个协程任务都需要有一个自己的任务栈，需要与内核隔离开，所以我们要引入 PSP 指针。</p>
 <hr>
 <h4 id="r14-链接指针-lr-link-register">R14 链接指针 LR （<em>Link Register</em>）
-</h4><p>R14作为链接指针，通常用于存储在调用函数或者子线程之后的返回地址（<strong>注意不是返回值的地址！是调用完函数之后程序需要回到的地址</strong>）。在一个函数或者子线程的调用结束之后，程序会返回到调用函数的位置然后通过将LR的值装在到PC中来回到程序的执行；当我们调用一个函数或者子线程之后，<strong>LR的值会自动立刻更新</strong>。<strong>如果涉及到在函数中调用另一个函数，则需要先将LR的值存储到栈中，然后再次更新，以此来避免当前的LR的值丢失</strong>。</p>
-<p>即使大多数时候，CortexM的返回地址都是偶数，LR的第0位也是可以读写的。比如一些调用操作要求LR的第0位设置为1来指示 **Thumb（ARM的一种指令集）**的状态。</p>
+</h4><p>R14 作为链接指针，通常用于存储在调用函数或者子线程之后的返回地址（<strong>注意不是返回值的地址！是调用完函数之后程序需要回到的地址</strong>）。在一个函数或者子线程的调用结束之后，程序会返回到调用函数的位置然后通过将 LR 的值装在到 PC 中来回到程序的执行；当我们调用一个函数或者子线程之后，<strong>LR 的值会自动立刻更新</strong>。<strong>如果涉及到在函数中调用另一个函数，则需要先将 LR 的值存储到栈中，然后再次更新，以此来避免当前的 LR 的值丢失</strong>。</p>
+<p>即使大多数时候，CortexM 的返回地址都是偶数，LR 的第 0 位也是可以读写的。比如一些调用操作要求 LR 的第 0 位设置为 1 来指示 <strong>Thumb（ARM 的一种指令集）</strong> 的状态。</p>
 <hr>
 <h4 id="r15-程序计数器-pc-promgram-counter">R15 程序计数器 PC （<em>Promgram Counter</em>）
-</h4><p>PC是可以读写的：<strong>读取到的值代表当前指令的地址再加上4</strong>，这是由于ARM采用了三级流水线模式：<strong>取值—译码—执行</strong>；当处理器正在<strong>执行</strong>地址A的指令的时候，就已经完成了对地址A+2处的指令的<strong>译码</strong>，并且正在<strong>读取</strong>地址A+4处的指令，所以为了让PC指针永远指向下一条要读取的指令的地址，PC的值会被设置为当前指向的指令的地址+指令长度：</p>
+</h4><p>PC 是可以读写的：<strong>读取到的值代表当前指令的地址再加上 4</strong>，这是由于 ARM 采用了三级流水线模式：<strong>取值—译码—执行</strong>；当处理器正在 <strong>执行</strong> 地址 A 的指令的时候，就已经完成了对地址 A+2 处的指令的 <strong>译码</strong>，并且正在 <strong>读取</strong> 地址 A+4 处的指令，所以为了让 PC 指针永远指向下一条要读取的指令的地址，PC 的值会被设置为当前指向的指令的地址+指令长度：</p>
 <ul>
-<li><strong>对于32位的ARM指令，每条指令占用4个字节，所以PC=当前执行指令的地址+4</strong></li>
-<li><strong>对于16位的Thumb指令，每条指令占用2个字节，所以PC=当前执行指令的地址+2</strong></li>
+<li><strong>对于 32 位的 ARM 指令，每条指令占用 4 个字节，所以 PC = 当前执行指令的地址+4</strong></li>
+<li><strong>对于 16 位的 Thumb 指令，每条指令占用 2 个字节，所以 PC = 当前执行指令的地址+2</strong></li>
 </ul>
-<p>对PC指针进行写操作就是让程序跳转到某个地方。</p>
-<p>由于指令必须对齐**半字（<em>Half-Word</em> 16位）**或 <strong>全字（<em>Word</em> 32位）</strong>，所以PC指针的最低位必须是0，但是有时候执行一些跳转操作的时候，我们需要手动将该位置1来指示Thumb的状态；否则，可能会触发一个错误。但是对于使用C/C++来编写代码的时候，编译器会自动帮我们处理这个过程。</p>
+<p>对 PC 指针进行写操作就是让程序跳转到某个地方。</p>
+<p>由于指令必须对齐 <strong>半字（<em>Half-Word</em> 16 位）</strong> 或 <strong>全字（<em>Word</em> 32 位）</strong>，所以 PC 指针的最低位必须是 0，但是有时候执行一些跳转操作的时候，我们需要手动将该位置 1 来指示 Thumb 的状态；否则，可能会触发一个错误。但是对于使用 C/C++来编写代码的时候，编译器会自动帮我们处理这个过程。</p>
 <hr>
 <h4 id="寄存器的命名">寄存器的命名
-</h4><p>在多数的ARM汇编工具中，我们可以使用下表的名字来代表一个寄存器：</p>
+</h4><p>在多数的 ARM 汇编工具中，我们可以使用下表的名字来代表一个寄存器：</p>
 <p>
 <div class="post-img-view">
 <a data-fancybox="gallery" href="./index.assets/image-20250918140827807.png">
@@ -492,7 +500,7 @@
 
 </p>
 <hr>
-<h3 id="arm汇编">ARM汇编
+<h3 id="arm-汇编">ARM 汇编
 </h3><p>协程调度的本质是 “保存 / 恢复任务的寄存器状态”，需熟练操作通用寄存器、特殊功能寄存器（如 <code>MSP/PSP</code>、<code>CONTROL</code>、<code>xPSR</code>）。</p>
 <hr>
 <h4 id="通用寄存器的访问r0-r12lrpc">通用寄存器的访问（R0-R12、LR、PC）
@@ -554,14 +562,37 @@
 </div><hr>
 <h4 id="栈操作指令">栈操作指令
 </h4><p>协程的上下文保存在任务私有栈中，而 Cortex-M 采用 <strong>满递减栈（Full Descending Stack）</strong>（栈顶指向最后一个已压入的数据，栈向低地址增长），需使用配套的栈操作指令。</p>
-<h5 id="1-多寄存器压栈--出栈stmdbldmia">1. 多寄存器压栈 / 出栈：<code>STMDB/LDMIA</code>
+<hr>
+<h5 id="1单个寄存器的访问压栈出栈pushpop">1.单个寄存器的访问压栈/出栈：<code>PUSH</code>/<code>POP</code>
+</h5><p>用于操作少量的寄存器，语法更简洁：</p>
+<ul>
+<li><strong><code>PUSH {寄存器列表}</code>：压栈 等价于 <code>STMDB SP!,{寄存器列表}</code></strong></li>
+<li><strong><code>POP {寄存器列表}</code>：出栈等价于 <code>LDMIA SP!, {寄存器列表}</code></strong></li>
+</ul>
+<p><strong>示例</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl">PUSH <span class="err">{LR}</span>  <span class="c1">; 将 LR（返回地址）压入当前栈（处理模式下为 MSP，线程模式下为 PSP）
+</span></span></span><span class="line"><span class="cl"><span class="c1">; ... 执行核心逻辑 ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>POP <span class="err">{LR}</span>   <span class="c1">; 恢复 LR，准备函数返回
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>BX <span class="err">LR</span>      <span class="c1">; 跳回调用者
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h5 id="2-多寄存器压栈--出栈stmdbldmia">2. 多寄存器压栈 / 出栈：<code>STMDB</code>/<code>LDMIA</code>
 </h5><p>这是上下文保存 / 恢复的 “主力指令”，一次性操作多个寄存器（如 R4-R11），效率远高于单寄存器指令。</p>
 <ul>
 <li><strong><code>STMDB Rd!, {寄存器列表}</code></strong>：
 <ul>
 <li><strong><code>STM</code>（<em>Store Multiple</em>）：多寄存器存储——压栈</strong></li>
-<li><strong><code>DB</code>（<em>Decrement Before</em>）：每次压栈前都将栈指针<code>Rd</code>减去4（其实就是指向下一个内存中的位置）</strong></li>
-<li><strong><code>!</code>（<em>Write Back</em>）:操作之后更新栈指针(<code>Rd</code>)到栈中</strong></li>
+<li><strong><code>DB</code>（<em>Decrement Before</em>）：每次压栈前都将栈指针 <code>Rd</code> 减去 4（其实就是指向下一个内存中的位置）</strong></li>
+<li><strong><code>!</code>（<em>Write Back</em>）: 操作之后更新栈指针(<code>Rd</code>)到栈中</strong></li>
 </ul>
 </li>
 </ul>
@@ -576,7 +607,7 @@
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl">MRS <span class="err">R0</span>, <span class="err">PSP</span>          <span class="c1">; R0 = 当前任务的栈指针（PSP）
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>STMDB <span class="err">R0!</span>, <span class="err">{R4-R11}</span>  <span class="c1">; 压栈 R4-R11到PSP指向的内存，栈指针 R0 自动递减（每次减4，共减 8*4=32）
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>				     <span class="c1">; !R0 将最后一次存储操作之后的地址写回R0 让R0始终指向最新的栈顶位置
+</span></span></span><span class="line"><span class="cl"><span class="c1">; !R0 将最后一次存储操作之后的地址写回R0 让R0始终指向最新的栈顶位置
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>STR <span class="err">R0</span>, <span class="err">[R1]</span>         <span class="c1">; 将更新后的栈指针（新栈顶）保存到 TCB 的 SP 成员
 </span></span></span></code></pre></td></tr></table>
 </div>
@@ -600,11 +631,320 @@
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl">LDR <span class="err">R0</span>, <span class="err">[R1]</span>         <span class="c1">; R0 = 新任务 TCB 中的栈顶指针（SP）
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>LDMIA <span class="err">R0!</span>, <span class="err">{R4-R11}</span>  <span class="c1">; 出栈 R4-R11，栈指针 R0 自动递增
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>					 <span class="c1">; !R0 将最后一次存储操作之后的地址写回R0 让R0始终指向最新的栈顶位置
+</span></span></span><span class="line"><span class="cl"><span class="c1">; !R0 将最后一次存储操作之后的地址写回R0 让R0始终指向最新的栈顶位置
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>MSR <span class="err">PSP</span>, <span class="err">R0</span>          <span class="c1">; 将新栈指针写入 PSP，完成栈切换
 </span></span></span></code></pre></td></tr></table>
 </div>
+</div><hr>
+<h4 id="异常处理与返回指令">异常处理与返回指令
+</h4><p>协程调度器依赖 <code>PendSV</code> 异常实现任务切换，需掌握异常处理的汇编语法，尤其是 <strong>异常返回（<code>EXC_RETURN</code>）</strong> 机制。</p>
+<hr>
+<h5 id="1触发-pendsv-异常操作-scb--icsr-寄存器">1.触发 PendSV 异常：操作 SCB-&gt; ICSR 寄存器
+</h5><p><strong>PendSV 是 Cortex-M 专为任务调度设计的异常，需通过软件触发（写入 <code>SCB-&gt;ICSR</code> 寄存器的 <code>PENDSVSET</code> 位）</strong>。
+汇编中需先获取 <code>SCB-&gt;ICSR</code> 的地址（Cortex-M 外设地址固定，如 0xE000ED04），再通过 <code>STR</code> 指令置位。</p>
+<p>示例（触发 PendSV 异常，请求任务调度）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl">LDR <span class="err">R0</span>, =<span class="nl">0xE000ED04</span>   <span class="c1">; R0 = SCB-&gt;ICSR 寄存器地址（固定值）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>LDR <span class="err">R1</span>, =<span class="nl">0x10000000</span>   <span class="c1">; R1 = 0x10000000（PENDSVSET 位，bit28）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>STR <span class="err">R1</span>, <span class="err">[R0]</span>          <span class="c1">; 置位 PENDSVSET，触发 PendSV 异常
+</span></span></span></code></pre></td></tr></table>
 </div>
+</div><hr>
+<h5 id="2异常返回bx-与-exc_return-特殊值">2.异常返回：BX 与 EXC_RETURN 特殊值
+</h5><p>异常处理完成后（如上下文切换），需通过 <strong><code>BX</code> 指令 + <code>EXC_RETURN</code> 特殊值</strong> 触发硬件自动恢复上下文，这是协程调度的 “最后一步魔法”。</p>
+<p><code>EXC_RETURN</code> 特殊值：Cortex-M 定义的特殊返回值，高 28 位为 <code>0xF</code>，低 4 位编码返回后的模式和栈指针选择。<strong>协程调度中最常用的是 <code>0xFFFFFFFD</code>，代表着返回线程模式，启用 PSP 恢复上下文（很重要！）</strong></p>
+<p><code>BX寄存器</code> 指令：普通用法是 “跳转到寄存器指向的地址”，但如果寄存器值是 <code>EXC_RETURN</code>，会触发 <strong>异常返回序列</strong>（硬件自动完成以下操作）：</p>
+<ol>
+<li><strong>从当前栈（PSP）中弹出硬件保存的寄存器（xPSR、PC、LR、R12、R0-R3）；</strong></li>
+<li><strong>自动切换处理器模式（从处理模式切回线程模式）；</strong></li>
+<li><strong>自动切换栈指针（从 MSP 切回 PSP）。</strong></li>
+</ol>
+<p>示例（PendSV 异常处理完成后，返回线程模式运行新任务）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl">LDR <span class="err">LR</span>, =<span class="nl">0xFFFFFFFD</span>  <span class="c1">; 将 EXC_RETURN 值加载到 LR 寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>BX <span class="err">LR</span>                <span class="c1">; 触发异常返回，硬件自动恢复上下文并切换到线程模式
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h4 id="内存访问">内存访问
+</h4><p>协程调度器需操作任务的 TCB（控制块，如保存 / 读取栈指针 <code>SP</code>、任务状态等），<strong>需通过汇编指令访问内存（TCB 本质是内存中的结构体）</strong>。</p>
+<p>最常用的就是 <strong>加载（LDR）、存储指令（STR）</strong>:</p>
+<ul>
+<li><strong><code>LDR Rd, [Rn, #offset]</code>：从 <code>Rn + offset</code> 指向的内存地址，读取 32 位数据到 <code>Rd</code> 寄存器中</strong></li>
+<li><strong><code>STR Rs,[Rn, #offset]</code>：将 <code>Rs</code> 中的 32 位数据，写入 <code>Rn + offset</code> 指向的内存地址</strong></li>
+</ul>
+<p>示例（保存当前任务的栈指针到 TCB，恢复新任务的栈指针从 TCB）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl"><span class="c1">; 1. 保存当前任务的 SP 到 TCB（R1 是当前 TCB 指针）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>MRS <span class="err">R0</span>, <span class="err">PSP</span>          <span class="c1">; R0 = 当前任务的栈指针（PSP）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>STR <span class="err">R0</span>, <span class="err">[R1]</span>         <span class="c1">; 将 R0 写入 TCB 的 SP 成员（偏移量 0）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">; 2. 从新任务 TCB 读取 SP（R0 是新任务 TCB 指针）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>LDR <span class="err">R0</span>, <span class="err">[R0]</span>         <span class="c1">; R0 = 新任务的 SP 成员（偏移量 0）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>MSR <span class="err">PSP</span>, <span class="err">R0</span>          <span class="c1">; 将新 SP 写入 PSP 寄存器，完成栈切换
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h4 id="其他指令">其他指令
+</h4><h5 id="1空操作nop">1.空操作：<code>NOP</code>
+</h5><p>对于部分需要对齐的指令或延时的时候，就可以调用 <code>NOP</code>。</p>
+<p>示例（指令地址 4 字节对齐）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-armasm" data-lang="armasm"><span class="line"><span class="cl">ALIGN <span class="err">4</span>       <span class="c1">; 汇编器伪指令，确保后续指令地址是 4 的倍数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nl">PendSV_Handler</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">NOP           <span class="c1">; 可选，用于填充对齐
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>MRS <span class="err">R0</span>, <span class="err">PSP</span>   <span class="c1">; 开始处理上下文
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h5 id="2跳转指令-bxbl">2.跳转指令 <code>BX</code>/<code>BL</code>
+</h5><ul>
+<li><code>BX Rn</code>：跳转到 <code>Rn</code> 指向的地址，同时根据 <code>Rn</code> 的最低位切换指令集（Cortex-M 仅用 Thumb，最低位需为 1）；</li>
+<li><code>BL 标签</code>：跳转到 “标签” 处，并将返回地址存入 <code>LR</code>（用于调用 C 函数，如调度器的 <code>EK_Schedule</code>）。</li>
+</ul>
+<hr>
+<h2 id="在c语言中如何使用汇编">在C语言中如何使用汇编
+</h2><p>有了上述的知识之后，我们就需要考虑：我们的协程调度器，总体肯定是使用C语言编写，但是如何在C语言中使用这些汇编代码呢？</p>
+<p>对于使用GCC的场景来说，GCC是支持直接在C中嵌入一段ARM汇编的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">Function</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 内联汇编格式
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">asm</span> <span class="k">volatile</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;汇编指令1 </span><span class="se">\n\t</span><span class="s">&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;汇编指令2 </span><span class="se">\n\t</span><span class="s">&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// ... 更多指令
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="o">:</span> <span class="err">输出操作数列表（</span><span class="n">C变量</span> <span class="err">→</span> <span class="err">汇编寄存器）</span>
+</span></span><span class="line"><span class="cl">        <span class="o">:</span> <span class="err">输入操作数列表（汇编寄存器</span> <span class="err">→</span> <span class="n">C变量</span><span class="err">）</span>
+</span></span><span class="line"><span class="cl">        <span class="o">:</span> <span class="err">被修改的寄存器列表（通知编译器这些寄存器值已变）</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>注意，这里的<code>volatile</code>关键字是不能舍弃的，因为有可能编译器优化会修改这里的效果</strong>！</p>
+<p>下面的例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdint.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 读取 PSP 寄存器（进程栈指针）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">uint32_t</span> <span class="nf">read_psp</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint32_t</span> <span class="n">psp_val</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">asm</span> <span class="k">volatile</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;MRS %0, PSP </span><span class="se">\n\t</span><span class="s">&#34;</span>  <span class="c1">// 将 PSP 的值读入 %0 代表的寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="o">:</span> <span class="s">&#34;=r&#34;</span> <span class="p">(</span><span class="n">psp_val</span><span class="p">)</span>    <span class="c1">// 输出：psp_val 接收结果（= 表示只写）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="o">:</span>                   <span class="c1">// 无输入
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="o">:</span>                   <span class="c1">// 无被修改的其他寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">psp_val</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 配置 CONTROL 寄存器（线程模式使用 PSP + 非特权模式）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">configure_control</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">asm</span> <span class="k">volatile</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;MOV R0, #0x03 </span><span class="se">\n\t</span><span class="s">&#34;</span>    <span class="c1">// R0 = 0x03（CONTROL[1]=1 用 PSP，CONTROL[0]=1 非特权）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="s">&#34;MSR CONTROL, R0 </span><span class="se">\n\t</span><span class="s">&#34;</span>  <span class="c1">// 将 R0 的值写入 CONTROL 寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="s">&#34;ISB </span><span class="se">\n\t</span><span class="s">&#34;</span>              <span class="c1">// 指令同步屏障，确保配置生效
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="o">:</span> 
+</span></span><span class="line"><span class="cl">        <span class="o">:</span> 
+</span></span><span class="line"><span class="cl">        <span class="o">:</span> <span class="s">&#34;r0&#34;</span>                  <span class="c1">// 通知编译器 R0 的值已被修改
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h1 id="2相关数据结构">2、相关数据结构
+</h1><p>注意，里面有一些适用于嵌入式的通用函数和数据类型，都来源于我和左岚的的开源项目——<strong><a class="link" href="https://github.com/zuoliangyu/EmbeddedKit"  target="_blank" rel="noopener"
+    >EmbeddedKit</a></strong>。</p>
+<p>后面将会直接使用，不再提及</p>
+<h2 id="任务控制块">任务控制块
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#ifndef __KERNAL_H
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define __KERNAL_H
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;../EK_Config.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef __cplusplus
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">extern</span> <span class="s">&#34;C&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">EK_CoroFunction_t</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">);</span> <span class="c1">// 任务入口函数，支持参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">enum</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">EK_CORO_READY</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="cm">/*&lt;- 任务就绪*/</span>
+</span></span><span class="line"><span class="cl">    <span class="n">EK_CORO_BLOCKED</span><span class="p">,</span> <span class="cm">/*&lt;- 任务被阻塞*/</span>
+</span></span><span class="line"><span class="cl">    <span class="n">EK_CORO_RUNNING</span><span class="p">,</span> <span class="cm">/*&lt;- 任务运行时*/</span>
+</span></span><span class="line"><span class="cl">    <span class="n">EK_CORO_SUSPENDED</span> <span class="cm">/*&lt;- 任务被挂起*/</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">EK_CoroState_t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">EK_CoroListNode_t</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="n">EK_CoroListNode_t</span> <span class="o">*</span><span class="n">CoroNode_Next</span><span class="p">;</span> <span class="cm">/*&lt;- 指向下一个协程节点的指针*/</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="o">*</span><span class="n">CoroNode_Owner</span><span class="p">;</span> <span class="cm">/*&lt;- 指向拥有该节点的协程TCB*/</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">EK_CoroListNode_t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">EK_CoroTCB_t</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="o">*</span><span class="n">TCB_SP</span><span class="p">;</span> <span class="cm">/*&lt;- 协程的栈顶指针*/</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="o">*</span><span class="n">TCB_Arg</span><span class="p">;</span> <span class="cm">/*&lt;- 协程入口函数的参数*/</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="o">*</span><span class="n">TCB_StackBase</span><span class="p">;</span> <span class="cm">/*&lt;- 协程栈的起始地址*/</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint8_t</span> <span class="n">TCB_Priority</span><span class="p">;</span> <span class="cm">/*&lt;- 协程的优先级*/</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint32_t</span> <span class="n">TCB_DelayTicks</span><span class="p">;</span> <span class="cm">/*&lt;- 协程延时节拍数*/</span>
+</span></span><span class="line"><span class="cl">    <span class="n">EK_Size_t</span> <span class="n">TCB_StackSize</span><span class="p">;</span> <span class="cm">/*&lt;- 协程栈的大小*/</span>
+</span></span><span class="line"><span class="cl">    <span class="n">EK_CoroState_t</span> <span class="n">TCB_State</span><span class="p">;</span> <span class="cm">/*&lt;- 协程的当前状态*/</span>
+</span></span><span class="line"><span class="cl">    <span class="n">EK_CoroFunction_t</span> <span class="n">TCB_Entry</span><span class="p">;</span> <span class="cm">/*&lt;- 协程的入口函数*/</span>
+</span></span><span class="line"><span class="cl">    <span class="n">EK_CoroListNode_t</span> <span class="n">TCB_Node</span><span class="p">;</span> <span class="cm">/*&lt;- 用于将TCB链入列表的节点*/</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">EK_CoroTCB_t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">EK_CoroList_t</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">EK_CoroListNode_t</span> <span class="o">*</span><span class="n">List_Head</span><span class="p">;</span> <span class="cm">/*&lt;- 链表头指针*/</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="o">*</span><span class="n">List_Tail</span><span class="p">;</span> <span class="cm">/*&lt;- 链表尾指针*/</span>
+</span></span><span class="line"><span class="cl">    <span class="n">EK_Size_t</span> <span class="n">List_Count</span><span class="p">;</span> <span class="cm">/*&lt;- 链表中的节点数量*/</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">EK_CoroList_t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef __cplusplus
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们想要使用两条链表来处理整个任务流转，一条是就绪表、一条是等待表，然后通过下面的图片的样式来连接所有的任务块:</p>
+<p>
+<div class="post-img-view">
+<a data-fancybox="gallery" href="./index.assets/image-20250918184358342.png">
+<img src="./index.assets/image-20250918184358342.png" alt="image-20250918184358342"  />
+</a>
+</div>
+
+</p>
+
 </section>
 
 
@@ -896,13 +1236,13 @@
         
         
         
-        共发表 11 篇文章 · 总计 198.01 k 字
+        共发表 11 篇文章 · 总计 200.14 k 字
     </div>
     <div>
         
         
 
-        最近一次更新时间：<span id="last-commit-time">2025-09-18 17:28</span>
+        最近一次更新时间：<span id="last-commit-time">2025-09-18 20:24</span>
     </div>
 </section>
 
